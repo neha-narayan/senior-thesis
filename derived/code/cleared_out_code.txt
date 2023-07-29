@@ -1,0 +1,41 @@
+program import_data
+foreach filetype in basic General Facility Teachers RTE Repeaters TotalEnrolment ///
+SCEnrolment STEnrolment OBCEnrolment DisabledEnrolment {
+    foreach year in 2006-07 2007-08 2008-09 2009-10 2010-11 2011-12 2012-13 2013-14 {
+		local year_trim = substr("`year'", 1, 4)
+		foreach state in "Andaman and Nicobar Islands" "Andhra Pradesh" ///
+		"Arunachal Pradesh" "Assam" "Bihar" "Chandigarh" "Chhattisgarh" ///
+		"Dadra and Nagar Haveli" "Daman and Diu" "Delhi" "Goa" ///
+		"Gujarat" "Haryana" "Himachal Pradesh" "Jharkhand" "Karnataka" ///
+		"Kerala" "Lakshadweep" "Madhya Pradesh" "Maharashtra" "Manipur" ///
+		"Meghalaya" "Mizoram" "Nagaland" "Orissa" "Puducherry" "Punjab" /// 
+		"Rajasthan" "Sikkim" "Tamil Nadu" "Tripura" "Uttar Pradesh" ///
+		"Uttaranchal" "West Bengal" {
+			local filenames : dir "${raw}\\`year'\\`state'" files "DISE_`filetype'*.xlsx"
+		     foreach f of local filenames {
+			 	dis "`f' `filetype'"
+			 	capture import delimited "${raw}\\`year'\\`state'\\`f'", varnames(1) stringcols(_all) clear
+				save "${output}\\`filetype'_`year_trim'_`state'", replace
+			 }
+		}
+	}
+	foreach year in 2014-15 2015-16 2016-17 2017-18 {
+		local year_trim = substr("`year'", 1, 4)
+		foreach state in "Andaman and Nicobar Islands" "Andhra Pradesh" ///
+		"Arunachal Pradesh" "Assam" "Bihar" "Chandigarh" "Chhattisgarh" ///
+		"Dadra and Nagar Haveli" "Daman and Diu" "Delhi" "Goa" ///
+		"Gujarat" "Haryana" "Himachal Pradesh" "Jharkhand" "Karnataka" ///
+		"Kerala" "Lakshadweep" "Madhya Pradesh" "Maharashtra" "Manipur" ///
+		"Meghalaya" "Mizoram" "Nagaland" "Orissa" "Puducherry" "Punjab" /// 
+		"Rajasthan" "Sikkim" "Tamil Nadu" "Telangana" "Tripura" "Uttar Pradesh" ///
+		"Uttaranchal" "West Bengal" {
+			local filenames : dir "${raw}\\`year'\\`state'" files "DISE_`filetype'*.xlsx"
+		     foreach f of local filenames {
+			 	dis "`f'"
+			 	capture import delimited "${raw}\\`year'\\`state'\\`f'", varnames(1) stringcols(_all) clear
+				save "${output}\\`filetype'_`year_trim'_`state'", replace
+			 }
+		}
+	}
+}
+end 

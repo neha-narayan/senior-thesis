@@ -1,1 +1,12 @@
+# folders
+
+
+# file types 
+*.csv
+*.dta 
+*.xls 
+*.xlsx
+*.zip 
+*.RData 
+*.RHistory
 
