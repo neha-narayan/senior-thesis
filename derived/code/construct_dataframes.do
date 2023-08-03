@@ -9,149 +9,154 @@ global messy_dta "C:\Users\Neha Narayan\Desktop\GitHub\senior-thesis\derived\out
 global clean_dta "C:\Users\Neha Narayan\Desktop\GitHub\senior-thesis\derived\output\clean_dta"
 
 program main
-    *prep_post2017
-	*append_files
-	*transform_enrollment_post2017
-	*append_files_post2017
-	recode_appended
+//  prep_post2017
+// 	append_files
+// 	transform_enrollment_post2017
+// 	recode_appended
+// 	merge_files_pre2017
 end 
 
 program prep_post2017
-foreach year in 2018-19 2019-20 2020-21 2021-22 {
-	clear
-	local idx = 0
-    local filenames : dir "${raw}\\`year'" files "nationalEnrol*.csv"
-	cap dis "`filenames'"
-	foreach file in `filenames' {
-		local idx "`++idx'"
-		import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
-		tempfile enroll_`idx'
-		save "`enroll_`idx''"
-		clear
-	}
-	clear
-	forvalues i = 1/`idx' {
-		append using "`enroll_`i''"
-	}
-	save "${messy_dta}\enrollment_`year'", replace
-}
+    foreach year in 2018-19 2019-20 2020-21 2021-22 {
+	    clear
+	    local idx = 0
+        local filenames : dir "${raw}\\`year'" files "nationalEnrol*.csv"
+	    cap dis "`filenames'"
+	    foreach file in `filenames' {
+		    local idx "`++idx'"
+		    import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+		    tempfile enroll_`idx'
+		    save "`enroll_`idx''"
+		    clear
+	    }
+	    clear
+	    forvalues i = 1/`idx' {
+		    append using "`enroll_`i''"
+	    }
+		gen ac_year = "`year'"
+	    save "${messy_dta}\enrollment_`year'", replace
+    }
 
-//profile 
-foreach year in 2018-19 2019-20  {
-	clear
-	local idx = 0
-    local filenames : dir "${raw}\\`year'" files "100_prof*.csv"
-	cap dis "`filenames'"
-	foreach file in `filenames' {
-		local idx "`++idx'"
-		import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
-		tempfile prof_`idx'
-		save "`prof_`idx''"
-		clear
-	}
-	clear
-	forvalues i = 1/`idx' {
-		append using "`prof_`i''"
-	}
-	save "${messy_dta}\profile_`year'", replace
-}
-
-foreach year in 2020-21 2021-22  {
-	clear
-	local idx = 0
-    local filenames : dir "${raw}\\`year'" files "nationalProfile*.csv"
-	cap dis "`filenames'"
-	foreach file in `filenames' {
-		local idx "`++idx'"
-		import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
-		tempfile prof_`idx'
-		save "`prof_`idx''"
-		clear
-	}
-	clear
-	forvalues i = 1/`idx' {
-		append using "`prof_`i''"
-	}
-	save "${messy_dta}\profile_`year'", replace
-}
-
-//facility
-foreach year in 2018-19 2019-20  {
-	clear
-	local idx = 0
-    local filenames : dir "${raw}\\`year'" files "100_fac*.csv"
-	cap dis "`filenames'"
-	foreach file in `filenames' {
-		local idx "`++idx'"
-		import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
-		tempfile facility_`idx'
-		save "`facility_`idx''"
-		clear
-	}
-	clear
-	forvalues i = 1/`idx' {
-		append using "`facility_`i''"
-	}
-	save "${messy_dta}\facility_`year'", replace
-}
+    foreach year in 2018-19 2019-20  {
+	    clear
+	    local idx = 0
+        local filenames : dir "${raw}\\`year'" files "100_prof*.csv"
+	    cap dis "`filenames'"
+	    foreach file in `filenames' {
+		    local idx "`++idx'"
+		    import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+		    tempfile prof_`idx'
+		    save "`prof_`idx''"
+		    clear
+	    }    
+	    clear
+	    forvalues i = 1/`idx' {
+		    append using "`prof_`i''"
+	    }
+		gen ac_year = "`year'"
+	    save "${messy_dta}\profile_`year'", replace
+    }
 
     foreach year in 2020-21 2021-22  {
-	clear
-	local idx = 0
-    local filenames : dir "${raw}\\`year'" files "nationalfacility*.csv"
-	cap dis "`filenames'"
-	foreach file in `filenames' {
-		local idx "`++idx'"
-		import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
-		tempfile facility_`idx'
-		save "`facility_`idx''"
-		clear
-	}
-	clear
-	forvalues i = 1/`idx' {
-		append using "`facility_`i''"
-	}
-	save "${messy_dta}\facility_`year'", replace
-}
+	    clear
+	    local idx = 0
+        local filenames : dir "${raw}\\`year'" files "nationalProfile*.csv"
+	    cap dis "`filenames'"
+	    foreach file in `filenames' {
+		    local idx "`++idx'"
+		    import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+		    tempfile prof_`idx'
+		    save "`prof_`idx''"
+		    clear
+	    }
+	    clear
+	    forvalues i = 1/`idx' {
+		    append using "`prof_`i''"
+	    }
+		gen ac_year = "`year'"
+	    save "${messy_dta}\profile_`year'", replace
+    }
+
+    foreach year in 2018-19 2019-20  {
+	    clear
+	    local idx = 0
+        local filenames : dir "${raw}\\`year'" files "100_fac*.csv"
+	    cap dis "`filenames'"
+	    foreach file in `filenames' {
+		    local idx "`++idx'"
+		    import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+		    tempfile facility_`idx'
+		    save "`facility_`idx''"
+		    clear
+	    }
+	    clear
+	    forvalues i = 1/`idx' {
+		    append using "`facility_`i''"
+	    }
+		gen ac_year = "`year'"
+	    save "${messy_dta}\facility_`year'", replace
+    }
+
+    foreach year in 2020-21 2021-22  {
+	    clear
+	    local idx = 0
+        local filenames : dir "${raw}\\`year'" files "nationalfacility*.csv"
+	    cap dis "`filenames'"
+	    foreach file in `filenames' {
+		    local idx "`++idx'"
+		    import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+		    tempfile facility_`idx'
+		    save "`facility_`idx''"
+		    clear
+	    }
+	    clear
+	    forvalues i = 1/`idx' {
+		    append using "`facility_`i''"
+	    }
+		gen ac_year = "`year'"
+	    save "${messy_dta}\facility_`year'", replace
+    }
 
 //teachers
-foreach year in 2018-19 2019-20  {
-	clear
-	local idx = 0
-    local filenames : dir "${raw}\\`year'" files "100_tch*.csv"
-	cap dis "`filenames'"
-	foreach file in `filenames' {
-		local idx "`++idx'"
-		import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
-		tempfile teachers_`idx'
-		save "`teachers_`idx''"
-		clear
-	}
-	clear
-	forvalues i = 1/`idx' {
-		append using "`teachers_`i''"
-	}
-	save "${messy_dta}\teachers_`year'", replace
-}
+    foreach year in 2018-19 2019-20  {
+	    clear
+	    local idx = 0
+        local filenames : dir "${raw}\\`year'" files "100_tch*.csv"
+	    cap dis "`filenames'"
+	    foreach file in `filenames' {
+		    local idx "`++idx'"
+		    import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+		    tempfile teachers_`idx'
+		    save "`teachers_`idx''"
+		    clear
+	    }
+	    clear
+	    forvalues i = 1/`idx' {
+		    append using "`teachers_`i''"
+	    }
+		gen ac_year = "`year'"
+	    save "${messy_dta}\teachers_`year'", replace
+    }
 
     foreach year in 2020-21 2021-22  {
-	clear
-	local idx = 0
-    local filenames : dir "${raw}\\`year'" files "nationalTeacher*.csv"
-	cap dis "`filenames'"
-	foreach file in `filenames' {
-		local idx "`++idx'"
-		import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
-		tempfile teachers_`idx'
-		save "`teachers_`idx''"
-		clear
-	}
-	clear
-	forvalues i = 1/`idx' {
-		append using "`teachers_`i''"
-	}
-	save "${messy_dta}\teachers_`year'", replace
-}
+	    clear
+	    local idx = 0
+        local filenames : dir "${raw}\\`year'" files "nationalTeacher*.csv"
+	    cap dis "`filenames'"
+	    foreach file in `filenames' {
+		    local idx "`++idx'"
+		    import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+		    tempfile teachers_`idx'
+		    save "`teachers_`idx''"
+		    clear
+	    }
+	    clear
+	    forvalues i = 1/`idx' {
+		    append using "`teachers_`i''"
+	    }
+		gen ac_year = "`year'"
+	    save "${messy_dta}\teachers_`year'", replace
+    }
 end 
 
 program append_files
@@ -306,49 +311,12 @@ program append_files
 	}
 	qui duplicates drop 
 	save "${messy_dta}\disabledenrollment_append", replace
-	
-	
-end 
-
-program append_files_post2017
-    //profile seems = to general 
-    /*clear
-    foreach year in 2018-19 2019-20 2020-21 2021-22 {
-		append using "${csv}\profile_`year'"
-	}
-	qui duplicates drop 
-	save "${messy_dta}\profile_append"
-	
-	clear 
-	foreach year in 2018-19 2019-20 2020-21 2021-22 {
-		append using "${csv}\facility_`year'"
-	}
-	qui duplicates drop 
-	save "${messy_dta}\facility_append_post2017", replace
-
-    clear 
-	foreach year in 2018-19 2019-20 2020-21 2021-22 {
-		append using "${csv}\teachers_`year'"
-	}
-	qui duplicates drop 
-	save "${messy_dta}\teachers_append_post2017", replace*/
-	
-	//this enrollment file is huge. transform first
-	clear 
-	foreach year in 2018-19 2019-20 2020-21 2021-22 {
-		append using "${csv}\enrollment_`year'"
-	}
-	qui duplicates drop 
-	save "${messy_dta}\enrollment_append_post2017", replace
 end 
 
 program recode_appended
     //basic 
 	use "${messy_dta}/basic_append", clear
 	replace district_name = distname if mi(district_name)
-	rename (district_name school_code ac_year school_name block_name cluster_name village_name) ///
-	    (district schoolcode academicyear schoolname blockname clustername villagename)
-	drop distname 
 	save "${messy_dta}/basic_append", replace
 	
 	//general 
@@ -408,10 +376,8 @@ program recode_appended
 	replace funds_from_students_expnd = funds_e if mi(funds_from_students_expnd)
 	drop funds_e
 	
-	rename (school_code ac_year rural_urban distance_brc distance_crc pre_pry_yn residential_sch_yn) ///
-	    (schoolcode academicyear ruralurban distancetobrc distancetocrc preprimary_ind resschool_ind)
-	rename (lowest_class highest_class pre_pry_students school_type shift_school_yn no_of_working_days) ///
-	    (lowestclass highestclass preprimary_students schooltype shiftschool_ind num_workingdays)
+	rename (schoolcode academicyear ruralurban distancetobrc distancetocrc preprimary_ind resschool_ind) ///
+	(school_code ac_year rural_urban distance_brc distance_crc pre_pry_yn residential_sch_yn)   
 	rename (estdyear) (year_est)
 	drop boardsec boardhsec schmgts schmgths
 	save "${messy_dta}/general_append", replace
@@ -522,25 +488,234 @@ program recode_appended
 	drop children_from_weaker_section_app
 	replace wsec25p_enrolled = children_from_weaker_section_enr if mi(wsec25p_enrolled)
 	drop children_from_weaker_section_enr
-	replace smc_constit
-	
-	
-	
-	
-	
-	qui ds 
-	foreach var in `r(varlist)' {
-	    dis "`var'"
-	    count if mi(`var')
-	}
-	
-	
+	replace smc_constituted = smc_yn if mi(smc_constituted)
+	drop smc_yn
+	replace smc_members_male = smcmem_m if mi(smc_members_male)
+	drop smcmem_m 
+	replace smc_members_female = smcmem_f if mi(smc_members_female)
+	drop smcmem_f
+	replace smc_members_parents_male = smsparents_m if mi(smc_members_parents_male)
+	drop smsparents_m
+	replace smc_members_parents_female = smsparents_f if mi(smc_members_parents_female)
+	drop smsparents_f
+    replace smc_members_local_authority_male = smcnomlocal_m if mi(smc_members_local_authority_male)
+	drop smcnomlocal_m
+	replace smc_members_local_authority_fema = smcnomlocal_f if mi(smc_members_local_authority_fema)
+	drop smcnomlocal_f
+	replace smc_meetings_held = smcmeetings if mi(smc_meetings_held)
+	drop smcmeetings
+	replace school_developmentplan_prepared = smcsdp_yn if mi(school_developmentplan_prepared) 
+	drop smcsdp_yn
+	replace smc_children_record_maintained = smschildrec_yn if mi(smc_children_record_maintained)
+	drop smschildrec_yn
+	replace spltrg_cy_enrolled_b = chld_enrolled_for_sp_training_cu if mi(spltrg_cy_enrolled_b)
+	drop chld_enrolled_for_sp_training_cu
+	replace spltrg_cy_enrolled_g = v28 if mi(spltrg_cy_enrolled_g)
+	drop v28
+	replace spltrg_cy_provided_b = spl_training_provided_current_ye if mi(spltrg_cy_provided_b)
+	drop spl_training_provided_current_ye
+	replace spltrg_cy_provided_g = v30 if mi(spltrg_cy_provided_g)
+	drop v30 
+	replace spltrg_py_enrolled_b = spl_training_enrolled_previous_y if mi(spltrg_py_enrolled_b)
+	drop spl_training_enrolled_previous_y
+	replace spltrg_py_enrolled_g = v32 if mi(spltrg_py_enrolled_g)
+	drop v32
+	replace spltrg_py_provided_b = spl_training_provided_previous_y if mi(spltrg_cy_provided_b)
+	drop spl_training_provided_previous_y 
+	replace spltrg_py_provided_g = v34 if mi(spltrg_py_provided_g)
+	drop v34
+	replace spl_training_conducted_by = spltrg_by if mi(spl_training_conducted_by)
+	drop spltrg_by
+	replace spl_training_place = spltrg_place if mi(spl_training_place)
+	drop spltrg_place
+	replace spl_training_type = spltrg_type if mi(spl_training_type)
+	drop spltrg_type
+	replace textbook_received = txtbkrecd_yn if mi(textbook_received)
+	drop txtbkrecd_yn
+    replace text_book_received_month = txtbkmnth if mi(text_book_received_month)
+	drop txtbkmnth
+	replace text_book_received_year = txtbkyear if mi(text_book_received_year)
+	drop txtbkyear
+	replace acstartmnth = academic_session_start_in if mi(acstartmnth)
+	drop academic_session_start_in
+	replace mdm_status = mealsinsch if mi(mdm_status)
+	drop mealsinsch
+	replace kitchenshed_status = kitshed if mi(kitchenshed_status)
+	drop kitshed
+	replace mdm_source = mdm_maintainer if mi(mdm_source)
+	drop mdm_maintainer
+	rename tch_or_evs_for_spl_training num_tch_evs_for_spltrg
+	rename kitchen_devaices_grant received_kitdev_grant
+	rename schcd school_code
+	save "${messy_dta}/rte_append", replace
 		
+	//repeaters
+	use "${messy_dta}/repeaters_append", clear
+	replace school_code = schcd if mi(school_code)
+	drop schcd
+	qui ds repeaters*
+	foreach var in `r(varlist)' {
+		dis "`var'"
+		local class = substr("`var'", 12, 1)
+		local gender = substr("`var'", 14, 1)
+		dis "`class' `gender'"
+		replace fail`class'`gender' = `var' if mi(fail`class'`gender')
+		drop `var'
+	}
+	replace ac_year = acyear if mi(ac_year)
+	drop acyear
+	save "${messy_dta}/repeaters_append", replace
+	
+	//total enrollment 
+	use "${messy_dta}/enrollment_append", clear
+	replace school_code = schcd if mi(school_code)
+	drop schcd
+	replace ac_year = acyear if mi(ac_year)
+	drop acyear 
+	qui ds class*
+	foreach var in `r(varlist)' {
+		local class = substr("`var'", 6, 1)
+		local gender = substr("`var'", 18, 1)
+		dis "`class' `gender'"
+		replace c`class'_tot`gender' = `var' if mi(c`class'_tot`gender')
+		drop `var'
+	}
+	replace apprb5 = c5_appeared_boys if mi(apprb5)
+	drop c5_appeared_boys
+	replace apprg5 = c5_appeared_girls if mi(apprg5)
+	drop c5_appeared_girls
+	replace apprb8 = c7_appeared_boys if mi(apprb8)
+	drop c7_appeared_boys
+	replace apprg8 = c7_appeared_girls if mi(apprg8)
+	drop c7_appeared_girls
+	replace passb5 = c5_passed_boys if mi(passb5)
+	drop c5_passed_boys
+	replace passg5 = c5_passed_girls if mi(passg5)
+	drop c5_passed_girls 
+	replace passb8 = c7_passed_boys if mi(passb8)
+	drop c7_passed_boys
+	replace passg8 = c7_passed_girls if mi(passg8)
+	drop c7_passed_girls
+	replace p60b5 = c5_passed_with_more_than_60_boys if mi(p60b5)
+	drop c5_passed_with_more_than_60_boys
+	replace p60g5 = c5_passed_with_more_than_60_girl if mi(p60g5)
+	drop c5_passed_with_more_than_60_girl 
+	replace p60b8 = c7_passed_with_more_than_60_boys if mi(p60b8)
+	drop c7_passed_with_more_than_60_boys 
+	replace p60g8 = c7_passed_with_more_than_60_girl if mi(p60g8)
+	drop c7_passed_with_more_than_60_girl
+	save "${messy_dta}/enrollment_append", replace
+	
+	//sc enrollment
+	use "${messy_dta}/scenrollment_append", clear
+	replace school_code = schcd if mi(school_code)
+	drop schcd
+	replace ac_year = acyear if mi(ac_year)
+	drop acyear 
+	qui ds class*
+	foreach var in `r(varlist)' {
+		local class = substr("`var'", 6, 1)
+		local gender = substr("`var'", 15, 1)
+		dis "`class' `gender'"
+		replace c`class'_c`gender' = `var' if mi(c`class'_c`gender')
+		drop `var'
+	}
+	save "${messy_dta}/scenrollment_append", replace
+	
+	//st enrollment
+	use "${messy_dta}/stenrollment_append", clear
+	replace school_code = schcd if mi(school_code)
+	drop schcd
+	replace ac_year = acyear if mi(ac_year)
+	drop acyear
+	qui ds class*
+	foreach var in `r(varlist)' {
+		local class = substr("`var'", 6, 1)
+		local gender = substr("`var'", 15, 1)
+		dis "`class' `gender'"
+		replace c`class'_t`gender' = `var' if mi(c`class'_t`gender')
+		drop `var'
+	}
+	save "${messy_dta}/stenrollment_append", replace
+	
+	//obc enrollment
+	use "${messy_dta}/obcenrollment_append", clear
+	replace school_code = schcd if mi(school_code)
+	drop schcd
+	replace ac_year = acyear if mi(ac_year)
+	drop acyear
+	qui ds class*
+	foreach var in `r(varlist)' {
+		local class = substr("`var'", 6, 1)
+		local gender = substr("`var'", 16, 1)
+		dis "`class' `gender'"
+		replace c`class'_o`gender' = `var' if mi(c`class'_o`gender')
+		drop `var'
+	}
+	save "${messy_dta}/obcenrollment_append", replace
+	
+	//disabled enrollment
+	use "${messy_dta}/disabledenrollment_append", clear 
+	replace school_code = schcd if mi(school_code)
+	drop schcd
+	replace ac_year = acyear if mi(ac_year)
+	drop acyear
+	qui ds disabled*
+	foreach var in `r(varlist)' {
+		local class = substr("`var'", 11, 1)
+		local gender = substr("`var'", 13, 1)
+		dis "`class' `gender'"
+		replace c`class'_dis_`gender' = `var' if mi(c`class'_dis_`gender')
+		drop `var'
+	}
+	save "${messy_dta}/disabledenrollment_append", replace 
+end
 
-    
-end 
-
-
+program merge_files_pre2017
+    use "${messy_dta}/basic_append", clear
+	
+	merge 1:1 school_code ac_year using "${messy_dta}/general_append", assert(1 2 3) keep(3) ///
+	    gen(merge_general)
+	drop merge_general
+	
+	merge 1:1 school_code ac_year using "${messy_dta}/facility_append", assert(1 2 3) keep(3) ///
+	    gen(merge_facility)
+	drop merge_facility
+	
+	merge 1:1 school_code ac_year using "${messy_dta}/teachers_append", assert(1 2 3) keep(1 3) ///
+	    gen(merge_teachers)
+	drop merge_teachers
+		
+	merge 1:1 school_code ac_year using "${messy_dta}/rte_append", assert(1 2 3) keep(1 3) ///
+	    gen(merge_rte)
+	drop merge_rte
+		
+	merge 1:1 school_code ac_year using "${messy_dta}/repeaters_append", assert(1 2 3) keep(3) ///
+	    gen(merge_repeaters)
+	drop merge_repeaters
+		
+	merge 1:1 school_code ac_year using "${messy_dta}/enrollment_append", assert(1 2 3) keep(3) ///
+	    gen(merge_enrollment)
+	drop merge_enrollment
+		
+	merge 1:1 school_code ac_year using "${messy_dta}/scenrollment_append", assert(1 2 3) keep(3) ///
+	    gen(merge_scenrollment)
+	drop merge_scenrollment
+	
+	merge 1:1 school_code ac_year using "${messy_dta}/stenrollment_append", assert(1 2 3) keep(3) ///
+	    gen(merge_stenrollment)
+	drop merge_stenrollment
+	
+	merge 1:1 school_code ac_year using "${messy_dta}/obcenrollment_append", assert(1 2 3) keep(3) ///
+	    gen(merge_obcenrollment)
+	drop merge_obcenrollment
+	
+	merge 1:1 school_code ac_year using "${messy_dta}/disabledenrollment_append", assert(1 2 3) ///
+	    gen(merge_disabledenrollment)
+	drop merge_disabledenrollment
+	
+	save "${clean_dta}/panel_pre2017", replace
+end  
 
 *Execute
 main
