@@ -356,3 +356,4 @@ fail2g                            c12_dis_b
 fail3g                            c12_dis_g
 fail4g
 
+. exit, clear

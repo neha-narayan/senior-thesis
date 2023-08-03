@@ -12,8 +12,10 @@ program main
 //  prep_post2017
 // 	append_files
 // 	transform_enrollment_post2017
+// 	append_files_post2017
 // 	recode_appended
 // 	merge_files_pre2017
+// 	merge_files_post2017
 end 
 
 program prep_post2017
@@ -311,6 +313,36 @@ program append_files
 	}
 	qui duplicates drop 
 	save "${messy_dta}\disabledenrollment_append", replace
+end 
+
+program append_files_post2017
+    clear
+    foreach year in 2018-19 2019-20 2020-21 2021-22 {
+		append using "${messy_dta}\profile_`year'"
+	}
+	qui duplicates drop 
+	save "${messy_dta}\profile_append", replace
+		
+	clear 
+	foreach year in 2018-19 2019-20 2020-21 2021-22 {
+		append using "${messy_dta}\facility_`year'"
+	}
+	qui duplicates drop 
+	save "${messy_dta}\facility_append_post2017", replace
+
+    clear 
+	foreach year in 2018-19 2019-20 2020-21 2021-22 {
+		append using "${messy_dta}\teachers_`year'"
+	}
+	qui duplicates drop 
+	save "${messy_dta}\teachers_append_post2017", replace*/
+	
+	clear 
+	foreach year in 2018-19 2019-20 2020-21 2021-22 {
+		append using "${messy_dta}\enrollment_`year'"
+	}
+	qui duplicates drop 
+	save "${messy_dta}\enrollment_append_post2017", replace
 end 
 
 program recode_appended
@@ -716,6 +748,14 @@ program merge_files_pre2017
 	
 	save "${clean_dta}/panel_pre2017", replace
 end  
+
+program merge_files_post2017
+    use "${messy_dta_fr_oscar}/profile_append", clear
+	
+	merge 1:1 psuedocode using "${messy_dta_fr_oscar}/teachers_append_post2017", assert(1 2 3) gen(merge_teachers)
+end
+
+
 
 *Execute
 main
