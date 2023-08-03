@@ -752,7 +752,7 @@ end
 program merge_files_post2017
     use ../output/messy_dta/profile_append_post2017, clear
 	
-	merge 1:1 psuedocode using "${messy_dta_fr_oscar}/teachers_append_post2017", assert(1 2 3) gen(merge_teachers)
+	merge 1:1 psuedocode using ../output/messy_dta/teachers_append_post2017", assert(1 2 3) gen(merge_teachers)
 end
 
 
