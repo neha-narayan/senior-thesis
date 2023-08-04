@@ -15,7 +15,7 @@ program main
     append_files_post2017
 // 	recode_appended
 // 	merge_files_pre2017
-    merge_files_post2017
+//    merge_files_post2017
 end 
 
 program prep_post2017
@@ -316,14 +316,14 @@ program append_files
 end 
 
 program append_files_post2017
-    /*clear
+    clear
     foreach year in 2018-19 2019-20 2020-21 2021-22 {
 		append using ../output/messy_dta/profile_`year'
 	}
 	qui duplicates drop 
 	save ../output/messy_dta/profile_append_post2017, replace
 		
-	clear 
+	/*clear 
 	foreach year in 2018-19 2019-20 2020-21 2021-22 {
 		append using ../output/messy_dta/facility_`year'
 	}
