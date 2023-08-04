@@ -1,9 +1,8 @@
-----------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------
       name:  <unnamed>
-       log:  C:\Users\Neha Narayan\Desktop\GitHub\senior-thesis\derived\code\construct_dataframes.lo
-> g
+       log:  /oscar/scratch/nnaraya6/senior-thesis/derived/code/construct_dataframes.log
   log type:  text
- opened on:  31 Jul 2023, 09:32:34
+ opened on:   3 Aug 2023, 23:54:25
 
 . clear all
 
@@ -19,341 +18,767 @@
 . global clean_dta "C:\Users\Neha Narayan\Desktop\GitHub\senior-thesis\derived\output\clean_dta"
 
 . 
-end of do-file
+. program main
+  1. //  prep_post2017
+. //      append_files
+. //      transform_enrollment_post2017
+.     append_files_post2017
+  2. //      recode_appended
+. //      merge_files_pre2017
+. //    merge_files_post2017
+. end 
 
-. do "C:\Users\NEHANA~1\AppData\Local\Temp\STDa7c0_000000.tmp"
+. 
+. program prep_post2017
+  1.     foreach year in 2018-19 2019-20 2020-21 2021-22 {
+  2.             clear
+  3.             local idx = 0
+  4.         local filenames : dir "${raw}\\`year'" files "nationalEnrol*.csv"
+  5.             cap dis "`filenames'"
+  6.             foreach file in `filenames' {
+  7.                     local idx "`++idx'"
+  8.                     import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+  9.                     tempfile enroll_`idx'
+ 10.                     save "`enroll_`idx''"
+ 11.                     clear
+ 12.             }
+ 13.             clear
+ 14.             forvalues i = 1/`idx' {
+ 15.                     append using "`enroll_`i''"
+ 16.             }
+ 17.                 gen ac_year = "`year'"
+ 18.             save "${messy_dta}\enrollment_`year'", replace
+ 19.     }
+ 20. 
+.     foreach year in 2018-19 2019-20  {
+ 21.             clear
+ 22.             local idx = 0
+ 23.         local filenames : dir "${raw}\\`year'" files "100_prof*.csv"
+ 24.             cap dis "`filenames'"
+ 25.             foreach file in `filenames' {
+ 26.                     local idx "`++idx'"
+ 27.                     import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+ 28.                     tempfile prof_`idx'
+ 29.                     save "`prof_`idx''"
+ 30.                     clear
+ 31.             }    
+ 32.             clear
+ 33.             forvalues i = 1/`idx' {
+ 34.                     append using "`prof_`i''"
+ 35.             }
+ 36.                 gen ac_year = "`year'"
+ 37.             save "${messy_dta}\profile_`year'", replace
+ 38.     }
+ 39. 
+.     foreach year in 2020-21 2021-22  {
+ 40.             clear
+ 41.             local idx = 0
+ 42.         local filenames : dir "${raw}\\`year'" files "nationalProfile*.csv"
+ 43.             cap dis "`filenames'"
+ 44.             foreach file in `filenames' {
+ 45.                     local idx "`++idx'"
+ 46.                     import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+ 47.                     tempfile prof_`idx'
+ 48.                     save "`prof_`idx''"
+ 49.                     clear
+ 50.             }
+ 51.             clear
+ 52.             forvalues i = 1/`idx' {
+ 53.                     append using "`prof_`i''"
+ 54.             }
+ 55.                 gen ac_year = "`year'"
+ 56.             save "${messy_dta}\profile_`year'", replace
+ 57.     }
+ 58. 
+.     foreach year in 2018-19 2019-20  {
+ 59.             clear
+ 60.             local idx = 0
+ 61.         local filenames : dir "${raw}\\`year'" files "100_fac*.csv"
+ 62.             cap dis "`filenames'"
+ 63.             foreach file in `filenames' {
+ 64.                     local idx "`++idx'"
+ 65.                     import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+ 66.                     tempfile facility_`idx'
+ 67.                     save "`facility_`idx''"
+ 68.                     clear
+ 69.             }
+ 70.             clear
+ 71.             forvalues i = 1/`idx' {
+ 72.                     append using "`facility_`i''"
+ 73.             }
+ 74.                 gen ac_year = "`year'"
+ 75.             save "${messy_dta}\facility_`year'", replace
+ 76.     }
+ 77. 
+.     foreach year in 2020-21 2021-22  {
+ 78.             clear
+ 79.             local idx = 0
+ 80.         local filenames : dir "${raw}\\`year'" files "nationalfacility*.csv"
+ 81.             cap dis "`filenames'"
+ 82.             foreach file in `filenames' {
+ 83.                     local idx "`++idx'"
+ 84.                     import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+ 85.                     tempfile facility_`idx'
+ 86.                     save "`facility_`idx''"
+ 87.                     clear
+ 88.             }
+ 89.             clear
+ 90.             forvalues i = 1/`idx' {
+ 91.                     append using "`facility_`i''"
+ 92.             }
+ 93.                 gen ac_year = "`year'"
+ 94.             save "${messy_dta}\facility_`year'", replace
+ 95.     }
+ 96. 
+. //teachers
+.     foreach year in 2018-19 2019-20  {
+ 97.             clear
+ 98.             local idx = 0
+ 99.         local filenames : dir "${raw}\\`year'" files "100_tch*.csv"
+100.             cap dis "`filenames'"
+101.             foreach file in `filenames' {
+102.                     local idx "`++idx'"
+103.                     import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+104.                     tempfile teachers_`idx'
+105.                     save "`teachers_`idx''"
+106.                     clear
+107.             }
+108.             clear
+109.             forvalues i = 1/`idx' {
+110.                     append using "`teachers_`i''"
+111.             }
+112.                 gen ac_year = "`year'"
+113.             save "${messy_dta}\teachers_`year'", replace
+114.     }
+115. 
+.     foreach year in 2020-21 2021-22  {
+116.             clear
+117.             local idx = 0
+118.         local filenames : dir "${raw}\\`year'" files "nationalTeacher*.csv"
+119.             cap dis "`filenames'"
+120.             foreach file in `filenames' {
+121.                     local idx "`++idx'"
+122.                     import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+123.                     tempfile teachers_`idx'
+124.                     save "`teachers_`idx''"
+125.                     clear
+126.             }
+127.             clear
+128.             forvalues i = 1/`idx' {
+129.                     append using "`teachers_`i''"
+130.             }
+131.                 gen ac_year = "`year'"
+132.             save "${messy_dta}\teachers_`year'", replace
+133.     }
+134. end 
 
-.     use "${messy_dta}/basic_append", clear
+. 
+. program append_files
+  1.     forvalues year = 2005/2017 {
+  2.             import delimited "${csv}\basic_`year'", varnames(1) stringcols(_all) ///
+>                 bindquote(strict) maxquotedrows(100)
+  3.                 tempfile basic_`year'
+  4.                 save "`basic_`year''"
+  5.                 clear
+  6.         }
+  7.         forvalues year = 2005/2017 {
+  8.                 append using "`basic_`year''"
+  9.         }
+ 10.         qui duplicates drop 
+ 11.         save "${messy_dta}\basic_append", replace
+ 12.         
+.         forvalues year = 2005/2017 {
+ 13.             import delimited "${csv}\general_`year'", varnames(1) stringcols(_all) ///
+>                 bindquote(strict) maxquotedrows(100)
+ 14.                 tempfile general_`year'
+ 15.                 save "`general_`year''"
+ 16.                 clear
+ 17.         }
+ 18.         forvalues year = 2005/2017 {
+ 19.                 append using "`general_`year''"
+ 20.         }
+ 21.         qui duplicates drop 
+ 22.         save "${messy_dta}\general_append", replace
+ 23.         
+.         clear
+ 24.         forvalues year = 2005/2017 {
+ 25.             import delimited "${csv}\facility_`year'", varnames(1) stringcols(_all) ///
+>                 bindquote(strict) maxquotedrows(100)
+ 26.                 tempfile facility_`year'
+ 27.                 save "`facility_`year''"
+ 28.                 clear
+ 29.         }
+ 30.         forvalues year = 2005/2017 {
+ 31.                 append using "`facility_`year''"
+ 32.         }
+ 33.         qui duplicates drop 
+ 34.         save "${messy_dta}\facility_append", replace
+ 35.         
+.         clear
+ 36.         forvalues year = 2009/2017 {
+ 37.             import delimited "${csv}\teachers_`year'", varnames(1) stringcols(_all) ///
+>                 bindquote(strict) maxquotedrows(100)
+ 38.                 tempfile teachers_`year'
+ 39.                 save "`teachers_`year''"
+ 40.                 clear
+ 41.         }
+ 42.         forvalues year = 2009/2017 {
+ 43.                 append using "`teachers_`year''"
+ 44.         }
+ 45.         qui duplicates drop 
+ 46.         save "${messy_dta}\teachers_append", replace
+ 47.         
+.         clear
+ 48.         forvalues year = 2010/2017 {
+ 49.             import delimited "${csv}\rte_`year'", varnames(1) stringcols(_all) ///
+>                 bindquote(strict) maxquotedrows(100)
+ 50.                 tempfile rte_`year'
+ 51.                 save "`rte_`year''"
+ 52.                 clear
+ 53.         }
+ 54.         forvalues year = 2010/2017 {
+ 55.                 append using "`rte_`year''"
+ 56.         }
+ 57.         qui duplicates drop 
+ 58.         save "${messy_dta}\rte_append", replace
+ 59.         
+.         clear
+ 60.         forvalues year = 2005/2017 {
+ 61.             import delimited "${csv}\repeaters_`year'", varnames(1) stringcols(_all) ///
+>                 bindquote(strict) maxquotedrows(100)
+ 62.                 tempfile repeaters_`year'
+ 63.                 save "`repeaters_`year''"
+ 64.                 clear
+ 65.         }
+ 66.         forvalues year = 2005/2017 {
+ 67.                 append using "`repeaters_`year''"
+ 68.         }
+ 69.         qui duplicates drop 
+ 70.         save "${messy_dta}\repeaters_append", replace
+ 71.         
+.         clear
+ 72.         forvalues year = 2005/2017 {
+ 73.             import delimited "${csv}\enrollment_`year'", varnames(1) stringcols(_all) ///
+>                 bindquote(strict) maxquotedrows(100)
+ 74.                 tempfile enrollment_`year'
+ 75.                 save "`enrollment_`year''"
+ 76.                 clear
+ 77.         }
+ 78.         forvalues year = 2005/2017 {
+ 79.                 append using "`enrollment_`year''"
+ 80.         }
+ 81.         qui duplicates drop 
+ 82.         save "${messy_dta}\enrollment_append", replace
+ 83.         
+.         clear
+ 84.         forvalues year = 2005/2017 {
+ 85.             import delimited "${csv}\scenrollment_`year'", varnames(1) stringcols(_all) ///
+>                 bindquote(strict) maxquotedrows(100)
+ 86.                 tempfile scenrollment_`year'
+ 87.                 save "`scenrollment_`year''"
+ 88.                 clear
+ 89.         }
+ 90.         forvalues year = 2005/2017 {
+ 91.                 append using "`scenrollment_`year''"
+ 92.         }
+ 93.         qui duplicates drop 
+ 94.         save "${messy_dta}\scenrollment_append", replace
+ 95.         
+.         clear
+ 96.         forvalues year = 2005/2017 {
+ 97.             import delimited "${csv}\stenrollment_`year'", varnames(1) stringcols(_all) ///
+>                 bindquote(strict) maxquotedrows(100)
+ 98.                 tempfile stenrollment_`year'
+ 99.                 save "`stenrollment_`year''"
+100.                 clear
+101.         }
+102.         forvalues year = 2005/2017 {
+103.                 append using "`stenrollment_`year''"
+104.         }
+105.         qui duplicates drop 
+106.         save "${messy_dta}\stenrollment_append", replace
+107.         
+.         clear
+108.         forvalues year = 2005/2017 {
+109.             import delimited "${csv}\obcenrollment_`year'", varnames(1) stringcols(_all) ///
+>                 bindquote(strict) maxquotedrows(100)
+110.                 tempfile obcenrollment_`year'
+111.                 save "`obcenrollment_`year''"
+112.                 clear
+113.         }
+114.         forvalues year = 2005/2017 {
+115.                 append using "`obcenrollment_`year''"
+116.         }
+117.         qui duplicates drop 
+118.         save "${messy_dta}\obcenrollment_append", replace
+119.         
+.         clear
+120.         forvalues year = 2005/2017 {
+121.             import delimited "${csv}\disabledenrollment_`year'", varnames(1) stringcols(_all) ///
+>                 bindquote(strict) maxquotedrows(100)
+122.                 tempfile disabledenrollment_`year'
+123.                 save "`disabledenrollment_`year''"
+124.                 clear
+125.         }
+126.         forvalues year = 2005/2017 {
+127.                 append using "`disabledenrollment_`year''"
+128.         }
+129.         qui duplicates drop 
+130.         save "${messy_dta}\disabledenrollment_append", replace
+131. end 
 
+. 
+. program append_files_post2017
+  1.     /*clear
+>     foreach year in 2018-19 2019-20 2020-21 2021-22 {
+>                 append using ../output/messy_dta/profile_`year'
+>         }
+>         qui duplicates drop 
+>         save ../output/messy_dta/profile_append_post2017, replace
+>                 
+>         clear 
+>         foreach year in 2018-19 2019-20 2020-21 2021-22 {
+>                 append using ../output/messy_dta/facility_`year'
+>         }
+>         qui duplicates drop 
+>         save ../output/messy_dta/facility_append_post2017, replace
+> 
+>     clear 
+>         foreach year in 2018-19 2019-20 2020-21 2021-22 {
+>                 append using ../output/messy_dta/teachers_`year'
+>         }
+>         qui duplicates drop 
+>         save ../output/messy_dta/teachers_append_post2017, replace*/
 .         
-.         merge 1:1 school_code ac_year using "${messy_dta}/general_append", assert(1 2 3) keep(3) /
-> //
+.         clear 
+  2.         foreach year in 2018-19 2019-20 2020-21 2021-22 {
+  3.                 append using ../output/messy_dta/enrollment_`year'
+  4.         }
+  5.         qui duplicates drop 
+  6.         save ../output/messy_dta/enrollment_append_post2017, replace
+  7. end 
+
+. 
+. program recode_appended
+  1.     //basic 
+.         use "${messy_dta}/basic_append", clear
+  2.         replace district_name = distname if mi(district_name)
+  3.         save "${messy_dta}/basic_append", replace
+  4.         
+.         //general 
+.         use "${messy_dta}/general_append", clear
+  5.         replace school_code = schcd if mi(school_code) 
+  6.         drop schcd
+  7.         replace rural_urban = rururb if mi(rural_urban)
+  8.         drop rururb
+  9.         forvalues i =  1/4 {
+ 10.             replace medium`i' = medinstr`i' if mi(medium`i')
+ 11.                 drop medinstr`i'
+ 12.         }
+ 13.         replace estdyear = yeur_estd if mi(estdyear)
+ 14.         drop yeur_estd  
+ 15.         replace pre_pry_yn = ppsec_yn if mi(pre_pry_yn)
+ 16.         drop ppsec_yn
+ 17.         replace residential_sch_yn = schres_yn if mi(residential_sch_yn)
+ 18.         drop schres_yn
+ 19.         replace sch_management = schmgt if mi(sch_management)
+ 20.         drop schmgt
+ 21.         replace lowest_class = lowclass if mi(lowest_class)
+ 22.         drop lowclass
+ 23.         replace highest_class = highclass if mi(highest_class)
+ 24.         drop highclass
+ 25.         rename schcat schoolcategory_post2013
+ 26.         rename sch_category schoolcategory_pre2013
+ 27.         replace pre_pry_students = ppstudent if mi(pre_pry_students)
+ 28.         drop ppstudent
+ 29.         replace school_type = schtype if mi(school_type)
+ 30.         drop schtype
+ 31.         replace shift_school_yn = schshi_yn if mi(shift_school_yn)
+ 32.         drop schshi_yn
+ 33.         destring workdays_* no_of_working_days, replace
+ 34.         replace no_of_working_days = workdays_pr + workdays_upr + workdays_sec + workdays_hsec ///
+>             if mi(no_of_working_days)
+ 35.         drop workdays_*
+ 36.         replace no_of_acad_inspection = noinspect if mi(no_of_acad_inspection)
+ 37.         drop noinspect
+ 38.         replace residential_sch_type = resitype if mi(residential_sch_type)
+ 39.         drop resitype
+ 40.         replace pre_pry_teachers = ppteacher if mi(pre_pry_teachers)
+ 41.         drop ppteacher
+ 42.         replace visits_by_brc = visitsbrc if mi(visits_by_brc)
+ 43.         drop visitsbrc
+ 44.         replace visits_by_crc = visitscrc if mi(visits_by_crc)
+ 45.         drop visitscrc
+ 46.         replace school_dev_grant_recd = schmntcgrant_r if mi(school_dev_grant_recd)
+ 47.         drop schmntcgrant_r
+ 48.         replace school_dev_grant_expnd = schmntcgrant_e if mi(school_dev_grant_expnd)
+ 49.         drop schmntcgrant_e
+ 50.         replace tlm_grant_recd = conti_r if mi(tlm_grant_recd)
+ 51.         drop conti_r
+ 52.         replace tlm_grant_expnd = conti_e if mi(tlm_grant_expnd)
+ 53.         drop conti_e
+ 54.         replace funds_from_students_recd = funds_r if mi(funds_from_students_recd)
+ 55.         drop funds_r
+ 56.         replace funds_from_students_expnd = funds_e if mi(funds_from_students_expnd)
+ 57.         drop funds_e
+ 58.         
+.         rename (schoolcode academicyear ruralurban distancetobrc distancetocrc preprimary_ind resschool_ind) ///
+>         (school_code ac_year rural_urban distance_brc distance_crc pre_pry_yn residential_sch_yn)   
+ 59.         rename (estdyear) (year_est)
+ 60.         drop boardsec boardhsec schmgts schmgths
+ 61.         save "${messy_dta}/general_append", replace
+ 62.         
+.         //facility
+.         use "${messy_dta}/facility_append", clear
+ 63.         replace school_code = schcd if mi(school_code) 
+ 64.         drop schcd
+ 65.         replace building_status = bldstatus if mi(building_status) //unavailable 2012-13
+ 66.         drop bldstatus
+ 67.         replace tot_clrooms = clrooms if mi(tot_clrooms)
+ 68.     drop clrooms
+ 69.         replace classrooms_in_good_condition = clgood if mi(classrooms_in_good_condition)
+ 70.         drop clgood
+ 71.         replace classrooms_require_major_repair = clmajor if mi(classrooms_require_major_repair)
+ 72.         drop clmajor 
+ 73.         replace classrooms_require_minor_repair = clminor if mi(classrooms_require_minor_repair)
+ 74.         drop clminor
+ 75.         replace other_rooms_in_good_cond = othgood if mi(other_rooms_in_good_cond)
+ 76.         drop othgood
+ 77.         replace other_rooms_need_major_rep = othmajor if mi(other_rooms_need_major_rep)
+ 78.         drop othmajor
+ 79.         replace other_rooms_need_minor_rep = othminor if mi(other_rooms_need_minor_rep)
+ 80.         drop othminor
+ 81.         foreach var in toilet_common_yn toilet_c toiletd {
+ 82.                 replace toilet_common = `var' if mi(toilet_common)
+ 83.                         drop `var'
+ 84.         }
+ 85.         foreach var in toilet_girls_yn toilet_g toiletg_func {
+ 86.             replace toilet_girls = `var' if mi(toilet_girls)
+ 87.                 drop `var'
+ 88.         }
+ 89.         foreach var in toilet_boys_yn toiletb toiletb_func {
+ 90.             replace toilet_boys = `var' if mi(toilet_boys) 
+ 91.                 drop `var'
+ 92.         }
+ 93.         replace electricity = electric_yn if mi(electricity)
+ 94.         drop electric_yn
+ 95.         replace boundary_wall = bndrywall if mi(boundary_wall)
+ 96.         drop bndrywall
+ 97.         replace playground = pground_yn if mi(playground)
+ 98.         drop pground_yn
+ 99.     replace books_in_library =  bookinlib if mi(books_in_library)
+100.         drop bookinlib
+101.         replace drinking_water = water if mi(drinking_water)
+102.         drop water
+103.         replace medical_checkup = medchk_yn if mi(medical_checkup)
+104.         drop medchk_yn
+105.         replace ramps = ramps_yn if mi(ramps)
+106.         drop ramps_yn 
+107.         replace no_of_computers = computer if mi(no_of_computers)
+108.         drop computer
+109.         replace male_tch = tch_male if mi(male_tch)
+110.         drop tch_male
+111.         replace female_tch = tch_female if mi(female_tch)
+112.         drop tch_female
+113.         replace noresp_tch = tch_nr if mi(noresp_tch)
+114.         drop tch_nr
+115.         replace head_teacher = headtch if mi(head_teacher)
+116.         drop headtch
+117.         replace graduate_teachers = gradabove if mi(graduate_teachers)
+118.         drop gradabove
+119.         replace tch_with_professional = tchwithprof if mi(tch_with_professional) 
+120.         drop tchwithprof
+121.         replace days_involved_in_non_tch = daysinvld if mi(days_involved_in_non_tch) 
+122.         drop daysinvld
+123.         replace teachers_involved_in_non_tch = tchinvld if mi(teachers_involved_in_non_tch)
+124.         drop tchinvld
+125.         replace status_of_mdm = mealsinsch if mi(status_of_mdm)
+126.         drop mealsinsch
+127.         replace kitchen_devices_grant = kitdevgrant_yn if mi(kitchen_devices_grant)
+128.         drop kitdevgrant_yn
+129.         replace computer_aided = cal_yn if mi(computer_aided)
+130.         drop cal_yn
+131.         drop book_bank blackboard column1
+132.         save "${messy_dta}/facility_append", replace
+133.         
+.         //teachers
+.         use "${messy_dta}/teachers_append", clear
+134.         rename (tch_male tch_female tch_nr gradabove tchwithprof daysinvld tchinvld) ///
+>             (male_tch female_tch noresp_tch graduate_teachers tch_with_professional days_involved_in_non_tch teachers_involved_in_non_tch)
+135.         save "${messy_dta}/teachers_append", replace
+136.         
+.         //rte
+.         use "${messy_dta}/rte_append", clear
+137.         replace ac_year = acyear if mi(ac_year)
+138.         drop acyear
+139.         replace working_days_primary = workdays_pr if mi(working_days_primary)
+140.         drop workdays_pr
+141.         replace working_days_uprimary = workdays_upr if mi(working_days_uprimary)
+142.         drop workdays_upr 
+143.         replace school_hours_children_upri = schhrschild_upr if mi(school_hours_children_upri)
+144.         drop schhrschild_upr
+145.         replace school_hours_tch_p = schhrstch_pr if mi(school_hours_tch_p)
+146.         drop schhrstch_pr
+147.         replace school_hours_tch_upr = schhrstch_upr if mi(school_hours_tch_upr)
+148.         drop schhrstch_upr
+149.         replace approachable_by_all_weather_road  = approachbyroad ///
+>             if mi(approachable_by_all_weather_road)
+150.         drop approachbyroad
+151.         replace cce_implemented = cce_yn if mi(cce_implemented)
+152.         drop cce_yn 
+153.         replace pcr_maintained = people_cumil if mi(pcr_maintained)
+154.         drop people_cumil
+155.         replace pcr_shared_with_parents = pcr_shared if mi(pcr_shared_with_parents)
+156.         drop pcr_shared
+157.         replace wsec25p_applied = children_from_weaker_section_app if mi(wsec25p_applied)
+158.         drop children_from_weaker_section_app
+159.         replace wsec25p_enrolled = children_from_weaker_section_enr if mi(wsec25p_enrolled)
+160.         drop children_from_weaker_section_enr
+161.         replace smc_constituted = smc_yn if mi(smc_constituted)
+162.         drop smc_yn
+163.         replace smc_members_male = smcmem_m if mi(smc_members_male)
+164.         drop smcmem_m 
+165.         replace smc_members_female = smcmem_f if mi(smc_members_female)
+166.         drop smcmem_f
+167.         replace smc_members_parents_male = smsparents_m if mi(smc_members_parents_male)
+168.         drop smsparents_m
+169.         replace smc_members_parents_female = smsparents_f if mi(smc_members_parents_female)
+170.         drop smsparents_f
+171.     replace smc_members_local_authority_male = smcnomlocal_m if mi(smc_members_local_authority_male)
+172.         drop smcnomlocal_m
+173.         replace smc_members_local_authority_fema = smcnomlocal_f if mi(smc_members_local_authority_fema)
+174.         drop smcnomlocal_f
+175.         replace smc_meetings_held = smcmeetings if mi(smc_meetings_held)
+176.         drop smcmeetings
+177.         replace school_developmentplan_prepared = smcsdp_yn if mi(school_developmentplan_prepared) 
+178.         drop smcsdp_yn
+179.         replace smc_children_record_maintained = smschildrec_yn if mi(smc_children_record_maintained)
+180.         drop smschildrec_yn
+181.         replace spltrg_cy_enrolled_b = chld_enrolled_for_sp_training_cu if mi(spltrg_cy_enrolled_b)
+182.         drop chld_enrolled_for_sp_training_cu
+183.         replace spltrg_cy_enrolled_g = v28 if mi(spltrg_cy_enrolled_g)
+184.         drop v28
+185.         replace spltrg_cy_provided_b = spl_training_provided_current_ye if mi(spltrg_cy_provided_b)
+186.         drop spl_training_provided_current_ye
+187.         replace spltrg_cy_provided_g = v30 if mi(spltrg_cy_provided_g)
+188.         drop v30 
+189.         replace spltrg_py_enrolled_b = spl_training_enrolled_previous_y if mi(spltrg_py_enrolled_b)
+190.         drop spl_training_enrolled_previous_y
+191.         replace spltrg_py_enrolled_g = v32 if mi(spltrg_py_enrolled_g)
+192.         drop v32
+193.         replace spltrg_py_provided_b = spl_training_provided_previous_y if mi(spltrg_cy_provided_b)
+194.         drop spl_training_provided_previous_y 
+195.         replace spltrg_py_provided_g = v34 if mi(spltrg_py_provided_g)
+196.         drop v34
+197.         replace spl_training_conducted_by = spltrg_by if mi(spl_training_conducted_by)
+198.         drop spltrg_by
+199.         replace spl_training_place = spltrg_place if mi(spl_training_place)
+200.         drop spltrg_place
+201.         replace spl_training_type = spltrg_type if mi(spl_training_type)
+202.         drop spltrg_type
+203.         replace textbook_received = txtbkrecd_yn if mi(textbook_received)
+204.         drop txtbkrecd_yn
+205.     replace text_book_received_month = txtbkmnth if mi(text_book_received_month)
+206.         drop txtbkmnth
+207.         replace text_book_received_year = txtbkyear if mi(text_book_received_year)
+208.         drop txtbkyear
+209.         replace acstartmnth = academic_session_start_in if mi(acstartmnth)
+210.         drop academic_session_start_in
+211.         replace mdm_status = mealsinsch if mi(mdm_status)
+212.         drop mealsinsch
+213.         replace kitchenshed_status = kitshed if mi(kitchenshed_status)
+214.         drop kitshed
+215.         replace mdm_source = mdm_maintainer if mi(mdm_source)
+216.         drop mdm_maintainer
+217.         rename tch_or_evs_for_spl_training num_tch_evs_for_spltrg
+218.         rename kitchen_devaices_grant received_kitdev_grant
+219.         rename schcd school_code
+220.         save "${messy_dta}/rte_append", replace
+221.                 
+.         //repeaters
+.         use "${messy_dta}/repeaters_append", clear
+222.         replace school_code = schcd if mi(school_code)
+223.         drop schcd
+224.         qui ds repeaters*
+225.         foreach var in `r(varlist)' {
+226.                 dis "`var'"
+227.                 local class = substr("`var'", 12, 1)
+228.                 local gender = substr("`var'", 14, 1)
+229.                 dis "`class' `gender'"
+230.                 replace fail`class'`gender' = `var' if mi(fail`class'`gender')
+231.                 drop `var'
+232.         }
+233.         replace ac_year = acyear if mi(ac_year)
+234.         drop acyear
+235.         save "${messy_dta}/repeaters_append", replace
+236.         
+.         //total enrollment 
+.         use "${messy_dta}/enrollment_append", clear
+237.         replace school_code = schcd if mi(school_code)
+238.         drop schcd
+239.         replace ac_year = acyear if mi(ac_year)
+240.         drop acyear 
+241.         qui ds class*
+242.         foreach var in `r(varlist)' {
+243.                 local class = substr("`var'", 6, 1)
+244.                 local gender = substr("`var'", 18, 1)
+245.                 dis "`class' `gender'"
+246.                 replace c`class'_tot`gender' = `var' if mi(c`class'_tot`gender')
+247.                 drop `var'
+248.         }
+249.         replace apprb5 = c5_appeared_boys if mi(apprb5)
+250.         drop c5_appeared_boys
+251.         replace apprg5 = c5_appeared_girls if mi(apprg5)
+252.         drop c5_appeared_girls
+253.         replace apprb8 = c7_appeared_boys if mi(apprb8)
+254.         drop c7_appeared_boys
+255.         replace apprg8 = c7_appeared_girls if mi(apprg8)
+256.         drop c7_appeared_girls
+257.         replace passb5 = c5_passed_boys if mi(passb5)
+258.         drop c5_passed_boys
+259.         replace passg5 = c5_passed_girls if mi(passg5)
+260.         drop c5_passed_girls 
+261.         replace passb8 = c7_passed_boys if mi(passb8)
+262.         drop c7_passed_boys
+263.         replace passg8 = c7_passed_girls if mi(passg8)
+264.         drop c7_passed_girls
+265.         replace p60b5 = c5_passed_with_more_than_60_boys if mi(p60b5)
+266.         drop c5_passed_with_more_than_60_boys
+267.         replace p60g5 = c5_passed_with_more_than_60_girl if mi(p60g5)
+268.         drop c5_passed_with_more_than_60_girl 
+269.         replace p60b8 = c7_passed_with_more_than_60_boys if mi(p60b8)
+270.         drop c7_passed_with_more_than_60_boys 
+271.         replace p60g8 = c7_passed_with_more_than_60_girl if mi(p60g8)
+272.         drop c7_passed_with_more_than_60_girl
+273.         save "${messy_dta}/enrollment_append", replace
+274.         
+.         //sc enrollment
+.         use "${messy_dta}/scenrollment_append", clear
+275.         replace school_code = schcd if mi(school_code)
+276.         drop schcd
+277.         replace ac_year = acyear if mi(ac_year)
+278.         drop acyear 
+279.         qui ds class*
+280.         foreach var in `r(varlist)' {
+281.                 local class = substr("`var'", 6, 1)
+282.                 local gender = substr("`var'", 15, 1)
+283.                 dis "`class' `gender'"
+284.                 replace c`class'_c`gender' = `var' if mi(c`class'_c`gender')
+285.                 drop `var'
+286.         }
+287.         save "${messy_dta}/scenrollment_append", replace
+288.         
+.         //st enrollment
+.         use "${messy_dta}/stenrollment_append", clear
+289.         replace school_code = schcd if mi(school_code)
+290.         drop schcd
+291.         replace ac_year = acyear if mi(ac_year)
+292.         drop acyear
+293.         qui ds class*
+294.         foreach var in `r(varlist)' {
+295.                 local class = substr("`var'", 6, 1)
+296.                 local gender = substr("`var'", 15, 1)
+297.                 dis "`class' `gender'"
+298.                 replace c`class'_t`gender' = `var' if mi(c`class'_t`gender')
+299.                 drop `var'
+300.         }
+301.         save "${messy_dta}/stenrollment_append", replace
+302.         
+.         //obc enrollment
+.         use "${messy_dta}/obcenrollment_append", clear
+303.         replace school_code = schcd if mi(school_code)
+304.         drop schcd
+305.         replace ac_year = acyear if mi(ac_year)
+306.         drop acyear
+307.         qui ds class*
+308.         foreach var in `r(varlist)' {
+309.                 local class = substr("`var'", 6, 1)
+310.                 local gender = substr("`var'", 16, 1)
+311.                 dis "`class' `gender'"
+312.                 replace c`class'_o`gender' = `var' if mi(c`class'_o`gender')
+313.                 drop `var'
+314.         }
+315.         save "${messy_dta}/obcenrollment_append", replace
+316.         
+.         //disabled enrollment
+.         use "${messy_dta}/disabledenrollment_append", clear 
+317.         replace school_code = schcd if mi(school_code)
+318.         drop schcd
+319.         replace ac_year = acyear if mi(ac_year)
+320.         drop acyear
+321.         qui ds disabled*
+322.         foreach var in `r(varlist)' {
+323.                 local class = substr("`var'", 11, 1)
+324.                 local gender = substr("`var'", 13, 1)
+325.                 dis "`class' `gender'"
+326.                 replace c`class'_dis_`gender' = `var' if mi(c`class'_dis_`gender')
+327.                 drop `var'
+328.         }
+329.         save "${messy_dta}/disabledenrollment_append", replace 
+330. end
+
+. 
+. program merge_files_pre2017
+  1.     use "${messy_dta}/basic_append", clear
+  2.         
+.         merge 1:1 school_code ac_year using "${messy_dta}/general_append", assert(1 2 3) keep(3) ///
 >             gen(merge_general)
-
-    Result                      Number of obs
-    -----------------------------------------
-    Not matched                             0
-    Matched                        17,966,993  (merge_general==3)
-    -----------------------------------------
-
-.         drop merge_general
-
-.         
-.         merge 1:1 school_code ac_year using "${messy_dta}/facility_append", assert(1 2 3) keep(3) 
-> ///
+  3.         drop merge_general
+  4.         
+.         merge 1:1 school_code ac_year using "${messy_dta}/facility_append", assert(1 2 3) keep(3) ///
 >             gen(merge_facility)
-
-    Result                      Number of obs
-    -----------------------------------------
-    Not matched                             0
-    Matched                        17,966,993  (merge_facility==3)
-    -----------------------------------------
-
-.         drop merge_facility
-
-.         
-.         merge 1:1 school_code ac_year using "${messy_dta}/teachers_append", assert(1 2 3) keep(1 3
-> ) ///
+  5.         drop merge_facility
+  6.         
+.         merge 1:1 school_code ac_year using "${messy_dta}/teachers_append", assert(1 2 3) keep(1 3) ///
 >             gen(merge_teachers)
-
-    Result                      Number of obs
-    -----------------------------------------
-    Not matched                     4,805,675
-        from master                 4,805,675  (merge_teachers==1)
-        from using                          0  (merge_teachers==2)
-
-    Matched                        13,161,318  (merge_teachers==3)
-    -----------------------------------------
-
-.         drop merge_teachers
-
-.                 
+  7.         drop merge_teachers
+  8.                 
 .         merge 1:1 school_code ac_year using "${messy_dta}/rte_append", assert(1 2 3) keep(1 3) ///
 >             gen(merge_rte)
-
-    Result                      Number of obs
-    -----------------------------------------
-    Not matched                     6,109,531
-        from master                 6,109,531  (merge_rte==1)
-        from using                          0  (merge_rte==2)
-
-    Matched                        11,857,462  (merge_rte==3)
-    -----------------------------------------
-
-.         drop merge_rte
-
-.                 
-.         merge 1:1 school_code ac_year using "${messy_dta}/repeaters_append", assert(1 2 3) keep(3)
->  ///
+  9.         drop merge_rte
+ 10.                 
+.         merge 1:1 school_code ac_year using "${messy_dta}/repeaters_append", assert(1 2 3) keep(3) ///
 >             gen(merge_repeaters)
-
-    Result                      Number of obs
-    -----------------------------------------
-    Not matched                             0
-    Matched                        17,966,993  (merge_repeaters==3)
-    -----------------------------------------
-
-.         drop merge_repeaters
-
-.                 
-.         merge 1:1 school_code ac_year using "${messy_dta}/enrollment_append", assert(1 2 3) ///
+ 11.         drop merge_repeaters
+ 12.                 
+.         merge 1:1 school_code ac_year using "${messy_dta}/enrollment_append", assert(1 2 3) keep(3) ///
 >             gen(merge_enrollment)
-
-    Result                      Number of obs
-    -----------------------------------------
-    Not matched                             0
-    Matched                        17,966,993  (merge_enrollment==3)
-    -----------------------------------------
-
-. 
-end of do-file
-
-. keep if merge_enrollment == 3
-(0 observations deleted)
-
-. drop merge_enrollment
-
-. merge 1:1 school_code ac_year using "${messy_dta}/scenrollment_append", assert(1 2 3) ///
-option / not allowed
-r(198);
-
-. 
-.     gen(merge_scenrollment)
-( invalid name
-r(198);
-
-. do "C:\Users\NEHANA~1\AppData\Local\Temp\STDa7c0_000000.tmp"
-
-.         merge 1:1 school_code ac_year using "${messy_dta}/scenrollment_append", assert(1 2 3) ///
+ 13.         drop merge_enrollment
+ 14.                 
+.         merge 1:1 school_code ac_year using "${messy_dta}/scenrollment_append", assert(1 2 3) keep(3) ///
 >             gen(merge_scenrollment)
-variables school_code ac_year do not uniquely identify observations in the using data
-r(459);
-
-end of do-file
-
-r(459);
-
-. do "C:\Users\NEHANA~1\AppData\Local\Temp\STDa7c0_000000.tmp"
-
-.         merge 1:1 school_code ac_year using "${messy_dta}/scenrollment_append", assert(1 2 3) ///
->             gen(merge_scenrollment)
-
-    Result                      Number of obs
-    -----------------------------------------
-    Not matched                             0
-    Matched                        17,966,993  (merge_scenrollment==3)
-    -----------------------------------------
-
-. 
-end of do-file
-
-. drop merge_scenrollment
-
-. do "C:\Users\NEHANA~1\AppData\Local\Temp\STDa7c0_000000.tmp"
-
-.         merge 1:1 school_code ac_year using "${messy_dta}/stenrollment_append", assert(1 2 3) ///
+ 15.         drop merge_scenrollment
+ 16.         
+.         merge 1:1 school_code ac_year using "${messy_dta}/stenrollment_append", assert(1 2 3) keep(3) ///
 >             gen(merge_stenrollment)
-
-    Result                      Number of obs
-    -----------------------------------------
-    Not matched                             0
-    Matched                        17,966,993  (merge_stenrollment==3)
-    -----------------------------------------
-
-. 
-end of do-file
-
-. drop merge_stenrollment
-
-. do "C:\Users\NEHANA~1\AppData\Local\Temp\STDa7c0_000000.tmp"
-
-.         merge 1:1 school_code ac_year using "${messy_dta}/obcenrollment_append", assert(1 2 3) ///
+ 17.         drop merge_stenrollment
+ 18.         
+.         merge 1:1 school_code ac_year using "${messy_dta}/obcenrollment_append", assert(1 2 3) keep(3) ///
 >             gen(merge_obcenrollment)
-
-    Result                      Number of obs
-    -----------------------------------------
-    Not matched                             0
-    Matched                        17,966,993  (merge_obcenrollment==3)
-    -----------------------------------------
-
-. 
-end of do-file
-
-. drop merge_obcenrollment
-
-. do "C:\Users\NEHANA~1\AppData\Local\Temp\STDa7c0_000000.tmp"
-
-.         merge 1:1 school_code ac_year using "${messy_dta}/disabledenrollment_append", assert(1 2 3
-> ) ///
+ 19.         drop merge_obcenrollment
+ 20.         
+.         merge 1:1 school_code ac_year using "${messy_dta}/disabledenrollment_append", assert(1 2 3) ///
 >             gen(merge_disabledenrollment)
-
-    Result                      Number of obs
-    -----------------------------------------
-    Not matched                             0
-    Matched                        17,966,993  (merge_disabledenrollment==3)
-    -----------------------------------------
+ 21.         drop merge_disabledenrollment
+ 22.         
+.         save "${clean_dta}/panel_pre2017", replace
+ 23. end  
 
 . 
-end of do-file
+. program merge_files_post2017
+  1.     use ../output/messy_dta/profile_append_post2017, clear
+  2.         
+.         merge 1:1 psuedocode using ../output/messy_dta/teachers_append_post2017", assert(1 2 3) gen(merge_teachers)
+  3. end
 
-. drop merge_disabled
-
-. global clean_dta "C:\Users\Neha Narayan\Desktop\GitHub\senior-thesis\derived\output\clean_dta"
-
-. save "${clean_dta}/panel_pre2017", replace
-(file C:\Users\Neha
-    Narayan\Desktop\GitHub\senior-thesis\derived\output\clean_dta/panel_pre2017.dta not found)
-file C:\Users\Neha Narayan\Desktop\GitHub\senior-thesis\derived\output\clean_dta/panel_pre2017.dta
-    saved
-
-. count
-  17,966,993
-
-. ds, varwidth(32)
-district                          fail5g
-school_code                       fail6g
-ac_year                           fail7g
-schoolname                        fail8g
-blockname                         fail9g
-clustername                       fail10g
-villagename                       fail11g
-pincode                           fail12g
-rural_urban                       c1_totb
-medium1                           c1_totg
-medium2                           c2_totb
-medium3                           c2_totg
-medium4                           c3_totb
-distance_brc                      c3_totg
-distance_crc                      c4_totb
-pre_pry_yn                        c4_totg
-residential_sch_yn                c5_totb
-sch_management                    c5_totg
-lowestclass                       c6_totb
-highestclass                      c6_totg
-schoolcategory_pre2013            c7_totb
-preprimary_students               c7_totg
-schooltype                        c8_totb
-shiftschool_ind                   c8_totg
-num_workingdays                   c9_b
-no_of_acad_inspection             c9_g
-residential_sch_type              c10_b
-pre_pry_teachers                  c10_g
-visits_by_brc                     c11_b
-visits_by_crc                     c11_g
-school_dev_grant_recd             c12_b
-school_dev_grant_expnd            c12_g
-tlm_grant_recd                    senrb5
-tlm_grant_expnd                   senrg5
-funds_from_students_recd          senrb8
-funds_from_students_expnd         senrg8
-year_est                          apprb5
-schoolcategory_post2013           apprg5
-building_status                   apprb8
-tot_clrooms                       apprg8
-classrooms_in_good_condition      passb5
-classrooms_require_major_repair   passg5
-classrooms_require_minor_repair   passb8
-other_rooms_in_good_cond          passg8
-other_rooms_need_major_rep        p60b5
-other_rooms_need_minor_rep        p60g5
-toilet_common                     p60b8
-toilet_girls                      p60g8
-electricity                       c1_cb
-boundary_wall                     c2_cb
-playground                        c3_cb
-books_in_library                  c4_cb
-drinking_water                    c5_cb
-medical_checkup                   c6_cb
-ramps                             c7_cb
-no_of_computers                   c8_cb
-male_tch                          c9_cb
-female_tch                        c10_cb
-noresp_tch                        c11_cb
-head_teacher                      c12_cb
-graduate_teachers                 c1_cg
-tch_with_professional_qualificat  c2_cg
-days_involved_in_non_tch_assgn    c3_cg
-teachers_involved_in_non_tch_ass  c4_cg
-kitchen_devices_grant             c5_cg
-status_of_mdm                     c6_cg
-computer_aided_learnin_lab        c7_cg
-separate_room_for_headmaster      c8_cg
-toilet_boys                       c9_cg
-library_yn                        c10_cg
-hmroom_yn                         c11_cg
-headtch                           c12_cg
-tch_with_professional             c1_tb
-days_involved_in_non_tch          c2_tb
-teachers_involved_in_non_tch      c3_tb
-htchname                          c4_tb
-working_days_primary              c5_tb
-working_days_uprimary             c6_tb
-schoool_hours_children_pri        c7_tb
-school_hours_children_upri        c8_tb
-school_hours_tch_p                c9_tb
-school_hours_tch_upr              c10_tb
-approachable_by_all_weather_road  c11_tb
-cce_implemented                   c12_tb
-pcr_shared_with_parents           c1_tg
-aid_received                      c2_tg
-chilren_admitted_for_free_educat  c3_tg
-smc_constituted                   c4_tg
-smc_members_male                  c5_tg
-smc_members_female                c6_tg
-smc_members_parents_male          c7_tg
-smc_members_parents_female        c8_tg
-smc_members_local_authority_male  c9_tg
-smc_members_local_authority_fema  c10_tg
-smc_meetings_held                 c11_tg
-school_developmentplan_prepared   c12_tg
-smc_children_record_maintained    c1_ob
-spl_training_conducted_by         c2_ob
-spl_training_place                c3_ob
-spl_training_type                 c4_ob
-num_tch_evs_for_spltrg            c5_ob
-spl_training_material             c6_ob
-textbook_received                 c7_ob
-text_book_received_month          c8_ob
-text_book_received_year           c9_ob
-mdm_status                        c10_ob
-kitchenshed_status                c11_ob
-mdm_source                        c12_ob
-days_meals_served                 c1_og
-meals_served_prev_yr              c2_og
-students_opted_mdm_b              c3_og
-stdents_opted_mdm_g               c4_og
-received_kitdev_grant             c5_og
-cook_m                            c6_og
-cook_f                            c7_og
-inspections_by_so                 c8_og
-inspections_by_cm                 c9_og
-pcr_maintained                    c10_og
-wsec25p_enrolled                  c11_og
-spltrg_cy_enrolled_b              c12_og
-spltrg_cy_enrolled_g              c1_dis_b
-spltrg_cy_provided_b              c1_dis_g
-spltrg_cy_provided_g              c2_dis_b
-spltrg_py_enrolled_b              c2_dis_g
-spltrg_py_enrolled_g              c3_dis_b
-spltrg_py_provided_b              c3_dis_g
-spltrg_py_provided_g              c4_dis_b
-acstartmnth                       c4_dis_g
-wsec25p_applied                   c5_dis_b
-fail1b                            c5_dis_g
-fail2b                            c6_dis_b
-fail3b                            c6_dis_g
-fail4b                            c7_dis_b
-fail5b                            c7_dis_g
-fail6b                            c8_dis_b
-fail7b                            c8_dis_g
-fail8b                            c9_dis_b
-fail9b                            c9_dis_g
-fail10b                           c10_dis_b
-fail11b                           c10_dis_g
-fail12b                           c11_dis_b
-fail1g                            c11_dis_g
-fail2g                            c12_dis_b
-fail3g                            c12_dis_g
-fail4g
-
-. exit, clear
+. 
+. 
+. 
+. *Execute
+. main
+(note: variable item_desc was str9, now str10 to accommodate using data's values)
+(note: variable c4_g was str3, now str4 to accommodate using data's values)
+(note: variable c6_g was str3, now str4 to accommodate using data's values)
+(note: variable c7_g was str3, now str4 to accommodate using data's values)
+(note: variable c8_g was str3, now str4 to accommodate using data's values)
+(note: variable item_desc was str10, now str15 to accommodate using data's values)
