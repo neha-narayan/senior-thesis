@@ -12,10 +12,10 @@ program main
 //  prep_post2017
 // 	append_files
 // 	transform_enrollment_post2017
-    append_files_post2017
+//    append_files_post2017
 // 	recode_appended
 // 	merge_files_pre2017
-//    merge_files_post2017
+   merge_files_post2017
 end 
 
 program prep_post2017
