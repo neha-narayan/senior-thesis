@@ -776,3 +776,6 @@ program merge_files_post2017
 	
 	save ../output/clean_dta/panel_post2017, replace*/
 end
+
+*Execute
+main
