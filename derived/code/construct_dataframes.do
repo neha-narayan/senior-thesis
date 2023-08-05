@@ -1513,25 +1513,30 @@ end
 
 program merge_files_post2017
     use ../output/messy_dta/profile_append_post2017, clear
-	duplicates drop 
+	qui ds psuedocode ac_year, not
+	collapse (firstnm) `r(varlist)', by(psuedocode ac_year)
 	save ../output/messy_dta/profile_append_post2017, replace
 	
-	use ../output/messy_dta/facility_append_post2017, clear
-	duplicates drop 
-	save ../output/messy_dta/facility_append_post2017, replace
-	
-	use ../output/messy_dta/teachers_append_post2017, clear
-	duplicates drop 
-	save ../output/messy_dta/teachers_append_post2017, replace
-	
 	use ../output/messy_dta/enrollment_append_post2017, clear
-	duplicates drop 
+	qui ds psuedocode ac_year, not
+	collapse (firstnm) `r(varlist)', by(psuedocode ac_year)
 	save ../output/messy_dta/enrollment_append_post2017, replace
-
-	/*merge 1:1 psuedocode ac_year using ../output/messy_dta/teachers_append_post2017, assert(1 2 3) gen(merge_teachers)
+	
+	/*use ../output/messy_dta/profile_append_post2017, clear
+	
+	merge 1:1 psuedocode ac_year using ../output/messy_dta/teachers_append_post2017, ///
+	    assert(1 2 3) keep(3) gen(merge_teachers)
 	drop merge_teachers
 	
-	merge 1:1 psuedocode ac_year using ../output/messy_dta/facility_append_post2017, assert(1 2 3) gen(merge_teachers)*/
+	merge 1:1 psuedocode ac_year using ../output/messy_dta/facility_append_post2017, ///
+	    assert(1 2 3) keep(3) gen(merge_facility)
+	drop merge_facility
+	
+	merge 1:1 psuedocode ac_year using ../output/messy_dta/enrollment_append_post2017, ///
+	    assert(1 2 3) keep(3) gen(merge_enroll)
+	drop merge_enroll
+	
+	save ../output/clean_dta/panel_post2017, replace*/
 end
 
 
