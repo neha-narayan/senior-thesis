@@ -12,10 +12,10 @@ program main
 //  prep_post2017
 // 	append_files
 // 	transform_enrollment_post2017
-//    append_files_post2017
+   append_files_post2017
 // 	recode_appended
 // 	merge_files_pre2017
-   merge_files_post2017
+//  merge_files_post2017
 end 
 
 program prep_post2017
@@ -316,12 +316,30 @@ program append_files
 end 
 
 program append_files_post2017
+	foreach year in 2018-19 2019-20 2020-21 2021-22 {
+	    use ../output/messy_dta/profile_`year', clear
+		qui ds psuedocode ac_year, not
+	    collapse (firstnm) `r(varlist)', by(psuedocode ac_year)
+		save ../output/messy_dta/profile_`year', replace
+		use ../output/messy_dta/enrollment_`year', clear
+		qui ds psuedocode ac_year, not
+	    collapse (firstnm) `r(varlist)', by(psuedocode ac_year)
+		save ../output/messy_dta/enrollment_`year', replace
+	}
+	
     clear
     foreach year in 2018-19 2019-20 2020-21 2021-22 {
 		append using ../output/messy_dta/profile_`year'
 	}
 	qui duplicates drop 
 	save ../output/messy_dta/profile_append_post2017, replace
+	
+	clear 
+	foreach year in 2018-19 2019-20 2020-21 2021-22 {
+		append using ../output/messy_dta/enrollment_`year'
+	}
+	qui duplicates drop 
+	save ../output/messy_dta/enrollment_append_post2017, replace
 		
 	/*clear 
 	foreach year in 2018-19 2019-20 2020-21 2021-22 {
@@ -336,13 +354,6 @@ program append_files_post2017
 	}
 	qui duplicates drop 
 	save ../output/messy_dta/teachers_append_post2017, replace*/
-	
-	clear 
-	foreach year in 2018-19 2019-20 2020-21 2021-22 {
-		append using ../output/messy_dta/enrollment_`year'
-	}
-	qui duplicates drop 
-	save ../output/messy_dta/enrollment_append_post2017, replace
 end 
 
 program recode_appended
