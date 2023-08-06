@@ -1,8 +1,9 @@
-------------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
       name:  <unnamed>
-       log:  /oscar/scratch/nnaraya6/senior-thesis/derived/code/construct_dataframes.log
+       log:  C:\Users\Neha Narayan\Desktop\GitHub\senior-thesis\derived\code\construct_dataframes.lo
+> g
   log type:  text
- opened on:   3 Aug 2023, 23:54:25
+ opened on:   5 Aug 2023, 18:20:35
 
 . clear all
 
@@ -19,18 +20,18 @@
 
 . 
 . program main
-  1. //  prep_post2017
-. //      append_files
+  1.   prep_post2017
+  2. //      append_files
 . //      transform_enrollment_post2017
-.     append_files_post2017
-  2. //      recode_appended
+. //   append_files_post2017
+. //      recode_appended
 . //      merge_files_pre2017
-. //    merge_files_post2017
+. //  merge_files_post2017
 . end 
 
 . 
 . program prep_post2017
-  1.     foreach year in 2018-19 2019-20 2020-21 2021-22 {
+  1.     foreach year in 2019-20 2020-21 2021-22 {
   2.             clear
   3.             local idx = 0
   4.         local filenames : dir "${raw}\\`year'" files "nationalEnrol*.csv"
@@ -50,127 +51,127 @@
  18.             save "${messy_dta}\enrollment_`year'", replace
  19.     }
  20. 
-.     foreach year in 2018-19 2019-20  {
- 21.             clear
- 22.             local idx = 0
- 23.         local filenames : dir "${raw}\\`year'" files "100_prof*.csv"
- 24.             cap dis "`filenames'"
- 25.             foreach file in `filenames' {
- 26.                     local idx "`++idx'"
- 27.                     import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
- 28.                     tempfile prof_`idx'
- 29.                     save "`prof_`idx''"
- 30.                     clear
- 31.             }    
- 32.             clear
- 33.             forvalues i = 1/`idx' {
- 34.                     append using "`prof_`i''"
- 35.             }
- 36.                 gen ac_year = "`year'"
- 37.             save "${messy_dta}\profile_`year'", replace
- 38.     }
- 39. 
-.     foreach year in 2020-21 2021-22  {
- 40.             clear
- 41.             local idx = 0
- 42.         local filenames : dir "${raw}\\`year'" files "nationalProfile*.csv"
- 43.             cap dis "`filenames'"
- 44.             foreach file in `filenames' {
- 45.                     local idx "`++idx'"
- 46.                     import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
- 47.                     tempfile prof_`idx'
- 48.                     save "`prof_`idx''"
- 49.                     clear
- 50.             }
- 51.             clear
- 52.             forvalues i = 1/`idx' {
- 53.                     append using "`prof_`i''"
- 54.             }
- 55.                 gen ac_year = "`year'"
- 56.             save "${messy_dta}\profile_`year'", replace
- 57.     }
- 58. 
-.     foreach year in 2018-19 2019-20  {
- 59.             clear
- 60.             local idx = 0
- 61.         local filenames : dir "${raw}\\`year'" files "100_fac*.csv"
- 62.             cap dis "`filenames'"
- 63.             foreach file in `filenames' {
- 64.                     local idx "`++idx'"
- 65.                     import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
- 66.                     tempfile facility_`idx'
- 67.                     save "`facility_`idx''"
- 68.                     clear
- 69.             }
- 70.             clear
- 71.             forvalues i = 1/`idx' {
- 72.                     append using "`facility_`i''"
- 73.             }
- 74.                 gen ac_year = "`year'"
- 75.             save "${messy_dta}\facility_`year'", replace
- 76.     }
- 77. 
-.     foreach year in 2020-21 2021-22  {
- 78.             clear
- 79.             local idx = 0
- 80.         local filenames : dir "${raw}\\`year'" files "nationalfacility*.csv"
- 81.             cap dis "`filenames'"
- 82.             foreach file in `filenames' {
- 83.                     local idx "`++idx'"
- 84.                     import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
- 85.                     tempfile facility_`idx'
- 86.                     save "`facility_`idx''"
- 87.                     clear
- 88.             }
- 89.             clear
- 90.             forvalues i = 1/`idx' {
- 91.                     append using "`facility_`i''"
- 92.             }
- 93.                 gen ac_year = "`year'"
- 94.             save "${messy_dta}\facility_`year'", replace
- 95.     }
- 96. 
-. //teachers
-.     foreach year in 2018-19 2019-20  {
- 97.             clear
- 98.             local idx = 0
- 99.         local filenames : dir "${raw}\\`year'" files "100_tch*.csv"
-100.             cap dis "`filenames'"
-101.             foreach file in `filenames' {
-102.                     local idx "`++idx'"
-103.                     import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
-104.                     tempfile teachers_`idx'
-105.                     save "`teachers_`idx''"
-106.                     clear
-107.             }
-108.             clear
-109.             forvalues i = 1/`idx' {
-110.                     append using "`teachers_`i''"
-111.             }
-112.                 gen ac_year = "`year'"
-113.             save "${messy_dta}\teachers_`year'", replace
-114.     }
-115. 
-.     foreach year in 2020-21 2021-22  {
-116.             clear
-117.             local idx = 0
-118.         local filenames : dir "${raw}\\`year'" files "nationalTeacher*.csv"
-119.             cap dis "`filenames'"
-120.             foreach file in `filenames' {
-121.                     local idx "`++idx'"
-122.                     import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
-123.                     tempfile teachers_`idx'
-124.                     save "`teachers_`idx''"
-125.                     clear
-126.             }
-127.             clear
-128.             forvalues i = 1/`idx' {
-129.                     append using "`teachers_`i''"
-130.             }
-131.                 gen ac_year = "`year'"
-132.             save "${messy_dta}\teachers_`year'", replace
-133.     }
-134. end 
+.     /*foreach year in 2018-19 2019-20  {
+>             clear
+>             local idx = 0
+>         local filenames : dir "${raw}\\`year'" files "100_prof*.csv"
+>             cap dis "`filenames'"
+>             foreach file in `filenames' {
+>                     local idx "`++idx'"
+>                     import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+>                     tempfile prof_`idx'
+>                     save "`prof_`idx''"
+>                     clear
+>             }    
+>             clear
+>             forvalues i = 1/`idx' {
+>                     append using "`prof_`i''"
+>             }
+>                 gen ac_year = "`year'"
+>             save "${messy_dta}\profile_`year'", replace
+>     }
+> 
+>     foreach year in 2020-21 2021-22  {
+>             clear
+>             local idx = 0
+>         local filenames : dir "${raw}\\`year'" files "nationalProfile*.csv"
+>             cap dis "`filenames'"
+>             foreach file in `filenames' {
+>                     local idx "`++idx'"
+>                     import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+>                     tempfile prof_`idx'
+>                     save "`prof_`idx''"
+>                     clear
+>             }
+>             clear
+>             forvalues i = 1/`idx' {
+>                     append using "`prof_`i''"
+>             }
+>                 gen ac_year = "`year'"
+>             save "${messy_dta}\profile_`year'", replace
+>     }
+> 
+>     foreach year in 2018-19 2019-20  {
+>             clear
+>             local idx = 0
+>         local filenames : dir "${raw}\\`year'" files "100_fac*.csv"
+>             cap dis "`filenames'"
+>             foreach file in `filenames' {
+>                     local idx "`++idx'"
+>                     import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+>                     tempfile facility_`idx'
+>                     save "`facility_`idx''"
+>                     clear
+>             }
+>             clear
+>             forvalues i = 1/`idx' {
+>                     append using "`facility_`i''"
+>             }
+>                 gen ac_year = "`year'"
+>             save "${messy_dta}\facility_`year'", replace
+>     }
+> 
+>     foreach year in 2020-21 2021-22  {
+>             clear
+>             local idx = 0
+>         local filenames : dir "${raw}\\`year'" files "nationalfacility*.csv"
+>             cap dis "`filenames'"
+>             foreach file in `filenames' {
+>                     local idx "`++idx'"
+>                     import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+>                     tempfile facility_`idx'
+>                     save "`facility_`idx''"
+>                     clear
+>             }
+>             clear
+>             forvalues i = 1/`idx' {
+>                     append using "`facility_`i''"
+>             }
+>                 gen ac_year = "`year'"
+>             save "${messy_dta}\facility_`year'", replace
+>     }
+> 
+> //teachers
+>     foreach year in 2018-19 2019-20  {
+>             clear
+>             local idx = 0
+>         local filenames : dir "${raw}\\`year'" files "100_tch*.csv"
+>             cap dis "`filenames'"
+>             foreach file in `filenames' {
+>                     local idx "`++idx'"
+>                     import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+>                     tempfile teachers_`idx'
+>                     save "`teachers_`idx''"
+>                     clear
+>             }
+>             clear
+>             forvalues i = 1/`idx' {
+>                     append using "`teachers_`i''"
+>             }
+>                 gen ac_year = "`year'"
+>             save "${messy_dta}\teachers_`year'", replace
+>     }
+> 
+>     foreach year in 2020-21 2021-22  {
+>             clear
+>             local idx = 0
+>         local filenames : dir "${raw}\\`year'" files "nationalTeacher*.csv"
+>             cap dis "`filenames'"
+>             foreach file in `filenames' {
+>                     local idx "`++idx'"
+>                     import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+>                     tempfile teachers_`idx'
+>                     save "`teachers_`idx''"
+>                     clear
+>             }
+>             clear
+>             forvalues i = 1/`idx' {
+>                     append using "`teachers_`i''"
+>             }
+>                 gen ac_year = "`year'"
+>             save "${messy_dta}\teachers_`year'", replace
+>     } */
+. end 
 
 . 
 . program append_files
@@ -314,7 +315,8 @@
 119.         
 .         clear
 120.         forvalues year = 2005/2017 {
-121.             import delimited "${csv}\disabledenrollment_`year'", varnames(1) stringcols(_all) ///
+121.             import delimited "${csv}\disabledenrollment_`year'", varnames(1) stringcols(_all) /
+> //
 >                 bindquote(strict) maxquotedrows(100)
 122.                 tempfile disabledenrollment_`year'
 123.                 save "`disabledenrollment_`year''"
@@ -329,14 +331,32 @@
 
 . 
 . program append_files_post2017
-  1.     /*clear
->     foreach year in 2018-19 2019-20 2020-21 2021-22 {
->                 append using ../output/messy_dta/profile_`year'
->         }
->         qui duplicates drop 
->         save ../output/messy_dta/profile_append_post2017, replace
->                 
->         clear 
+  1.         foreach year in 2018-19 2019-20 2020-21 2021-22 {
+  2.             use ../output/messy_dta/profile_`year', clear
+  3.                 qui ds psuedocode ac_year, not
+  4.             collapse (firstnm) `r(varlist)', by(psuedocode ac_year)
+  5.                 save ../output/messy_dta/profile_`year', replace
+  6.                 use ../output/messy_dta/enrollment_`year', clear
+  7.                 qui ds psuedocode ac_year, not
+  8.             collapse (firstnm) `r(varlist)', by(psuedocode ac_year)
+  9.                 save ../output/messy_dta/enrollment_`year', replace
+ 10.         }
+ 11.         
+.     clear
+ 12.     foreach year in 2018-19 2019-20 2020-21 2021-22 {
+ 13.                 append using ../output/messy_dta/profile_`year'
+ 14.         }
+ 15.         qui duplicates drop 
+ 16.         save ../output/messy_dta/profile_append_post2017, replace
+ 17.         
+.         clear 
+ 18.         foreach year in 2018-19 2019-20 2020-21 2021-22 {
+ 19.                 append using ../output/messy_dta/enrollment_`year'
+ 20.         }
+ 21.         qui duplicates drop 
+ 22.         save ../output/messy_dta/enrollment_append_post2017, replace
+ 23.                 
+.         /*clear 
 >         foreach year in 2018-19 2019-20 2020-21 2021-22 {
 >                 append using ../output/messy_dta/facility_`year'
 >         }
@@ -349,14 +369,7 @@
 >         }
 >         qui duplicates drop 
 >         save ../output/messy_dta/teachers_append_post2017, replace*/
-.         
-.         clear 
-  2.         foreach year in 2018-19 2019-20 2020-21 2021-22 {
-  3.                 append using ../output/messy_dta/enrollment_`year'
-  4.         }
-  5.         qui duplicates drop 
-  6.         save ../output/messy_dta/enrollment_append_post2017, replace
-  7. end 
+. end 
 
 . 
 . program recode_appended
@@ -396,7 +409,8 @@
  31.         replace shift_school_yn = schshi_yn if mi(shift_school_yn)
  32.         drop schshi_yn
  33.         destring workdays_* no_of_working_days, replace
- 34.         replace no_of_working_days = workdays_pr + workdays_upr + workdays_sec + workdays_hsec ///
+ 34.         replace no_of_working_days = workdays_pr + workdays_upr + workdays_sec + workdays_hsec 
+> ///
 >             if mi(no_of_working_days)
  35.         drop workdays_*
  36.         replace no_of_acad_inspection = noinspect if mi(no_of_acad_inspection)
@@ -422,8 +436,10 @@
  56.         replace funds_from_students_expnd = funds_e if mi(funds_from_students_expnd)
  57.         drop funds_e
  58.         
-.         rename (schoolcode academicyear ruralurban distancetobrc distancetocrc preprimary_ind resschool_ind) ///
->         (school_code ac_year rural_urban distance_brc distance_crc pre_pry_yn residential_sch_yn)   
+.         rename (schoolcode academicyear ruralurban distancetobrc distancetocrc preprimary_ind ress
+> chool_ind) ///
+>         (school_code ac_year rural_urban distance_brc distance_crc pre_pry_yn residential_sch_yn) 
+>   
  59.         rename (estdyear) (year_est)
  60.         drop boardsec boardhsec schmgts schmgths
  61.         save "${messy_dta}/general_append", replace
@@ -438,9 +454,11 @@
  68.     drop clrooms
  69.         replace classrooms_in_good_condition = clgood if mi(classrooms_in_good_condition)
  70.         drop clgood
- 71.         replace classrooms_require_major_repair = clmajor if mi(classrooms_require_major_repair)
+ 71.         replace classrooms_require_major_repair = clmajor if mi(classrooms_require_major_repair
+> )
  72.         drop clmajor 
- 73.         replace classrooms_require_minor_repair = clminor if mi(classrooms_require_minor_repair)
+ 73.         replace classrooms_require_minor_repair = clminor if mi(classrooms_require_minor_repair
+> )
  74.         drop clminor
  75.         replace other_rooms_in_good_cond = othgood if mi(other_rooms_in_good_cond)
  76.         drop othgood
@@ -504,7 +522,8 @@
 .         //teachers
 .         use "${messy_dta}/teachers_append", clear
 134.         rename (tch_male tch_female tch_nr gradabove tchwithprof daysinvld tchinvld) ///
->             (male_tch female_tch noresp_tch graduate_teachers tch_with_professional days_involved_in_non_tch teachers_involved_in_non_tch)
+>             (male_tch female_tch noresp_tch graduate_teachers tch_with_professional days_involved_
+> in_non_tch teachers_involved_in_non_tch)
 135.         save "${messy_dta}/teachers_append", replace
 136.         
 .         //rte
@@ -544,29 +563,37 @@
 168.         drop smsparents_m
 169.         replace smc_members_parents_female = smsparents_f if mi(smc_members_parents_female)
 170.         drop smsparents_f
-171.     replace smc_members_local_authority_male = smcnomlocal_m if mi(smc_members_local_authority_male)
+171.     replace smc_members_local_authority_male = smcnomlocal_m if mi(smc_members_local_authority_
+> male)
 172.         drop smcnomlocal_m
-173.         replace smc_members_local_authority_fema = smcnomlocal_f if mi(smc_members_local_authority_fema)
+173.         replace smc_members_local_authority_fema = smcnomlocal_f if mi(smc_members_local_author
+> ity_fema)
 174.         drop smcnomlocal_f
 175.         replace smc_meetings_held = smcmeetings if mi(smc_meetings_held)
 176.         drop smcmeetings
-177.         replace school_developmentplan_prepared = smcsdp_yn if mi(school_developmentplan_prepared) 
+177.         replace school_developmentplan_prepared = smcsdp_yn if mi(school_developmentplan_prepar
+> ed) 
 178.         drop smcsdp_yn
-179.         replace smc_children_record_maintained = smschildrec_yn if mi(smc_children_record_maintained)
+179.         replace smc_children_record_maintained = smschildrec_yn if mi(smc_children_record_maint
+> ained)
 180.         drop smschildrec_yn
-181.         replace spltrg_cy_enrolled_b = chld_enrolled_for_sp_training_cu if mi(spltrg_cy_enrolled_b)
+181.         replace spltrg_cy_enrolled_b = chld_enrolled_for_sp_training_cu if mi(spltrg_cy_enrolle
+> d_b)
 182.         drop chld_enrolled_for_sp_training_cu
 183.         replace spltrg_cy_enrolled_g = v28 if mi(spltrg_cy_enrolled_g)
 184.         drop v28
-185.         replace spltrg_cy_provided_b = spl_training_provided_current_ye if mi(spltrg_cy_provided_b)
+185.         replace spltrg_cy_provided_b = spl_training_provided_current_ye if mi(spltrg_cy_provide
+> d_b)
 186.         drop spl_training_provided_current_ye
 187.         replace spltrg_cy_provided_g = v30 if mi(spltrg_cy_provided_g)
 188.         drop v30 
-189.         replace spltrg_py_enrolled_b = spl_training_enrolled_previous_y if mi(spltrg_py_enrolled_b)
+189.         replace spltrg_py_enrolled_b = spl_training_enrolled_previous_y if mi(spltrg_py_enrolle
+> d_b)
 190.         drop spl_training_enrolled_previous_y
 191.         replace spltrg_py_enrolled_g = v32 if mi(spltrg_py_enrolled_g)
 192.         drop v32
-193.         replace spltrg_py_provided_b = spl_training_provided_previous_y if mi(spltrg_cy_provided_b)
+193.         replace spltrg_py_provided_b = spl_training_provided_previous_y if mi(spltrg_cy_provide
+> d_b)
 194.         drop spl_training_provided_previous_y 
 195.         replace spltrg_py_provided_g = v34 if mi(spltrg_py_provided_g)
 196.         drop v34
@@ -721,15 +748,18 @@
 . program merge_files_pre2017
   1.     use "${messy_dta}/basic_append", clear
   2.         
-.         merge 1:1 school_code ac_year using "${messy_dta}/general_append", assert(1 2 3) keep(3) ///
+.         merge 1:1 school_code ac_year using "${messy_dta}/general_append", assert(1 2 3) keep(3) /
+> //
 >             gen(merge_general)
   3.         drop merge_general
   4.         
-.         merge 1:1 school_code ac_year using "${messy_dta}/facility_append", assert(1 2 3) keep(3) ///
+.         merge 1:1 school_code ac_year using "${messy_dta}/facility_append", assert(1 2 3) keep(3) 
+> ///
 >             gen(merge_facility)
   5.         drop merge_facility
   6.         
-.         merge 1:1 school_code ac_year using "${messy_dta}/teachers_append", assert(1 2 3) keep(1 3) ///
+.         merge 1:1 school_code ac_year using "${messy_dta}/teachers_append", assert(1 2 3) keep(1 3
+> ) ///
 >             gen(merge_teachers)
   7.         drop merge_teachers
   8.                 
@@ -737,27 +767,33 @@
 >             gen(merge_rte)
   9.         drop merge_rte
  10.                 
-.         merge 1:1 school_code ac_year using "${messy_dta}/repeaters_append", assert(1 2 3) keep(3) ///
+.         merge 1:1 school_code ac_year using "${messy_dta}/repeaters_append", assert(1 2 3) keep(3)
+>  ///
 >             gen(merge_repeaters)
  11.         drop merge_repeaters
  12.                 
-.         merge 1:1 school_code ac_year using "${messy_dta}/enrollment_append", assert(1 2 3) keep(3) ///
+.         merge 1:1 school_code ac_year using "${messy_dta}/enrollment_append", assert(1 2 3) keep(3
+> ) ///
 >             gen(merge_enrollment)
  13.         drop merge_enrollment
  14.                 
-.         merge 1:1 school_code ac_year using "${messy_dta}/scenrollment_append", assert(1 2 3) keep(3) ///
+.         merge 1:1 school_code ac_year using "${messy_dta}/scenrollment_append", assert(1 2 3) keep
+> (3) ///
 >             gen(merge_scenrollment)
  15.         drop merge_scenrollment
  16.         
-.         merge 1:1 school_code ac_year using "${messy_dta}/stenrollment_append", assert(1 2 3) keep(3) ///
+.         merge 1:1 school_code ac_year using "${messy_dta}/stenrollment_append", assert(1 2 3) keep
+> (3) ///
 >             gen(merge_stenrollment)
  17.         drop merge_stenrollment
  18.         
-.         merge 1:1 school_code ac_year using "${messy_dta}/obcenrollment_append", assert(1 2 3) keep(3) ///
+.         merge 1:1 school_code ac_year using "${messy_dta}/obcenrollment_append", assert(1 2 3) kee
+> p(3) ///
 >             gen(merge_obcenrollment)
  19.         drop merge_obcenrollment
  20.         
-.         merge 1:1 school_code ac_year using "${messy_dta}/disabledenrollment_append", assert(1 2 3) ///
+.         merge 1:1 school_code ac_year using "${messy_dta}/disabledenrollment_append", assert(1 2 3
+> ) ///
 >             gen(merge_disabledenrollment)
  21.         drop merge_disabledenrollment
  22.         
@@ -767,18 +803,148 @@
 . 
 . program merge_files_post2017
   1.     use ../output/messy_dta/profile_append_post2017, clear
-  2.         
-.         merge 1:1 psuedocode using ../output/messy_dta/teachers_append_post2017", assert(1 2 3) gen(merge_teachers)
-  3. end
+  2.         qui ds psuedocode ac_year, not
+  3.         collapse (firstnm) `r(varlist)', by(psuedocode ac_year)
+  4.         save ../output/messy_dta/profile_append_post2017, replace
+  5.         
+.         use ../output/messy_dta/enrollment_append_post2017, clear
+  6.         qui ds psuedocode ac_year, not
+  7.         collapse (firstnm) `r(varlist)', by(psuedocode ac_year)
+  8.         save ../output/messy_dta/enrollment_append_post2017, replace
+  9.         
+.         /*use ../output/messy_dta/profile_append_post2017, clear
+>         
+>         merge 1:1 psuedocode ac_year using ../output/messy_dta/teachers_append_post2017, ///
+>             assert(1 2 3) keep(3) gen(merge_teachers)
+>         drop merge_teachers
+>         
+>         merge 1:1 psuedocode ac_year using ../output/messy_dta/facility_append_post2017, ///
+>             assert(1 2 3) keep(3) gen(merge_facility)
+>         drop merge_facility
+>         
+>         merge 1:1 psuedocode ac_year using ../output/messy_dta/enrollment_append_post2017, ///
+>             assert(1 2 3) keep(3) gen(merge_enroll)
+>         drop merge_enroll
+>         
+>         save ../output/clean_dta/panel_post2017, replace*/
+. end
 
-. 
-. 
 . 
 . *Execute
 . main
-(note: variable item_desc was str9, now str10 to accommodate using data's values)
-(note: variable c4_g was str3, now str4 to accommodate using data's values)
-(note: variable c6_g was str3, now str4 to accommodate using data's values)
-(note: variable c7_g was str3, now str4 to accommodate using data's values)
-(note: variable c8_g was str3, now str4 to accommodate using data's values)
-(note: variable item_desc was str10, now str15 to accommodate using data's values)
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 9,171,267 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_000001.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 5,681,842 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_000002.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 6,402,413 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_000003.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-2)
+(28 vars, 13,031,420 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_000004.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-2)
+(28 vars, 8,105,400 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_000005.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-2)
+(28 vars, 9,017,340 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_000006.tmp saved as .dta format
+(variable cpp_b was str3, now str4 to accommodate using data's values)
+(variable cpp_g was str3, now str4 to accommodate using data's values)
+(variable c2_b was str3, now str4 to accommodate using data's values)
+(variable c2_g was str3, now str4 to accommodate using data's values)
+file C:\Users\Neha
+    Narayan\Desktop\GitHub\senior-thesis\derived\output\messy_dta\enrollment_2019-20.dta saved
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 5,144,689 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_000007.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 3,631,035 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_000008.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 2,470,543 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_000009.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 3,650,775 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000a.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 4,068,759 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000b.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 3,853,665 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000c.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-2)
+(28 vars, 6,827,900 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000d.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-2)
+(28 vars, 4,841,380 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000e.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-2)
+(28 vars, 3,207,120 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000f.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-2)
+(28 vars, 4,867,700 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000g.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-2)
+(28 vars, 5,300,400 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000h.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-2)
+(28 vars, 5,138,220 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000i.tmp saved as .dta format
+(variable cpp_b was str3, now str4 to accommodate using data's values)
+(variable cpp_g was str3, now str4 to accommodate using data's values)
+(variable c2_b was str3, now str4 to accommodate using data's values)
+(variable c2_g was str3, now str4 to accommodate using data's values)
+(variable c6_b was str3, now str4 to accommodate using data's values)
+(variable c7_b was str3, now str4 to accommodate using data's values)
+(variable c7_g was str3, now str4 to accommodate using data's values)
+(variable c3_g was str3, now str4 to accommodate using data's values)
+file C:\Users\Neha
+    Narayan\Desktop\GitHub\senior-thesis\derived\output\messy_dta\enrollment_2020-21.dta saved
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 4,757,966 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000j.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 3,363,948 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000k.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 2,239,301 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000l.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 3,292,618 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000m.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 3,758,771 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000n.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 3,612,756 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000o.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 6,763,200 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000p.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 4,805,640 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000q.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 3,112,060 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000r.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 4,703,740 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000s.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 5,236,580 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000t.tmp saved as .dta format
+(encoding automatically selected: ISO-8859-1)
+(28 vars, 5,161,080 obs)
+file C:\Users\NEHANA~1\AppData\Local\Temp\ST_15340_00000u.tmp saved as .dta format
+(variable c1_g was str3, now str4 to accommodate using data's values)
+(variable c4_b was str3, now str4 to accommodate using data's values)
+(variable c6_b was str3, now str4 to accommodate using data's values)
+(variable c7_b was str3, now str4 to accommodate using data's values)
+file C:\Users\Neha
+    Narayan\Desktop\GitHub\senior-thesis\derived\output\messy_dta\enrollment_2021-22.dta saved
+
+. 
+end of do-file
+
