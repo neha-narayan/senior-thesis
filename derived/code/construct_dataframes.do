@@ -809,7 +809,7 @@ program merge_files_post2017
 	
 	save ../output/clean_dta/panel_post2017, replace
 end
-R
+
 program merge_panels
     use ../output/clean_dta/panel_post2017, clear
 	rename psuedocode school_code 
