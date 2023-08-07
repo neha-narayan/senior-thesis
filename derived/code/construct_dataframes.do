@@ -12,10 +12,10 @@ program main
 //  prep_post2017
 // 	append_files
 // 	transform_enrollment_post2017
-  append_files_post2017
+//  append_files_post2017
 // 	recode_appended
 // 	merge_files_pre2017
-//  merge_files_post2017
+  merge_files_post2017
 end 
 
 program prep_post2017
@@ -761,6 +761,37 @@ program merge_files_pre2017
 end  
 
 program merge_files_post2017
+    use ../output/messy_dta/enrollment_append_post2017, clear
+	/*drop if mi(item_desc)
+	replace item_desc = subinstr(item_desc, " ", "", .)
+	replace item_desc = "AgeLessThan5" if item_desc == "Age<5"
+	qui ds psuedocode item_desc ac_year, not
+	reshape wide `r(varlist)', i(psuedocode ac_year) j(item_desc) string*/
+	forvalues i = 1/12 {
+		rename c`i'_bSC c`i'_cb
+		rename c`i'_gSC c`i'_cg
+		rename c`i'_bST c`i'_tb
+		rename c`i'_gST c`i'_tg
+		rename c`i'_bOBC c`i'_ob
+		rename c`i'_gOBC c`i'_og
+		rename c`i'_bTotalrepeaters fail`i'b
+		rename c`i'_gTotalrepeaters fail`i'g
+		destring c`i'_bAge*, replace
+		egen c`i'_totb = rowtotal(c`i'_bAge*)
+		destring c`i'_gAge*, replace
+		egen c`i'_totg = rowtotal(c`i'_gAge*)
+	}
+	rename cpp_bSC cpp_cb
+	rename cpp_gSC cpp_cg
+	rename cpp_bST cpp_tb
+	rename cpp_gST cpp_tg
+	rename cpp_bOBC cpp_ob
+	rename cpp_gOBC cpp_og
+	rename cpp_bTotalrepeaters failppb
+	rename cpp_gTotalrepeaters failppg
+	ds c1_*
+	//save ../output/messy_dta/enrollment_append_post2017, replace
+	
 	/*use ../output/messy_dta/profile_append_post2017, clear
 	
 	merge 1:1 psuedocode ac_year using ../output/messy_dta/teachers_append_post2017, ///
