@@ -811,6 +811,11 @@ program merge_files_post2017
 end
 
 program merge_panels
+    use ../output/clean_dta/panel_pre2017, clear
+	forvalues i in 1/12 {
+		destring c`i'_totb c`i'_totg, replace
+	}
+	save ../output/clean_dta/panel_pre2017, replace
     use ../output/clean_dta/panel_post2017, clear
 	rename psuedocode school_code 
 	merge 1:1 school_code ac_year using ../output/clean_dta/panel_pre2017, assert(1 2 3) gen(merge_panel)
