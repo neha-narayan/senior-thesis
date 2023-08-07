@@ -15,7 +15,8 @@ program main
 //  append_files_post2017
 // 	recode_appended
 // 	merge_files_pre2017
-  merge_files_post2017
+//  merge_files_post2017
+    merge_panels
 end 
 
 program prep_post2017
@@ -790,9 +791,9 @@ program merge_files_post2017
 	rename cpp_bTotalrepeaters failppb
 	rename cpp_gTotalrepeaters failppg
 	ds c1_*
-	//save ../output/messy_dta/enrollment_append_post2017, replace
+	save ../output/messy_dta/enrollment_append_post2017, replace
 	
-	/*use ../output/messy_dta/profile_append_post2017, clear
+	use ../output/messy_dta/profile_append_post2017, clear
 	
 	merge 1:1 psuedocode ac_year using ../output/messy_dta/teachers_append_post2017, ///
 	    assert(1 2 3) keep(3) gen(merge_teachers)
@@ -802,12 +803,18 @@ program merge_files_post2017
 	    assert(1 2 3) keep(3) gen(merge_facility)
 	drop merge_facility
 	
-	merge 1:1 psuedocode ac_year using ../output/messy_dta/enrollment_append_post2017, ///
-	    assert(1 2 3) keep(3) gen(merge_enroll)
+	merge 1:1 psuedocode ac_year using ../output/messy_dta/enrollment_append_post2017, assert(1 2 3) gen(merge_enroll)
+	keep if merge_enroll == 3
 	drop merge_enroll
 	
-	save ../output/clean_dta/panel_post2017, replace*/
+	save ../output/clean_dta/panel_post2017, replace
 end
+R
+program merge_panels
+    use ../output/clean_dta/panel_post2017, clear
+	rename psuedocode school_code 
+	merge 1:1 school_code ac_year using ../output/clean_dta/panel_pre2017, assert(1 2 3) gen(merge_panel)
+end 
 
 *Execute
 main
