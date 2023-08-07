@@ -812,7 +812,7 @@ end
 
 program merge_panels
     use ../output/clean_dta/panel_pre2017, clear
-	forvalues i in 1/12 {
+	forvalues i = 1/12 {
 		destring c`i'_totb c`i'_totg, replace
 	}
 	save ../output/clean_dta/panel_pre2017, replace
