@@ -812,6 +812,8 @@ end
 
 program merge_panels
     use ../output/clean_dta/panel_pre2017, clear
+	rename (c9_b c9_g c10_b c10_g c11_b c11_g c12_b c12_g) ///
+	    (c9_totb c9_totg c10_totb c10_totg c11_totb c11_totg c12_totb c12_totg)
 	forvalues i = 1/12 {
 		destring c`i'_totb c`i'_totg, replace
 	}
