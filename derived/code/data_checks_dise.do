@@ -25,15 +25,18 @@ program drop_sus_schools
 		replace pctChange_`var' = 0 if `var'[_n] == 0 & `var'[_n-1] == 0
 		replace pctChange_`var' = `var'[_n] if `var'[_n] != 0 & `var'[_n-1] == 0
 	}
-	gen ratiob5 = abs(pctChange_apprb5 - pctChange_c5_totb)
-	gen ratiog5 = abs(pctChange_apprg5 - pctChange_c5_totg)
-	gen ratiob8 = abs(pctChange_apprb8 - pctChange_c8_totb)
-	gen ratiog8 = abs(pctChange_apprg8 - pctChange_c8_totg)
+	gen ratiob5 = pctChange_apprb5/pctChange_c5_totb
+	gen ratiog5 = pctChange_apprg5/pctChange_c5_totg
+	gen ratiob8 = pctChange_apprb8/pctChange_c8_totb
+	gen ratiog8 = pctChange_apprg8/pctChange_c8_totg
 	
 	foreach var in ratiob5 ratiog5 ratiob8 ratiog8 {
 		bysort school_code: egen mean_`var' = mean(`var')
 	}
- 	bysort school_code: gen meaned_diff = mean_ratiob5 + mean_ratiog5 + mean_ratiob8 + mean_ratiog8 / 4
+ 	bysort school_code: gen meaned_ratio = mean_ratiob5 + mean_ratiog5 + mean_ratiob8 + mean_ratiog8 / 4
+	
+	eststo ratio_hist: qui estpost sum meaned_ratio, de
+	graph export ../output/ratio_hist.png, height(600) width(450) replace
 end 
 
 
