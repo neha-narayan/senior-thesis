@@ -4,7 +4,7 @@ clear all
 set more off
 
 //raw points to the raw .xlsx files I download from schoolreportcards.in and udiseplus.gov.in
-global raw "C:\Users\Neha Narayan\Desktop\GitHub\senior-thesis\raw"
+global raw "C:\Users\Neha Narayan\Desktop\GitHub\senior-thesis\raw\DISE"
 
 /*csv points to a folder containing the data from 2005-06 to 2017-18 aggregated at the 
 table-year level. for example, it contains rte_2017, which contains all of the rte data from 
@@ -17,15 +17,15 @@ which is a file containing the SC enrollment data for the years 2005-06 to 2017-
 2021-22 separately, then append.*/
 
 program main
-    prep_post2017
+    //prep_post2017
 	append_files_pre_2017
-	transform_enrollment_post2017
-    append_files_post2017
+	//transform_enrollment_post2017
+    //append_files_post2017
 	recode_appended
 	merge_files_pre2017
     merge_files_post2017
+	//clean_pre2005_panel
     merge_panels
-    clean_panel  
 end 
  
 program prep_post2017
@@ -33,11 +33,11 @@ program prep_post2017
     foreach year in 2018-19 2019-20 2020-21 2021-22 {
 	    clear
 	    local idx = 0
-        local filenames : dir "${raw}\\`year'" files "nationalEnrol*.csv"
+        local filenames : dir "${raw} `year'" files "nationalEnrol*.csv"
 	    cap dis "`filenames'"
 	    foreach file in `filenames' {
 		    local idx "`++idx'"
-		    import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
 		    tempfile enroll_`idx'
 		    save "`enroll_`idx''"
 		    clear
@@ -53,11 +53,11 @@ program prep_post2017
     foreach year in 2018-19 2019-20  {
 	    clear
 	    local idx = 0
-        local filenames : dir "${raw}\\`year'" files "100_prof*.csv"
+        local filenames : dir "${raw} `year'" files "100_prof*.csv"
 	    cap dis "`filenames'"
 	    foreach file in `filenames' {
 		    local idx "`++idx'"
-		    import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
 		    tempfile prof_`idx'
 		    save "`prof_`idx''"
 		    clear
@@ -73,11 +73,11 @@ program prep_post2017
     foreach year in 2020-21 2021-22  {
 	    clear
 	    local idx = 0
-        local filenames : dir "${raw}\\`year'" files "nationalProfile*.csv"
+        local filenames : dir "${raw} `year'" files "nationalProfile*.csv"
 	    cap dis "`filenames'"
 	    foreach file in `filenames' {
 		    local idx "`++idx'"
-		    import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
 		    tempfile prof_`idx'
 		    save "`prof_`idx''"
 		    clear
@@ -93,11 +93,11 @@ program prep_post2017
     foreach year in 2018-19 2019-20  {
 	    clear
 	    local idx = 0
-        local filenames : dir "${raw}\\`year'" files "100_fac*.csv"
+        local filenames : dir "${raw} `year'" files "100_fac*.csv"
 	    cap dis "`filenames'"
 	    foreach file in `filenames' {
 		    local idx "`++idx'"
-		    import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
 		    tempfile facility_`idx'
 		    save "`facility_`idx''"
 		    clear
@@ -113,11 +113,11 @@ program prep_post2017
     foreach year in 2020-21 2021-22  {
 	    clear
 	    local idx = 0
-        local filenames : dir "${raw}\\`year'" files "nationalfacility*.csv"
+        local filenames : dir "${raw} `year'" files "nationalfacility*.csv"
 	    cap dis "`filenames'"
 	    foreach file in `filenames' {
 		    local idx "`++idx'"
-		    import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
 		    tempfile facility_`idx'
 		    save "`facility_`idx''"
 		    clear
@@ -133,11 +133,11 @@ program prep_post2017
     foreach year in 2018-19 2019-20  {
 	    clear
 	    local idx = 0
-        local filenames : dir "${raw}\\`year'" files "100_tch*.csv"
+        local filenames : dir "${raw} `year'" files "100_tch*.csv"
 	    cap dis "`filenames'"
 	    foreach file in `filenames' {
 		    local idx "`++idx'"
-		    import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
 		    tempfile teachers_`idx'
 		    save "`teachers_`idx''"
 		    clear
@@ -153,11 +153,11 @@ program prep_post2017
     foreach year in 2020-21 2021-22  {
 	    clear
 	    local idx = 0
-        local filenames : dir "${raw}\\`year'" files "nationalTeacher*.csv"
+        local filenames : dir "${raw} `year'" files "nationalTeacher*.csv"
 	    cap dis "`filenames'"
 	    foreach file in `filenames' {
 		    local idx "`++idx'"
-		    import delimited "${raw}\\`year'\\`file'", varnames(1) stringcols(_all)
+		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
 		    tempfile teachers_`idx'
 		    save "`teachers_`idx''"
 		    clear
@@ -640,26 +640,18 @@ program recode_appended
 	drop c5_appeared_boys
 	replace apprg5 = c5_appeared_girls if mi(apprg5)
 	drop c5_appeared_girls
-	replace apprb8 = c7_appeared_boys if mi(apprb8)
-	drop c7_appeared_boys
-	replace apprg8 = c7_appeared_girls if mi(apprg8)
-	drop c7_appeared_girls
 	replace passb5 = c5_passed_boys if mi(passb5)
 	drop c5_passed_boys
 	replace passg5 = c5_passed_girls if mi(passg5)
 	drop c5_passed_girls 
-	replace passb8 = c7_passed_boys if mi(passb8)
-	drop c7_passed_boys
-	replace passg8 = c7_passed_girls if mi(passg8)
-	drop c7_passed_girls
 	replace p60b5 = c5_passed_with_more_than_60_boys if mi(p60b5)
 	drop c5_passed_with_more_than_60_boys
 	replace p60g5 = c5_passed_with_more_than_60_girl if mi(p60g5)
 	drop c5_passed_with_more_than_60_girl 
-	replace p60b8 = c7_passed_with_more_than_60_boys if mi(p60b8)
-	drop c7_passed_with_more_than_60_boys 
-	replace p60g8 = c7_passed_with_more_than_60_girl if mi(p60g8)
-	drop c7_passed_with_more_than_60_girl
+	
+	rename (c7_appeared_boys c7_appeared_girls c7_passed_boys c7_passed_girls) ///
+	    (apprb7 apprg7 passb7 passg7)
+	rename (c7_passed_with_more_than_60_boys c7_passed_with_more_than_60_girl) (p60b7 p60g7)	
 	save "../output/messy_dta/enrollment_append", replace
 	
 	//sc enrollment
@@ -817,26 +809,45 @@ program merge_files_post2017
 	drop merge_facility
 	
 	merge 1:1 psuedocode ac_year using ../output/messy_dta/enrollment_append_post2017, ///
-	    assert(1 2 3) gen(merge_enroll)
-	keep if merge_enroll == 3
+	    assert(1 2 3) keep(3) gen(merge_enroll)
 	drop merge_enroll
 	
-	save ../output/clean_dta/panel_post2017, replace
+	rename psuedocode school_code
+ 	save ../output/clean_dta/panel_post2017, replace
+end
+
+program clean_pre2005_panel
+    use ../output/clean_dta/panel_2001-12, clear
+	rename (schcd year) (school_code ac_year) 
+    drop if ac_year > 4
+	replace ac_year = ac_year + 2000
+	tostring ac_year, replace 
+	replace ac_year = "2001-02" if ac_year == "2001"
+	replace ac_year = "2002-03" if ac_year == "2002"
+	replace ac_year = "2003-04" if ac_year == "2003"
+	replace ac_year = "2004-05" if ac_year == "2004"
+	
+	gen check_obc = enr_io/(enr_ig + enr_ic + enr_it + enr_io)
+	count if mi(enr_io) & mi(enr_ig) & mi(enr_ic) & mi(enr_it)
+	sum check_obc, de //mean = 38% and median 34%, suggests this probably is OBC. 
+	
+	
+	
+	
+	
+	
 end
 
 program merge_panels
-    dis "Create the full panel. "
+    dis "Create the full panel."
     use ../output/clean_dta/panel_pre2017, clear
 	rename (c9_b c9_g c10_b c10_g c11_b c11_g c12_b c12_g) ///
 	    (c9_totb c9_totg c10_totb c10_totg c11_totb c11_totg c12_totb c12_totg)
 	forvalues i = 1/12 {
 		destring c`i'_totb c`i'_totg, replace
 	}
-	rename psuedocode school_code
 	save ../output/clean_dta/panel_pre2017, replace
 	qui append using ../output/clean_dta/panel_post2017
-	
-	
 	
 	
 end 
