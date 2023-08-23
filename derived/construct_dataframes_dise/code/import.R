@@ -19,6 +19,7 @@ for (dir in yeardirs) {
   for (sdir in statedirs) {
         file <- list.files(sdir, pattern = "Basic")
         basic <- read_xlsx(paste(sdir, file, sep = "/"))
+        basic$state <- sub(paste(dir, "*", sep = "/"), "", sdir) 
         if (sdir == statedirs[1]) {
           Basic <- basic
         }
@@ -88,8 +89,8 @@ for (dir in yeardirs) {
   idx = idx + 1
 }
 
-idx = 2016
-for (dir in yeardirs[12:13]) {
+idx = 2005
+for (dir in yeardirs) {
   Enrollment <- data.frame(matrix(NA, nrow = 1, ncol = 18))
   statedirs <- dir(dir, pattern = "", full.names = TRUE)
   for (sdir in statedirs) {
@@ -145,8 +146,8 @@ for (dir in yeardirs) {
   idx = idx + 1
 }
 
-idx = 2013
-for (dir in yeardirs[9:13]) {
+idx = 2005
+for (dir in yeardirs) {
   OBCEnrollment <- data.frame(matrix(NA, nrow = 1, ncol = 18))
   statedirs <- dir(dir, pattern = "", full.names = TRUE)
   for (sdir in statedirs) {

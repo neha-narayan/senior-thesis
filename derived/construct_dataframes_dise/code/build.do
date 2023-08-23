@@ -1,5 +1,5 @@
 capture log close 
-log using construct_dataframes_dise.log, replace
+log using build.log, replace
 clear all
 set more off
 
@@ -27,9 +27,9 @@ program main
     merge_panels
     clean_panel  
 end 
-
-//this program converts the raw files from 2018-19 to 2021-22 to datasets at the table-year level. 
+ 
 program prep_post2017
+    dis "Convert the raw files from 2018-19 to 2021-22 to datasets at the table-year level."
     foreach year in 2018-19 2019-20 2020-21 2021-22 {
 	    clear
 	    local idx = 0
@@ -171,8 +171,8 @@ program prep_post2017
     } 
 end 
 
-//this program appends the yearly files by table from 2005-06 to 2017-18
 program append_files_pre_2017
+    dis "Append the yearly files by table from 2005-06 to 2017-18."
     forvalues year = 2005/2017 {
 	    import delimited "../output/csv/basic_`year'", varnames(1) stringcols(_all) ///
 		bindquote(strict) maxquotedrows(100)
@@ -326,8 +326,8 @@ program append_files_pre_2017
 	save "../output/messy_dta/disabledenrollment_append", replace
 end 
 
-//this program consolidates the yearly files by table from 2018-19 to 2021-22
 program append_files_post2017
+    dis "Consolidate the yearly files by table from 2018-19 to 2021-22."
 	foreach year in 2018-19 2019-20 2020-21 2021-22 {
 	    use ../output/messy_dta/profile_`year', clear
 		qui ds psuedocode ac_year, not
@@ -368,8 +368,8 @@ program append_files_post2017
 	save ../output/messy_dta/teachers_append_post2017, replace*/
 end 
 
-//this program recodes the appended files to address changing variable names over the years. 
 program recode_appended
+    dis "Recode the appended files to address changing variable names over the years. "
     //basic 
 	use "../output/messy_dta/basic_append", clear
 	replace district_name = distname if mi(district_name)
@@ -727,8 +727,8 @@ program recode_appended
 	save "../output/messy_dta/disabledenrollment_append", replace 
 end
 
-//this program creates the panel for 2005-06 to 2017-18
 program merge_files_pre2017
+    dis "Recode the appended files to address changing variable names over the years."
     use "../output/messy_dta/basic_append", clear
 	
 	merge 1:1 school_code ac_year using "../output/messy_dta/general_append", assert(1 2 3) keep(3) ///
@@ -774,9 +774,8 @@ program merge_files_pre2017
 	save "../output/clean_dta/panel_pre2017", replace
 end  
 
-/*this program creates the panel for 2018-19 to 2021-22, while reshaping the data so it conforms
-with the earlier panel*/
 program merge_files_post2017
+    dis "Create the panel for 2018-19 to 2021-22 and reshape data to conform with earlier panel."
     use ../output/messy_dta/enrollment_append_post2017, clear
 	drop if mi(item_desc)
 	replace item_desc = subinstr(item_desc, " ", "", .)
@@ -817,15 +816,16 @@ program merge_files_post2017
 	    assert(1 2 3) keep(3) gen(merge_facility)
 	drop merge_facility
 	
-	merge 1:1 psuedocode ac_year using ../output/messy_dta/enrollment_append_post2017, assert(1 2 3) gen(merge_enroll)
+	merge 1:1 psuedocode ac_year using ../output/messy_dta/enrollment_append_post2017, ///
+	    assert(1 2 3) gen(merge_enroll)
 	keep if merge_enroll == 3
 	drop merge_enroll
 	
 	save ../output/clean_dta/panel_post2017, replace
 end
 
-//this program creates the full panel
 program merge_panels
+    dis "Create the full panel. "
     use ../output/clean_dta/panel_pre2017, clear
 	rename (c9_b c9_g c10_b c10_g c11_b c11_g c12_b c12_g) ///
 	    (c9_totb c9_totg c10_totb c10_totg c11_totb c11_totg c12_totb c12_totg)
@@ -835,7 +835,10 @@ program merge_panels
 	rename psuedocode school_code
 	save ../output/clean_dta/panel_pre2017, replace
 	qui append using ../output/clean_dta/panel_post2017
-	save ../output/clean_dta/panel, replace
+	
+	
+	
+	
 end 
 
 *Execute
