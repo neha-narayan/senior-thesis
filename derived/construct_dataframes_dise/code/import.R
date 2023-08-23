@@ -9,7 +9,7 @@ memory.limit(size=56000)
 
 #gen directories 
 root <- "C:/Users/Neha Narayan/Desktop/GitHub/senior-thesis/raw/DISE_school_data"
-outdata <- "C:/Users/Neha Narayan/Desktop/GitHub/senior-thesis/derived/output/csv"
+outdata <- "C:/Users/Neha Narayan/Desktop/GitHub/senior-thesis/derived/construct_dataframes_dise/output/csv"
 yeardirs <- dir(root, pattern = "", full.names = TRUE)
 
 idx = 2005

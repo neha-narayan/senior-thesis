@@ -35,8 +35,15 @@ program drop_sus_schools
 	}
  	bysort school_code: gen meaned_ratio = mean_ratiob5 + mean_ratiog5 + mean_ratiob8 + mean_ratiog8 / 4
 	
-	eststo ratio_hist: qui estpost sum meaned_ratio, de
-	graph export ../output/ratio_hist.png, height(600) width(450) replace
+	centile meaned_ratio, centile(5)
+	local lower = `r(c_1)'
+	dis `lower'
+	centile meaned_ratio, centile(95)
+	local upper = `r(c_1)'
+	drop if meaned_ratio < lower | meaned_ratio > upper
+	
+	hist meaned_ratio
+	graph export ../output/ratio_hist.pdf, replace
 end 
 
 

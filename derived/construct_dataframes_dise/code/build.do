@@ -1,24 +1,34 @@
 capture log close 
-log using construct_dataframes.log, replace
+log using construct_dataframes_dise.log, replace
 clear all
 set more off
 
+//raw points to the raw .xlsx files I download from schoolreportcards.in and udiseplus.gov.in
 global raw "C:\Users\Neha Narayan\Desktop\GitHub\senior-thesis\raw"
-global csv "C:\Users\Neha Narayan\Desktop\GitHub\senior-thesis\derived\output\csv"
-global messy_dta "C:\Users\Neha Narayan\Desktop\GitHub\senior-thesis\derived\output\messy_dta"
-global clean_dta "C:\Users\Neha Narayan\Desktop\GitHub\senior-thesis\derived\output\clean_dta"
+
+/*csv points to a folder containing the data from 2005-06 to 2017-18 aggregated at the 
+table-year level. for example, it contains rte_2017, which contains all of the rte data from 
+the 2017-18 school year across states and UTs.*/
+
+/*messy_dta is where I save intermediary .dta files. these include files like scenrollment_append, 
+which is a file containing the SC enrollment data for the years 2005-06 to 2017-18*/
+
+/*clean_dta is where I save panel datasets. I construct panels for 2005-06 to 2017-18 and 2018-19 to 
+2021-22 separately, then append.*/
 
 program main
-//  prep_post2017
-// 	append_files
-// 	transform_enrollment_post2017
-//  append_files_post2017
-// 	recode_appended
-// 	merge_files_pre2017
-//  merge_files_post2017
+    prep_post2017
+	append_files_pre_2017
+	transform_enrollment_post2017
+    append_files_post2017
+	recode_appended
+	merge_files_pre2017
+    merge_files_post2017
     merge_panels
+    clean_panel  
 end 
 
+//this program converts the raw files from 2018-19 to 2021-22 to datasets at the table-year level. 
 program prep_post2017
     foreach year in 2018-19 2019-20 2020-21 2021-22 {
 	    clear
@@ -37,7 +47,7 @@ program prep_post2017
 		    append using "`enroll_`i''"
 	    }
 		gen ac_year = "`year'"
-	    save "${messy_dta}\enrollment_`year'", replace
+	    save "../output/messy_dta/enrollment_`year'", replace
     }
 
     foreach year in 2018-19 2019-20  {
@@ -57,7 +67,7 @@ program prep_post2017
 		    append using "`prof_`i''"
 	    }
 		gen ac_year = "`year'"
-	    save "${messy_dta}\profile_`year'", replace
+	    save "../output/messy_dta/profile_`year'", replace
     }
 
     foreach year in 2020-21 2021-22  {
@@ -77,7 +87,7 @@ program prep_post2017
 		    append using "`prof_`i''"
 	    }
 		gen ac_year = "`year'"
-	    save "${messy_dta}\profile_`year'", replace
+	    save "../output/messy_dta/profile_`year'", replace
     }
 
     foreach year in 2018-19 2019-20  {
@@ -97,7 +107,7 @@ program prep_post2017
 		    append using "`facility_`i''"
 	    }
 		gen ac_year = "`year'"
-	    save "${messy_dta}\facility_`year'", replace
+	    save "../output/messy_dta/facility_`year'", replace
     }
 
     foreach year in 2020-21 2021-22  {
@@ -117,10 +127,9 @@ program prep_post2017
 		    append using "`facility_`i''"
 	    }
 		gen ac_year = "`year'"
-	    save "${messy_dta}\facility_`year'", replace
+	    save "../output/messy_dta/facility_`year'", replace
     }
 
-//teachers
     foreach year in 2018-19 2019-20  {
 	    clear
 	    local idx = 0
@@ -138,7 +147,7 @@ program prep_post2017
 		    append using "`teachers_`i''"
 	    }
 		gen ac_year = "`year'"
-	    save "${messy_dta}\teachers_`year'", replace
+	    save "../output/messy_dta/teachers_`year'", replace
     }
 
     foreach year in 2020-21 2021-22  {
@@ -158,13 +167,14 @@ program prep_post2017
 		    append using "`teachers_`i''"
 	    }
 		gen ac_year = "`year'"
-	    save "${messy_dta}\teachers_`year'", replace
+	    save "../output/messy_dta/teachers_`year'", replace
     } 
 end 
 
-program append_files
+//this program appends the yearly files by table from 2005-06 to 2017-18
+program append_files_pre_2017
     forvalues year = 2005/2017 {
-	    import delimited "${csv}\basic_`year'", varnames(1) stringcols(_all) ///
+	    import delimited "../output/csv/basic_`year'", varnames(1) stringcols(_all) ///
 		bindquote(strict) maxquotedrows(100)
 		tempfile basic_`year'
 		save "`basic_`year''"
@@ -174,10 +184,10 @@ program append_files
 		append using "`basic_`year''"
 	}
 	qui duplicates drop 
-	save "${messy_dta}\basic_append", replace
+	save "../output/messy_dta/basic_append", replace
 	
 	forvalues year = 2005/2017 {
-	    import delimited "${csv}\general_`year'", varnames(1) stringcols(_all) ///
+	    import delimited "../output/csv/general_`year'", varnames(1) stringcols(_all) ///
 		bindquote(strict) maxquotedrows(100)
 		tempfile general_`year'
 		save "`general_`year''"
@@ -187,11 +197,11 @@ program append_files
 		append using "`general_`year''"
 	}
 	qui duplicates drop 
-	save "${messy_dta}\general_append", replace
+	save "../output/messy_dta/general_append", replace
 	
 	clear
 	forvalues year = 2005/2017 {
-	    import delimited "${csv}\facility_`year'", varnames(1) stringcols(_all) ///
+	    import delimited "../output/csv/facility_`year'", varnames(1) stringcols(_all) ///
 		bindquote(strict) maxquotedrows(100)
 		tempfile facility_`year'
 		save "`facility_`year''"
@@ -201,11 +211,11 @@ program append_files
 		append using "`facility_`year''"
 	}
 	qui duplicates drop 
-	save "${messy_dta}\facility_append", replace
+	save "../output/messy_dta/facility_append", replace
 	
 	clear
 	forvalues year = 2009/2017 {
-	    import delimited "${csv}\teachers_`year'", varnames(1) stringcols(_all) ///
+	    import delimited "../output/csv/teachers_`year'", varnames(1) stringcols(_all) ///
 		bindquote(strict) maxquotedrows(100)
 		tempfile teachers_`year'
 		save "`teachers_`year''"
@@ -215,11 +225,11 @@ program append_files
 		append using "`teachers_`year''"
 	}
 	qui duplicates drop 
-	save "${messy_dta}\teachers_append", replace
+	save "../output/messy_dta/teachers_append", replace
 	
 	clear
 	forvalues year = 2010/2017 {
-	    import delimited "${csv}\rte_`year'", varnames(1) stringcols(_all) ///
+	    import delimited "../output/csv/rte_`year'", varnames(1) stringcols(_all) ///
 		bindquote(strict) maxquotedrows(100)
 		tempfile rte_`year'
 		save "`rte_`year''"
@@ -229,11 +239,11 @@ program append_files
 		append using "`rte_`year''"
 	}
 	qui duplicates drop 
-	save "${messy_dta}\rte_append", replace
+	save "../output/messy_dta/rte_append", replace
 	
 	clear
 	forvalues year = 2005/2017 {
-	    import delimited "${csv}\repeaters_`year'", varnames(1) stringcols(_all) ///
+	    import delimited "../output/csv/repeaters_`year'", varnames(1) stringcols(_all) ///
 		bindquote(strict) maxquotedrows(100)
 		tempfile repeaters_`year'
 		save "`repeaters_`year''"
@@ -243,11 +253,11 @@ program append_files
 		append using "`repeaters_`year''"
 	}
 	qui duplicates drop 
-	save "${messy_dta}\repeaters_append", replace
+	save "../output/messy_dta/repeaters_append", replace
 	
 	clear
 	forvalues year = 2005/2017 {
-	    import delimited "${csv}\enrollment_`year'", varnames(1) stringcols(_all) ///
+	    import delimited "../output/csv/enrollment_`year'", varnames(1) stringcols(_all) ///
 		bindquote(strict) maxquotedrows(100)
 		tempfile enrollment_`year'
 		save "`enrollment_`year''"
@@ -257,11 +267,11 @@ program append_files
 		append using "`enrollment_`year''"
 	}
 	qui duplicates drop 
-	save "${messy_dta}\enrollment_append", replace
+	save "../output/messy_dta/enrollment_append", replace
 	
 	clear
 	forvalues year = 2005/2017 {
-	    import delimited "${csv}\scenrollment_`year'", varnames(1) stringcols(_all) ///
+	    import delimited "../output/csv/scenrollment_`year'", varnames(1) stringcols(_all) ///
 		bindquote(strict) maxquotedrows(100)
 		tempfile scenrollment_`year'
 		save "`scenrollment_`year''"
@@ -271,11 +281,11 @@ program append_files
 		append using "`scenrollment_`year''"
 	}
 	qui duplicates drop 
-	save "${messy_dta}\scenrollment_append", replace
+	save "../output/messy_dta/scenrollment_append", replace
 	
 	clear
 	forvalues year = 2005/2017 {
-	    import delimited "${csv}\stenrollment_`year'", varnames(1) stringcols(_all) ///
+	    import delimited "../output/csv/stenrollment_`year'", varnames(1) stringcols(_all) ///
 		bindquote(strict) maxquotedrows(100)
 		tempfile stenrollment_`year'
 		save "`stenrollment_`year''"
@@ -285,11 +295,11 @@ program append_files
 		append using "`stenrollment_`year''"
 	}
 	qui duplicates drop 
-	save "${messy_dta}\stenrollment_append", replace
+	save "../output/messy_dta/stenrollment_append", replace
 	
 	clear
 	forvalues year = 2005/2017 {
-	    import delimited "${csv}\obcenrollment_`year'", varnames(1) stringcols(_all) ///
+	    import delimited "../output/csv/obcenrollment_`year'", varnames(1) stringcols(_all) ///
 		bindquote(strict) maxquotedrows(100)
 		tempfile obcenrollment_`year'
 		save "`obcenrollment_`year''"
@@ -299,11 +309,11 @@ program append_files
 		append using "`obcenrollment_`year''"
 	}
 	qui duplicates drop 
-	save "${messy_dta}\obcenrollment_append", replace
+	save "../output/messy_dta/obcenrollment_append", replace
 	
 	clear
 	forvalues year = 2005/2017 {
-	    import delimited "${csv}\disabledenrollment_`year'", varnames(1) stringcols(_all) ///
+	    import delimited "../output/csv/disabledenrollment_`year'", varnames(1) stringcols(_all) ///
 		bindquote(strict) maxquotedrows(100)
 		tempfile disabledenrollment_`year'
 		save "`disabledenrollment_`year''"
@@ -313,11 +323,12 @@ program append_files
 		append using "`disabledenrollment_`year''"
 	}
 	qui duplicates drop 
-	save "${messy_dta}\disabledenrollment_append", replace
+	save "../output/messy_dta/disabledenrollment_append", replace
 end 
 
+//this program consolidates the yearly files by table from 2018-19 to 2021-22
 program append_files_post2017
-	/*foreach year in 2018-19 2019-20 2020-21 2021-22 {
+	foreach year in 2018-19 2019-20 2020-21 2021-22 {
 	    use ../output/messy_dta/profile_`year', clear
 		qui ds psuedocode ac_year, not
 	    collapse (firstnm) `r(varlist)', by(psuedocode ac_year)
@@ -326,14 +337,14 @@ program append_files_post2017
 		qui ds psuedocode ac_year item_desc, not
 	    collapse (firstnm) `r(varlist)', by(psuedocode ac_year item_desc)
 		save ../output/messy_dta/enrollment_`year', replace
-	}*/
+	}
 	
-    /*clear
+    clear
     foreach year in 2018-19 2019-20 2020-21 2021-22 {
 		append using ../output/messy_dta/profile_`year'
 	}
 	qui duplicates drop 
-	save ../output/messy_dta/profile_append_post2017, replace*/
+	save ../output/messy_dta/profile_append_post2017, replace
 	
 	clear 
 	foreach year in 2018-19 2019-20 2020-21 2021-22 {
@@ -342,7 +353,7 @@ program append_files_post2017
 	qui duplicates drop 
 	save ../output/messy_dta/enrollment_append_post2017, replace
 		
-	/*clear 
+	clear 
 	foreach year in 2018-19 2019-20 2020-21 2021-22 {
 		append using ../output/messy_dta/facility_`year'
 	}
@@ -357,14 +368,15 @@ program append_files_post2017
 	save ../output/messy_dta/teachers_append_post2017, replace*/
 end 
 
+//this program recodes the appended files to address changing variable names over the years. 
 program recode_appended
     //basic 
-	use "${messy_dta}/basic_append", clear
+	use "../output/messy_dta/basic_append", clear
 	replace district_name = distname if mi(district_name)
-	save "${messy_dta}/basic_append", replace
+	save "../output/messy_dta/basic_append", replace
 	
 	//general 
-	use "${messy_dta}/general_append", clear
+	use "../output/messy_dta/general_append", clear
 	replace school_code = schcd if mi(school_code) 
 	drop schcd
 	replace rural_urban = rururb if mi(rural_urban)
@@ -424,10 +436,10 @@ program recode_appended
 	(school_code ac_year rural_urban distance_brc distance_crc pre_pry_yn residential_sch_yn)   
 	rename (estdyear) (year_est)
 	drop boardsec boardhsec schmgts schmgths
-	save "${messy_dta}/general_append", replace
+	save "../output/messy_dta/general_append", replace
 	
 	//facility
-	use "${messy_dta}/facility_append", clear
+	use "../output/messy_dta/facility_append", clear
 	replace school_code = schcd if mi(school_code) 
 	drop schcd
 	replace building_status = bldstatus if mi(building_status) //unavailable 2012-13
@@ -497,16 +509,16 @@ program recode_appended
 	replace computer_aided = cal_yn if mi(computer_aided)
 	drop cal_yn
 	drop book_bank blackboard column1
-	save "${messy_dta}/facility_append", replace
+	save "../output/messy_dta/facility_append", replace
 	
 	//teachers
-	use "${messy_dta}/teachers_append", clear
+	use "../output/messy_dta/teachers_append", clear
 	rename (tch_male tch_female tch_nr gradabove tchwithprof daysinvld tchinvld) ///
 	    (male_tch female_tch noresp_tch graduate_teachers tch_with_professional days_involved_in_non_tch teachers_involved_in_non_tch)
-	save "${messy_dta}/teachers_append", replace
+	save "../output/messy_dta/teachers_append", replace
 	
 	//rte
-	use "${messy_dta}/rte_append", clear
+	use "../output/messy_dta/rte_append", clear
 	replace ac_year = acyear if mi(ac_year)
 	drop acyear
 	replace working_days_primary = workdays_pr if mi(working_days_primary)
@@ -591,10 +603,10 @@ program recode_appended
 	rename tch_or_evs_for_spl_training num_tch_evs_for_spltrg
 	rename kitchen_devaices_grant received_kitdev_grant
 	rename schcd school_code
-	save "${messy_dta}/rte_append", replace
+	save "../output/messy_dta/rte_append", replace
 		
 	//repeaters
-	use "${messy_dta}/repeaters_append", clear
+	use "../output/messy_dta/repeaters_append", clear
 	replace school_code = schcd if mi(school_code)
 	drop schcd
 	qui ds repeaters*
@@ -608,10 +620,10 @@ program recode_appended
 	}
 	replace ac_year = acyear if mi(ac_year)
 	drop acyear
-	save "${messy_dta}/repeaters_append", replace
+	save "../output/messy_dta/repeaters_append", replace
 	
 	//total enrollment 
-	use "${messy_dta}/enrollment_append", clear
+	use "../output/messy_dta/enrollment_append", clear
 	replace school_code = schcd if mi(school_code)
 	drop schcd
 	replace ac_year = acyear if mi(ac_year)
@@ -648,10 +660,10 @@ program recode_appended
 	drop c7_passed_with_more_than_60_boys 
 	replace p60g8 = c7_passed_with_more_than_60_girl if mi(p60g8)
 	drop c7_passed_with_more_than_60_girl
-	save "${messy_dta}/enrollment_append", replace
+	save "../output/messy_dta/enrollment_append", replace
 	
 	//sc enrollment
-	use "${messy_dta}/scenrollment_append", clear
+	use "../output/messy_dta/scenrollment_append", clear
 	replace school_code = schcd if mi(school_code)
 	drop schcd
 	replace ac_year = acyear if mi(ac_year)
@@ -664,10 +676,10 @@ program recode_appended
 		replace c`class'_c`gender' = `var' if mi(c`class'_c`gender')
 		drop `var'
 	}
-	save "${messy_dta}/scenrollment_append", replace
+	save "../output/messy_dta/scenrollment_append", replace
 	
 	//st enrollment
-	use "${messy_dta}/stenrollment_append", clear
+	use "../output/messy_dta/stenrollment_append", clear
 	replace school_code = schcd if mi(school_code)
 	drop schcd
 	replace ac_year = acyear if mi(ac_year)
@@ -680,10 +692,10 @@ program recode_appended
 		replace c`class'_t`gender' = `var' if mi(c`class'_t`gender')
 		drop `var'
 	}
-	save "${messy_dta}/stenrollment_append", replace
+	save "../output/messy_dta/stenrollment_append", replace
 	
 	//obc enrollment
-	use "${messy_dta}/obcenrollment_append", clear
+	use "../output/messy_dta/obcenrollment_append", clear
 	replace school_code = schcd if mi(school_code)
 	drop schcd
 	replace ac_year = acyear if mi(ac_year)
@@ -696,10 +708,10 @@ program recode_appended
 		replace c`class'_o`gender' = `var' if mi(c`class'_o`gender')
 		drop `var'
 	}
-	save "${messy_dta}/obcenrollment_append", replace
+	save "../output/messy_dta/obcenrollment_append", replace
 	
 	//disabled enrollment
-	use "${messy_dta}/disabledenrollment_append", clear 
+	use "../output/messy_dta/disabledenrollment_append", clear 
 	replace school_code = schcd if mi(school_code)
 	drop schcd
 	replace ac_year = acyear if mi(ac_year)
@@ -712,62 +724,65 @@ program recode_appended
 		replace c`class'_dis_`gender' = `var' if mi(c`class'_dis_`gender')
 		drop `var'
 	}
-	save "${messy_dta}/disabledenrollment_append", replace 
+	save "../output/messy_dta/disabledenrollment_append", replace 
 end
 
+//this program creates the panel for 2005-06 to 2017-18
 program merge_files_pre2017
-    use "${messy_dta}/basic_append", clear
+    use "../output/messy_dta/basic_append", clear
 	
-	merge 1:1 school_code ac_year using "${messy_dta}/general_append", assert(1 2 3) keep(3) ///
+	merge 1:1 school_code ac_year using "../output/messy_dta/general_append", assert(1 2 3) keep(3) ///
 	    gen(merge_general)
 	drop merge_general
 	
-	merge 1:1 school_code ac_year using "${messy_dta}/facility_append", assert(1 2 3) keep(3) ///
+	merge 1:1 school_code ac_year using "../output/messy_dta/facility_append", assert(1 2 3) keep(3) ///
 	    gen(merge_facility)
 	drop merge_facility
 	
-	merge 1:1 school_code ac_year using "${messy_dta}/teachers_append", assert(1 2 3) keep(1 3) ///
+	merge 1:1 school_code ac_year using "../output/messy_dta/teachers_append", assert(1 2 3) keep(1 3) ///
 	    gen(merge_teachers)
 	drop merge_teachers
 		
-	merge 1:1 school_code ac_year using "${messy_dta}/rte_append", assert(1 2 3) keep(1 3) ///
+	merge 1:1 school_code ac_year using "../output/messy_dta/rte_append", assert(1 2 3) keep(1 3) ///
 	    gen(merge_rte)
 	drop merge_rte
 		
-	merge 1:1 school_code ac_year using "${messy_dta}/repeaters_append", assert(1 2 3) keep(3) ///
+	merge 1:1 school_code ac_year using "../output/messy_dta/repeaters_append", assert(1 2 3) keep(3) ///
 	    gen(merge_repeaters)
 	drop merge_repeaters
 		
-	merge 1:1 school_code ac_year using "${messy_dta}/enrollment_append", assert(1 2 3) keep(3) ///
+	merge 1:1 school_code ac_year using "../output/messy_dta/enrollment_append", assert(1 2 3) keep(3) ///
 	    gen(merge_enrollment)
 	drop merge_enrollment
 		
-	merge 1:1 school_code ac_year using "${messy_dta}/scenrollment_append", assert(1 2 3) keep(3) ///
+	merge 1:1 school_code ac_year using "../output/messy_dta/scenrollment_append", assert(1 2 3) keep(3) ///
 	    gen(merge_scenrollment)
 	drop merge_scenrollment
 	
-	merge 1:1 school_code ac_year using "${messy_dta}/stenrollment_append", assert(1 2 3) keep(3) ///
+	merge 1:1 school_code ac_year using "../output/messy_dta/stenrollment_append", assert(1 2 3) keep(3) ///
 	    gen(merge_stenrollment)
 	drop merge_stenrollment
 	
-	merge 1:1 school_code ac_year using "${messy_dta}/obcenrollment_append", assert(1 2 3) keep(3) ///
+	merge 1:1 school_code ac_year using "../output/messy_dta/obcenrollment_append", assert(1 2 3) keep(3) ///
 	    gen(merge_obcenrollment)
 	drop merge_obcenrollment
 	
-	merge 1:1 school_code ac_year using "${messy_dta}/disabledenrollment_append", assert(1 2 3) ///
+	merge 1:1 school_code ac_year using "../output/messy_dta/disabledenrollment_append", assert(1 2 3) ///
 	    gen(merge_disabledenrollment)
 	drop merge_disabledenrollment
 	
-	save "${clean_dta}/panel_pre2017", replace
+	save "../output/clean_dta/panel_pre2017", replace
 end  
 
+/*this program creates the panel for 2018-19 to 2021-22, while reshaping the data so it conforms
+with the earlier panel*/
 program merge_files_post2017
     use ../output/messy_dta/enrollment_append_post2017, clear
-	/*drop if mi(item_desc)
+	drop if mi(item_desc)
 	replace item_desc = subinstr(item_desc, " ", "", .)
 	replace item_desc = "AgeLessThan5" if item_desc == "Age<5"
 	qui ds psuedocode item_desc ac_year, not
-	reshape wide `r(varlist)', i(psuedocode ac_year) j(item_desc) string*/
+	reshape wide `r(varlist)', i(psuedocode ac_year) j(item_desc) string
 	forvalues i = 1/12 {
 		rename c`i'_bSC c`i'_cb
 		rename c`i'_gSC c`i'_cg
@@ -790,7 +805,6 @@ program merge_files_post2017
 	rename cpp_gOBC cpp_og
 	rename cpp_bTotalrepeaters failppb
 	rename cpp_gTotalrepeaters failppg
-	ds c1_*
 	save ../output/messy_dta/enrollment_append_post2017, replace
 	
 	use ../output/messy_dta/profile_append_post2017, clear
@@ -810,6 +824,7 @@ program merge_files_post2017
 	save ../output/clean_dta/panel_post2017, replace
 end
 
+//this program creates the full panel
 program merge_panels
     use ../output/clean_dta/panel_pre2017, clear
 	rename (c9_b c9_g c10_b c10_g c11_b c11_g c12_b c12_g) ///
@@ -817,10 +832,10 @@ program merge_panels
 	forvalues i = 1/12 {
 		destring c`i'_totb c`i'_totg, replace
 	}
+	rename psuedocode school_code
 	save ../output/clean_dta/panel_pre2017, replace
-    use ../output/clean_dta/panel_post2017, clear
-	rename psuedocode school_code 
-	merge 1:1 school_code ac_year using ../output/clean_dta/panel_pre2017, assert(1 2 3) gen(merge_panel)
+	qui append using ../output/clean_dta/panel_post2017
+	save ../output/clean_dta/panel, replace
 end 
 
 *Execute
