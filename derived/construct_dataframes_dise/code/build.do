@@ -174,8 +174,7 @@ end
 program append_files_pre_2017
     dis "Append the yearly files by table from 2005-06 to 2017-18."
     forvalues year = 2005/2017 {
-	    import delimited "../output/csv/basic_`year'", varnames(1) stringcols(_all) ///
-		bindquote(strict) maxquotedrows(100)
+	    import delimited "../output/csv/basic_`year'", varnames(1) stringcols(_all) 
 		tempfile basic_`year'
 		save "`basic_`year''"
 		clear
@@ -831,11 +830,51 @@ program clean_pre2005_panel
 	count if mi(enr_io) & mi(enr_ig) & mi(enr_ic) & mi(enr_it)
 	sum check_obc, de //mean = 38% and median 34%, suggests this probably is OBC. 
 	
+	//rename variables to remain consistent with the post 2005 data
+	foreach sexidentity in bc bt bo gc gt go {
+		local sex = substr("`sexidentity'", 1, 1)
+		local identity = substr("`sexidentity'", 2, 1)
+		rename enr_si`sexidentity' tot_`identity'`sex'
+	}
+	rename (enr_sigg enr_sibg) (tot_geng tot_genb)
+	foreach gender in g b {
+	    forvalues class = 1/8 {
+		    rename enr_sc`gender'`class' c`class'_tot`gender'
+	    }
+	}
+	foreach identity in c t o {
+	    forvalues class = 1/8 {
+		    rename enr_ci`class'`identity' c`class'_`identity'
+	    }
+	}
+	forvalues class = 1/8 {
+	    rename enr_ci`class'g c`class'_gen
+	}
+	rename (enr_ig enr_ic enr_it enr_io) (tot_gen tot_c tot_t tot_o)
+	rename (enr_g enr_b enr_p enr_up enr_total) (tot_g tot_b tot_primary tot_uprimary tot_enroll)
+	forvalues class = 1/8 {
+		rename enr_cl`class' c`class'_tot
+	}
+	ds enr_ca_* 
+	foreach var in `r(varlist)' {
+		local class = substr("`var'", 8, 1)
+		local age = substr("`var'", 10, .)
+		rename `var' c`class'_Age`age'
+	}
+	forvalues class = 1/8 {
+		cap rename c`class'_Agel5 c`class'_AgeLessThan5
+	}
+	ds enr_age* 
+	foreach var in `r(varlist)' {
+		local age = substr("`var'", 8, .)
+		rename enr_age`age' tot_Age`age'
+	}
+	rename tot_Agel5 tot_AgeLessThan5
+	rename (appear_b5 appear_g5 appear_b7 appear_g7) (apprb5 apprg5 apprb7 apprg7)
+	rename (pass_b5 pass_g5 pass_b7 pass_g7) (passb5 passg5 passb7 passg7)
+	rename (m60_b5 m60_g5 m60_b7 m60_g7) (p60b5 p60g5 p60b7 p60g7)
 	
-	
-	
-	
-	
+	save ../output/clean_dta/RECODED_panel_2001-12, replace
 end
 
 program merge_panels
@@ -848,6 +887,17 @@ program merge_panels
 	}
 	save ../output/clean_dta/panel_pre2017, replace
 	qui append using ../output/clean_dta/panel_post2017
+	
+	foreach gender in g b {
+	    forvalues class = 1/12 {
+		    replace c`class'_o`gender' = c`class'_`gender'Others if mi(c`class'_o`gender')
+	        drop c`class'_`gender'Others
+	    }
+	}
+	
+	qui append using ../output/clean_dta/RECODED_panel_2001-12
+	
+	
 	
 	
 end 
