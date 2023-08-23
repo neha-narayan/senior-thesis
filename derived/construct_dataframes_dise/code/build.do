@@ -175,6 +175,8 @@ program append_files_pre_2017
     dis "Append the yearly files by table from 2005-06 to 2017-18."
     forvalues year = 2005/2017 {
 	    import delimited "../output/csv/basic_`year'", varnames(1) stringcols(_all) 
+		trim_strings
+		convert_to_int
 		tempfile basic_`year'
 		save "`basic_`year''"
 		clear
@@ -188,6 +190,8 @@ program append_files_pre_2017
 	forvalues year = 2005/2017 {
 	    import delimited "../output/csv/general_`year'", varnames(1) stringcols(_all) ///
 		bindquote(strict) maxquotedrows(100)
+		trim_strings
+		convert_to_int
 		tempfile general_`year'
 		save "`general_`year''"
 		clear
@@ -202,6 +206,8 @@ program append_files_pre_2017
 	forvalues year = 2005/2017 {
 	    import delimited "../output/csv/facility_`year'", varnames(1) stringcols(_all) ///
 		bindquote(strict) maxquotedrows(100)
+		trim_strings
+		convert_to_int
 		tempfile facility_`year'
 		save "`facility_`year''"
 		clear
@@ -216,6 +222,8 @@ program append_files_pre_2017
 	forvalues year = 2009/2017 {
 	    import delimited "../output/csv/teachers_`year'", varnames(1) stringcols(_all) ///
 		bindquote(strict) maxquotedrows(100)
+		trim_strings
+		convert_to_int
 		tempfile teachers_`year'
 		save "`teachers_`year''"
 		clear
@@ -230,6 +238,8 @@ program append_files_pre_2017
 	forvalues year = 2010/2017 {
 	    import delimited "../output/csv/rte_`year'", varnames(1) stringcols(_all) ///
 		bindquote(strict) maxquotedrows(100)
+		trim_strings
+		convert_to_int
 		tempfile rte_`year'
 		save "`rte_`year''"
 		clear
@@ -272,6 +282,8 @@ program append_files_pre_2017
 	forvalues year = 2005/2017 {
 	    import delimited "../output/csv/scenrollment_`year'", varnames(1) stringcols(_all) ///
 		bindquote(strict) maxquotedrows(100)
+		trim_strings
+		convert_to_int
 		tempfile scenrollment_`year'
 		save "`scenrollment_`year''"
 		clear
@@ -286,6 +298,8 @@ program append_files_pre_2017
 	forvalues year = 2005/2017 {
 	    import delimited "../output/csv/stenrollment_`year'", varnames(1) stringcols(_all) ///
 		bindquote(strict) maxquotedrows(100)
+		trim_strings
+		convert_to_int
 		tempfile stenrollment_`year'
 		save "`stenrollment_`year''"
 		clear
@@ -300,6 +314,8 @@ program append_files_pre_2017
 	forvalues year = 2005/2017 {
 	    import delimited "../output/csv/obcenrollment_`year'", varnames(1) stringcols(_all) ///
 		bindquote(strict) maxquotedrows(100)
+		trim_strings
+		convert_to_int
 		tempfile obcenrollment_`year'
 		save "`obcenrollment_`year''"
 		clear
@@ -314,6 +330,8 @@ program append_files_pre_2017
 	forvalues year = 2005/2017 {
 	    import delimited "../output/csv/disabledenrollment_`year'", varnames(1) stringcols(_all) ///
 		bindquote(strict) maxquotedrows(100)
+		trim_strings
+		convert_to_int
 		tempfile disabledenrollment_`year'
 		save "`disabledenrollment_`year''"
 		clear
@@ -874,6 +892,7 @@ program clean_pre2005_panel
 	rename (pass_b5 pass_g5 pass_b7 pass_g7) (passb5 passg5 passb7 passg7)
 	rename (m60_b5 m60_g5 m60_b7 m60_g7) (p60b5 p60g5 p60b7 p60g7)
 	
+	drop enr*
 	save ../output/clean_dta/RECODED_panel_2001-12, replace
 end
 
@@ -896,10 +915,41 @@ program merge_panels
 	}
 	
 	qui append using ../output/clean_dta/RECODED_panel_2001-12
-	
-	
-	
-	
+end
+
+program trim_strings
+    ds, has(type string)
+    local string_vars = r(varlist)
+    foreach var in `string_vars' {
+        replace `var' = strtrim(`var')
+    }
+    compress
+end
+
+program convert_to_int
+    ds, not(varlabel *ID)
+    local string_vars = r(varlist)
+    foreach var in `string_vars' {
+        if "`:type `var''" != "string" {
+            continue
+        }
+        local length = strlen(`var')
+        di "`var'"
+        if `length' < 16 {
+            gen `var'_r = real(`var')
+            sum `var'_r, d
+            count if !mi(`var'_r)
+            local nonmiss = `r(N)'
+            count
+            local N = `r(N)'
+            local nonmissing_pct = `nonmiss'/`N'
+            if `nonmissing_pct' >= 0.05 {
+                destring `var', replace
+            }
+            drop `var'_r
+        }
+    } 
+    compress
 end 
 
 *Execute
