@@ -915,6 +915,7 @@ program merge_panels
 	}
 	
 	qui append using ../output/clean_dta/RECODED_panel_2001-12
+	save ../output/clean_dta/panel, replace
 end
 
 program trim_strings
