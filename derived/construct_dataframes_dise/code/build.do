@@ -17,7 +17,7 @@ which is a file containing the SC enrollment data for the years 2005-06 to 2017-
 2021-22 separately, then append.*/
 
 program main
-    prep_post2017
+    //prep_post2017
 	append_files_pre_2017
 	transform_enrollment_post2017
     append_files_post2017
@@ -366,10 +366,14 @@ program append_files_post2017
 	    use ../output/messy_dta/profile_`year', clear
 		qui ds psuedocode ac_year, not
 	    collapse (firstnm) `r(varlist)', by(psuedocode ac_year)
+		trim_strings
+		convert_to_int
 		save ../output/messy_dta/profile_`year', replace
 		use ../output/messy_dta/enrollment_`year', clear
 		qui ds psuedocode ac_year item_desc, not
 	    collapse (firstnm) `r(varlist)', by(psuedocode ac_year item_desc)
+		trim_strings
+		convert_to_int
 		save ../output/messy_dta/enrollment_`year', replace
 	}
 	
@@ -378,6 +382,8 @@ program append_files_post2017
 		append using ../output/messy_dta/profile_`year'
 	}
 	qui duplicates drop 
+	trim_strings
+	convert_to_int
 	save ../output/messy_dta/profile_append_post2017, replace
 	
 	clear 
@@ -385,13 +391,17 @@ program append_files_post2017
 		append using ../output/messy_dta/enrollment_`year'
 	}
 	qui duplicates drop 
+	trim_strings
+	convert_to_int
 	save ../output/messy_dta/enrollment_append_post2017, replace
 		
 	clear 
 	foreach year in 2018-19 2019-20 2020-21 2021-22 {
 		append using ../output/messy_dta/facility_`year'
 	}
-	qui duplicates drop 
+	qui duplicates drop
+	trim_strings
+	convert_to_int
 	save ../output/messy_dta/facility_append_post2017, replace
 
     clear 
@@ -399,6 +409,8 @@ program append_files_post2017
 		append using ../output/messy_dta/teachers_`year'
 	}
 	qui duplicates drop 
+	trim_strings
+	convert_to_int
 	save ../output/messy_dta/teachers_append_post2017, replace*/
 end 
 
