@@ -188,6 +188,7 @@ program append_files_pre_2017
 	qui duplicates drop 
 	save "../output/messy_dta/basic_append", replace
 	
+	clear
 	forvalues year = 2005/2017 {
 	    import delimited "../output/csv/general_`year'", varnames(1) stringcols(_all) ///
 	        bindquotes(strict) 
