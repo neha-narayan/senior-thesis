@@ -11,7 +11,7 @@ program main
 end 
 
 program clean_house 
-    import delimited "${raw_house}/ASER 2007 Household Data", varnames(1) stringcols(_all)
+    import delimited "${raw_house}/ASER 2007 Household Data", varnames(1) stringcols(_all) 
 	trim_strings
 	convert_to_int
 	save ../output/messy_dta/household_2007, replace
