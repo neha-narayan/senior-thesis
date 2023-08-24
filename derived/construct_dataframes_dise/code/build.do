@@ -17,13 +17,13 @@ which is a file containing the SC enrollment data for the years 2005-06 to 2017-
 2021-22 separately, then append.*/
 
 program main
-    //prep_post2017
+    prep_post2017
 	append_files_pre_2017
-	//transform_enrollment_post2017
-    //append_files_post2017
+	transform_enrollment_post2017
+    append_files_post2017
 	recode_appended
 	merge_files_pre2017
-    //merge_files_post2017
+    merge_files_post2017
 	//clean_pre2005_panel
     merge_panels
 end 
@@ -38,6 +38,8 @@ program prep_post2017
 	    foreach file in `filenames' {
 		    local idx "`++idx'"
 		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
+			trim_strings
+		    convert_to_int
 		    tempfile enroll_`idx'
 		    save "`enroll_`idx''"
 		    clear
@@ -58,6 +60,8 @@ program prep_post2017
 	    foreach file in `filenames' {
 		    local idx "`++idx'"
 		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
+			trim_strings
+		    convert_to_int
 		    tempfile prof_`idx'
 		    save "`prof_`idx''"
 		    clear
@@ -78,6 +82,8 @@ program prep_post2017
 	    foreach file in `filenames' {
 		    local idx "`++idx'"
 		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
+			trim_strings
+		    convert_to_int
 		    tempfile prof_`idx'
 		    save "`prof_`idx''"
 		    clear
@@ -98,6 +104,8 @@ program prep_post2017
 	    foreach file in `filenames' {
 		    local idx "`++idx'"
 		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
+			trim_strings
+		    convert_to_int
 		    tempfile facility_`idx'
 		    save "`facility_`idx''"
 		    clear
@@ -118,6 +126,8 @@ program prep_post2017
 	    foreach file in `filenames' {
 		    local idx "`++idx'"
 		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
+			trim_strings
+		    convert_to_int
 		    tempfile facility_`idx'
 		    save "`facility_`idx''"
 		    clear
@@ -138,6 +148,8 @@ program prep_post2017
 	    foreach file in `filenames' {
 		    local idx "`++idx'"
 		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
+			trim_strings
+		    convert_to_int
 		    tempfile teachers_`idx'
 		    save "`teachers_`idx''"
 		    clear
@@ -158,6 +170,8 @@ program prep_post2017
 	    foreach file in `filenames' {
 		    local idx "`++idx'"
 		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
+			trim_strings
+		    convert_to_int
 		    tempfile teachers_`idx'
 		    save "`teachers_`idx''"
 		    clear
@@ -188,7 +202,7 @@ program append_files_pre_2017
 	}
 	qui duplicates drop 
 	save "../output/messy_dta/basic_append", replace
-	/*
+	
 	clear
 	forvalues year = 2005/2017 {
 	    import delimited "../output/csv/general_`year'", varnames(1) stringcols(_all) ///
@@ -280,7 +294,7 @@ program append_files_pre_2017
 	}
 	qui duplicates drop 
 	save "../output/messy_dta/enrollment_append", replace
-	/*
+	
 	clear
 	forvalues year = 2005/2017 {
 	    import delimited "../output/csv/scenrollment_`year'", varnames(1) stringcols(_all) ///
@@ -344,7 +358,6 @@ program append_files_pre_2017
 	}
 	qui duplicates drop 
 	save "../output/messy_dta/disabledenrollment_append", replace
-	*/
 end 
 
 program append_files_post2017
@@ -397,7 +410,6 @@ program recode_appended
 	save "../output/messy_dta/basic_append", replace
 	
 	//general 
-	/*
 	use "../output/messy_dta/general_append", clear
 	replace school_code = schcd if mi(school_code) 
 	drop schcd
@@ -643,7 +655,6 @@ program recode_appended
 	replace ac_year = acyear if mi(ac_year)
 	drop acyear
 	save "../output/messy_dta/repeaters_append", replace
-	*/
 	
 	//total enrollment 
 	use "../output/messy_dta/enrollment_append", clear
@@ -678,7 +689,6 @@ program recode_appended
 	save "../output/messy_dta/enrollment_append", replace
 	
 	//sc enrollment
-	/*
 	use "../output/messy_dta/scenrollment_append", clear
 	replace school_code = schcd if mi(school_code)
 	drop schcd
@@ -741,7 +751,6 @@ program recode_appended
 		drop `var'
 	}
 	save "../output/messy_dta/disabledenrollment_append", replace 
-	*/
 end
 
 program merge_files_pre2017
@@ -793,7 +802,6 @@ end
 
 program merge_files_post2017
     dis "Create the panel for 2018-19 to 2021-22 and reshape data to conform with earlier panel."
-	/*
     use ../output/messy_dta/enrollment_append_post2017, clear
 	drop if mi(item_desc)
 	replace item_desc = subinstr(item_desc, " ", "", .)
@@ -823,7 +831,6 @@ program merge_files_post2017
 	rename cpp_bTotalrepeaters failppb
 	rename cpp_gTotalrepeaters failppg
 	save ../output/messy_dta/enrollment_append_post2017, replace
-	*/
 	
 	use ../output/messy_dta/profile_append_post2017, clear
 	
@@ -939,12 +946,9 @@ program trim_strings
 end
 
 program convert_to_int
-    ds school_code, not
+    cap ds school_code psuedocode, not
     local string_vars = r(varlist)
     foreach var in `string_vars' {
-        if "`:type `var''" != "string" {
-            continue
-        }
         local length = strlen(`var')
         di "`var'"
         if `length' < 16 {
