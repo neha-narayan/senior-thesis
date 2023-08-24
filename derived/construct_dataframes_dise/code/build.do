@@ -188,8 +188,7 @@ program append_files_pre_2017
 	save "../output/messy_dta/basic_append", replace
 	
 	forvalues year = 2005/2017 {
-	    import delimited "../output/csv/general_`year'", varnames(1) stringcols(_all) ///
-		bindquote(strict) maxquotedrows(100)
+	    import delimited "../output/csv/general_`year'", varnames(1) stringcols(_all)
 		trim_strings
 		convert_to_int
 		tempfile general_`year'
@@ -204,8 +203,7 @@ program append_files_pre_2017
 	
 	clear
 	forvalues year = 2005/2017 {
-	    import delimited "../output/csv/facility_`year'", varnames(1) stringcols(_all) ///
-		bindquote(strict) maxquotedrows(100)
+	    import delimited "../output/csv/facility_`year'", varnames(1) stringcols(_all) 
 		trim_strings
 		convert_to_int
 		tempfile facility_`year'
@@ -220,8 +218,7 @@ program append_files_pre_2017
 	
 	clear
 	forvalues year = 2009/2017 {
-	    import delimited "../output/csv/teachers_`year'", varnames(1) stringcols(_all) ///
-		bindquote(strict) maxquotedrows(100)
+	    import delimited "../output/csv/teachers_`year'", varnames(1) stringcols(_all) 
 		trim_strings
 		convert_to_int
 		tempfile teachers_`year'
@@ -236,8 +233,7 @@ program append_files_pre_2017
 	
 	clear
 	forvalues year = 2010/2017 {
-	    import delimited "../output/csv/rte_`year'", varnames(1) stringcols(_all) ///
-		bindquote(strict) maxquotedrows(100)
+	    import delimited "../output/csv/rte_`year'", varnames(1) stringcols(_all)
 		trim_strings
 		convert_to_int
 		tempfile rte_`year'
@@ -252,8 +248,7 @@ program append_files_pre_2017
 	
 	clear
 	forvalues year = 2005/2017 {
-	    import delimited "../output/csv/repeaters_`year'", varnames(1) stringcols(_all) ///
-		bindquote(strict) maxquotedrows(100)
+	    import delimited "../output/csv/repeaters_`year'", varnames(1) stringcols(_all) 
 		tempfile repeaters_`year'
 		save "`repeaters_`year''"
 		clear
@@ -266,8 +261,7 @@ program append_files_pre_2017
 	
 	clear
 	forvalues year = 2005/2017 {
-	    import delimited "../output/csv/enrollment_`year'", varnames(1) stringcols(_all) ///
-		bindquote(strict) maxquotedrows(100)
+	    import delimited "../output/csv/enrollment_`year'", varnames(1) stringcols(_all)
 		tempfile enrollment_`year'
 		save "`enrollment_`year''"
 		clear
@@ -280,8 +274,7 @@ program append_files_pre_2017
 	
 	clear
 	forvalues year = 2005/2017 {
-	    import delimited "../output/csv/scenrollment_`year'", varnames(1) stringcols(_all) ///
-		bindquote(strict) maxquotedrows(100)
+	    import delimited "../output/csv/scenrollment_`year'", varnames(1) stringcols(_all) 
 		trim_strings
 		convert_to_int
 		tempfile scenrollment_`year'
@@ -296,8 +289,7 @@ program append_files_pre_2017
 	
 	clear
 	forvalues year = 2005/2017 {
-	    import delimited "../output/csv/stenrollment_`year'", varnames(1) stringcols(_all) ///
-		bindquote(strict) maxquotedrows(100)
+	    import delimited "../output/csv/stenrollment_`year'", varnames(1) stringcols(_all) 
 		trim_strings
 		convert_to_int
 		tempfile stenrollment_`year'
@@ -312,8 +304,7 @@ program append_files_pre_2017
 	
 	clear
 	forvalues year = 2005/2017 {
-	    import delimited "../output/csv/obcenrollment_`year'", varnames(1) stringcols(_all) ///
-		bindquote(strict) maxquotedrows(100)
+	    import delimited "../output/csv/obcenrollment_`year'", varnames(1) stringcols(_all) 
 		trim_strings
 		convert_to_int
 		tempfile obcenrollment_`year'
@@ -328,8 +319,7 @@ program append_files_pre_2017
 	
 	clear
 	forvalues year = 2005/2017 {
-	    import delimited "../output/csv/disabledenrollment_`year'", varnames(1) stringcols(_all) ///
-		bindquote(strict) maxquotedrows(100)
+	    import delimited "../output/csv/disabledenrollment_`year'", varnames(1) stringcols(_all) 
 		trim_strings
 		convert_to_int
 		tempfile disabledenrollment_`year'
