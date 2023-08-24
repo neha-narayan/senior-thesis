@@ -175,7 +175,7 @@ program append_files_pre_2017
     dis "Append the yearly files by table from 2005-06 to 2017-18."
     forvalues year = 2005/2017 {
 	    import delimited "../output/csv/basic_`year'", varnames(1) stringcols(_all)  ///
-	        bindquotes(strict) maxquotedrows(100)
+	        bindquotes(strict) 
 		trim_strings
 		convert_to_int
 		tempfile basic_`year'
