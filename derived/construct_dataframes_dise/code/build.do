@@ -21,8 +21,8 @@ program main
 	append_files_pre_2017
 	//transform_enrollment_post2017
     //append_files_post2017
-	recode_appended
-	merge_files_pre2017
+	//recode_appended
+	//merge_files_pre2017
     merge_files_post2017
 	//clean_pre2005_panel
     merge_panels
