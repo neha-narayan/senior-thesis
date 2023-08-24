@@ -18,12 +18,12 @@ which is a file containing the SC enrollment data for the years 2005-06 to 2017-
 
 program main
     //prep_post2017
-	//append_files_pre_2017
+	append_files_pre_2017
 	//transform_enrollment_post2017
     //append_files_post2017
-	//recode_appended
-	//merge_files_pre2017
-    merge_files_post2017
+	recode_appended
+	merge_files_pre2017
+    //merge_files_post2017
 	//clean_pre2005_panel
     merge_panels
 end 
@@ -173,7 +173,7 @@ end
 
 program append_files_pre_2017
     dis "Append the yearly files by table from 2005-06 to 2017-18."
-    /*
+    
 	forvalues year = 2005/2017 {
 	    import delimited "../output/csv/basic_`year'", varnames(1) stringcols(_all)  ///
 	        bindquotes(strict) 
@@ -188,7 +188,7 @@ program append_files_pre_2017
 	}
 	qui duplicates drop 
 	save "../output/messy_dta/basic_append", replace
-	
+	/*
 	clear
 	forvalues year = 2005/2017 {
 	    import delimited "../output/csv/general_`year'", varnames(1) stringcols(_all) ///
@@ -923,7 +923,8 @@ program merge_panels
 	        drop c`class'_`gender'Others
 	    }
 	}
-	
+	trim_strings
+	convert_to_int
 	qui append using ../output/clean_dta/RECODED_panel_2001-12
 	save ../output/clean_dta/panel, replace
 end
@@ -938,7 +939,7 @@ program trim_strings
 end
 
 program convert_to_int
-    ds, not(varlabel *ID)
+    ds school_code, not
     local string_vars = r(varlist)
     foreach var in `string_vars' {
         if "`:type `var''" != "string" {
