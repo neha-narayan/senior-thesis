@@ -186,7 +186,6 @@ end
 
 program append_files_pre_2017
     dis "Append the yearly files by table from 2005-06 to 2017-18."
-    
 	forvalues year = 2005/2017 {
 	    import delimited "../output/csv/basic_`year'", varnames(1) stringcols(_all)  ///
 	        bindquotes(strict) 
@@ -957,7 +956,7 @@ program trim_strings
 end
 
 program convert_to_int
-    cap ds school_code psuedocode, not
+    ds school_code, not
     local string_vars = r(varlist)
     foreach var in `string_vars' {
         local length = strlen(`var')
