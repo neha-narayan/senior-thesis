@@ -18,7 +18,7 @@ which is a file containing the SC enrollment data for the years 2005-06 to 2017-
 
 program main
     //prep_post2017
-	//append_files_pre_2017
+	append_files_pre_2017
 	//transform_enrollment_post2017
     //append_files_post2017
 	recode_appended
@@ -173,7 +173,8 @@ end
 
 program append_files_pre_2017
     dis "Append the yearly files by table from 2005-06 to 2017-18."
-    forvalues year = 2005/2017 {
+    /*
+	forvalues year = 2005/2017 {
 	    import delimited "../output/csv/basic_`year'", varnames(1) stringcols(_all)  ///
 	        bindquotes(strict) 
 		trim_strings
@@ -265,7 +266,7 @@ program append_files_pre_2017
 	}
 	qui duplicates drop 
 	save "../output/messy_dta/repeaters_append", replace
-	
+	*/
 	clear
 	forvalues year = 2005/2017 {
 	    import delimited "../output/csv/enrollment_`year'", varnames(1) stringcols(_all) ///
@@ -279,7 +280,7 @@ program append_files_pre_2017
 	}
 	qui duplicates drop 
 	save "../output/messy_dta/enrollment_append", replace
-	
+	/*
 	clear
 	forvalues year = 2005/2017 {
 	    import delimited "../output/csv/scenrollment_`year'", varnames(1) stringcols(_all) ///
@@ -343,6 +344,7 @@ program append_files_pre_2017
 	}
 	qui duplicates drop 
 	save "../output/messy_dta/disabledenrollment_append", replace
+	*/
 end 
 
 program append_files_post2017
@@ -395,6 +397,7 @@ program recode_appended
 	save "../output/messy_dta/basic_append", replace
 	
 	//general 
+	/*
 	use "../output/messy_dta/general_append", clear
 	replace school_code = schcd if mi(school_code) 
 	drop schcd
@@ -640,6 +643,7 @@ program recode_appended
 	replace ac_year = acyear if mi(ac_year)
 	drop acyear
 	save "../output/messy_dta/repeaters_append", replace
+	*/
 	
 	//total enrollment 
 	use "../output/messy_dta/enrollment_append", clear
@@ -674,6 +678,7 @@ program recode_appended
 	save "../output/messy_dta/enrollment_append", replace
 	
 	//sc enrollment
+	/*
 	use "../output/messy_dta/scenrollment_append", clear
 	replace school_code = schcd if mi(school_code)
 	drop schcd
@@ -736,10 +741,11 @@ program recode_appended
 		drop `var'
 	}
 	save "../output/messy_dta/disabledenrollment_append", replace 
+	*/
 end
 
 program merge_files_pre2017
-    dis "Recode the appended files to address changing variable names over the years."
+    dis "Merge the tables from 2005-06 to 2017-18."
     use "../output/messy_dta/basic_append", clear
 	
 	merge 1:1 school_code ac_year using "../output/messy_dta/general_append", assert(1 2 3) keep(3) ///
