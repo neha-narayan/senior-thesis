@@ -19,7 +19,6 @@ which is a file containing the SC enrollment data for the years 2005-06 to 2017-
 program main
     //prep_post2017
 	append_files_pre_2017
-	transform_enrollment_post2017
     append_files_post2017
 	recode_appended
 	merge_files_pre2017
