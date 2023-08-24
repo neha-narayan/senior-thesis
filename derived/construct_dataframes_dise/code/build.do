@@ -206,7 +206,7 @@ program append_files_pre_2017
 	clear
 	forvalues year = 2005/2017 {
 	    import delimited "../output/csv/facility_`year'", varnames(1) stringcols(_all) ///
-	        bindquotes(strict) maxquotedrows(100)
+	        bindquotes(strict) 
 		trim_strings
 		convert_to_int
 		tempfile facility_`year'
