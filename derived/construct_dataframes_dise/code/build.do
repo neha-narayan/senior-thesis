@@ -793,6 +793,7 @@ end
 
 program merge_files_post2017
     dis "Create the panel for 2018-19 to 2021-22 and reshape data to conform with earlier panel."
+	/*
     use ../output/messy_dta/enrollment_append_post2017, clear
 	drop if mi(item_desc)
 	replace item_desc = subinstr(item_desc, " ", "", .)
@@ -822,6 +823,7 @@ program merge_files_post2017
 	rename cpp_bTotalrepeaters failppb
 	rename cpp_gTotalrepeaters failppg
 	save ../output/messy_dta/enrollment_append_post2017, replace
+	*/
 	
 	use ../output/messy_dta/profile_append_post2017, clear
 	
