@@ -1,49 +1,49 @@
 capture log close 
-log using data_checks.log, replace
+log using analysis.log, replace
 clear all
 set more off
 
-program main
-    drop_sus_schools
+program main 
+    tests
 end
 
-program drop_sus_schools
-    use ../output/clean_dta/panel_pre2017, clear
-	foreach var in apprb5 apprg5 apprb8 apprg8 {
-		replace `var' = "." if `var' == "NA"
-		destring `var', replace
-	}
-	tab ac_year if mi(apprb5)
-	drop if ac_year == "2005-06" | ac_year == "2006-07" | ac_year == "2007-08" | ac_year == "2008-09" | ac_year == "2013-14"
-	foreach var in apprb5 apprg5 apprb8 apprg8 {
-		bys school_code (ac_year): gen pctChange_`var' = (`var'[_n] - `var'[_n-1])/`var'[_n-1]
-		replace pctChange_`var' = 0 if `var'[_n] == 0 & `var'[_n-1] == 0
-	    replace pctChange_`var' = `var'[_n] if `var'[_n] != 0 & `var'[_n-1] == 0
-	}
-	foreach var in c5_totb c5_totg c8_totb c8_totg {
-        bys school_code (ac_year): gen pctChange_`var' = (`var'[_n] - `var'[_n-1])/`var'[_n-1]
-		replace pctChange_`var' = 0 if `var'[_n] == 0 & `var'[_n-1] == 0
-		replace pctChange_`var' = `var'[_n] if `var'[_n] != 0 & `var'[_n-1] == 0
-	}
-	gen ratiob5 = pctChange_apprb5/pctChange_c5_totb
-	gen ratiog5 = pctChange_apprg5/pctChange_c5_totg
-	gen ratiob8 = pctChange_apprb8/pctChange_c8_totb
-	gen ratiog8 = pctChange_apprg8/pctChange_c8_totg
+program tests
+    //use ../../../shared_data/balanced_panel, clear
+	use ../../../shared_data/panel_1pct, clear
+	drop if state == "Puducherry" | state == "Uttarakhand" //really no info / big contradictions on linkage
+	gen interact = .
+	replace interact = 1 if ac_year == "2019-20" & state == "Tamil Nadu"
+	replace interact = 1 if ac_year == "2017-18" & (state == "Andaman and Nicobar Islands" | ///
+	state == "Arunachal Pradesh" | state == "Bihar" | state == "Chandigarh" | state == "Chhattisgarh" | ///
+	state == "DNH and DD" | state == "Goa" | state == "Gujarat" | state == "Karnataka" | ///
+    state == "Lakshadweep" | state == "Mizoram" | state == "Nagaland" | state == "Odisha" | ///
+	| state == "Punjab" | state == "Rajasthan" | state == "Sikkim" | state == "Tripura" | ///
+	state == "Uttar Pradesh" | state == "Madhya Pradesh")
+	replace interact = 1 if ac_year == "2016-17" & ///
+	    (state == "Delhi" | state == "Manipur" | state == "Jharkhand")
+	replace interact = 1 if ac_year == "2015-16" & (state == "Andhra Pradesh" | state == "Haryana")
+	replace interact = 1 if ac_year == "2013-14" & ///
+	    (state == "Himachal Pradesh")
+    replace interact = 0 if state == "Assam" | state == "Jammu and Kashmir" | state == "Kerala" ///
+	    | state == "Maharashtra" | state == "Meghalaya" | state == "West Bengal")
+	replace interact = 0 if mi(interact)
+	bysort school_code (ac_year): replace interact = interact[_n-1] if interact[_n-1] == 1	
 	
-	foreach var in ratiob5 ratiog5 ratiob8 ratiog8 {
-		bysort school_code: egen mean_`var' = mean(`var')
-	}
- 	bysort school_code: gen meaned_ratio = mean_ratiob5 + mean_ratiog5 + mean_ratiob8 + mean_ratiog8 / 4
+	collapse (firstnm) interact (sum) tot_pup pup_b pup_g, by(ac_year state)
+	egen year = group(ac_year)
+	egen num_state = group(state)
+	gen log_enr = log(tot_pup)
 	
-	centile meaned_ratio, centile(5)
-	local lower = `r(c_1)'
-	dis `lower'
-	centile meaned_ratio, centile(95)
-	local upper = `r(c_1)'
-	drop if meaned_ratio < lower | meaned_ratio > upper
+    egen c = group(ac_year num_state)
+	reg log_enr i.year i.num_state interact, cluster(c)
+	predict double resid, residuals
 	
-	hist meaned_ratio
-	graph export ../output/ratio_hist.pdf, replace
+	rvfplot, title("Residual Plot from DiD Regression (DISE)") 
+	//graph export ../output/residual.pdf, replace
+	
+	sktest resid
+
+	frontier log_enr i.year i.num_state interact, uhet(year) vce(cluster c)
 end 
 
 
