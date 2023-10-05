@@ -6,11 +6,14 @@ set more off
 global raw_house "C:\Users\Neha Narayan\Desktop\GitHub\senior-thesis\raw\ASER_Household_Village_Data"
 
 program main
-    convert_to_dta
-    recode 
-	append_files
+    //convert_to_dta
+    //recode 
+	//append_files
 	clean_appended
+	clear_temp
+	collapse_datasets
 end 
+
 
 program convert_to_dta
     import delimited "${raw_house}/ASER 2007 Household Data", varnames(1) stringcols(_all) 
@@ -99,7 +102,6 @@ program convert_to_dta
 	
 end 
 
-
 program recode 
     //2007
 	use ../output/messy_dta/household_2007, clear 
@@ -123,6 +125,7 @@ program recode
 	
 	rename (child5to16schoolingclassstd age5to16neverbeentoschool age5to16dropout ge5to16dropoutstd) ///
 	    (school_class oos_never_enr oos_dropout oos_dropout_class) 
+	destring school_class oos_*, replace
 		
 	foreach var in govt_ind pvt_ind madarsa_ind other_ind {
 		replace `var' = 0 if mi(`var')
@@ -144,6 +147,11 @@ program recode
 	gen enrolled_ind = .
 	replace enrolled_ind = 0 if mi(school_class)
 	replace enrolled_ind = 1 if !mi(school_class)
+	
+	//sas = Shah and Steinberg measure of enrollment
+	gen enrolled_ind_sas = .
+	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
+	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
 	
 	gen tuition = . 
 	replace tuition = 1 if tutionyes == 1 
@@ -219,6 +227,13 @@ program recode
 	replace sample_year = 2007 if aser07 == 1 
 	replace sample_year = 2008 if aser08 == 1
 	
+	destring school_class oos_*, replace
+	
+	egen missing_tracker = rowtotal(hhtype_pucca hhtype_semi_katcha hhtype_katcha)
+	foreach var in hhtype_pucca hhtype_semi_katcha hhtype_katcha {
+	    replace `var' = 0 if mi(`var') & missing_tracker != 0 
+	}
+	
 	gen hh_electricity_conn = .
 	replace hh_electricity_conn = 1 if hh_electricity_conn_yes == 1
 	replace hh_electricity_conn = 2 if hh_electricity_conn_no == 1
@@ -254,6 +269,11 @@ program recode
 	gen enrolled_ind = .
 	replace enrolled_ind = 0 if mi(school_class)
 	replace enrolled_ind = 1 if !mi(school_class)
+	
+	//sas = Shah and Steinberg measure of enrollment
+	gen enrolled_ind_sas = .
+	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
+	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
 	
 	rename (school_govt school_private school_madarsa school_other) ///
 	     (govt_ind pvt_ind madarsa_ind other_ind)
@@ -319,6 +339,13 @@ program recode
 	replace sample_year = 2008 if aser08 == 1 
 	replace sample_year = 2009 if aser09 == 1
 	
+	destring school_class oos_*, replace
+	
+	egen missing_tracker = rowtotal(hhtype_pucca hhtype_semi_katcha hhtype_katcha)
+	foreach var in hhtype_pucca hhtype_semi_katcha hhtype_katcha {
+	    replace `var' = 0 if mi(`var') & missing_tracker != 0 
+	}
+
 	gen hh_electricity_conn = .
 	replace hh_electricity_conn = 1 if hh_electricity_conn_yes == 1
 	replace hh_electricity_conn = 2 if hh_electricity_conn_no == 1
@@ -350,6 +377,11 @@ program recode
 	gen enrolled_ind = .
 	replace enrolled_ind = 0 if mi(school_class)
 	replace enrolled_ind = 1 if !mi(school_class)
+	
+	//sas = Shah and Steinberg measure of enrollment
+	gen enrolled_ind_sas = .
+	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
+	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
 	
 	rename (school_govt school_private school_madarsa school_other) ///
 	     (govt_ind pvt_ind madarsa_ind other_ind)
@@ -411,6 +443,13 @@ program recode
 	replace sample_year = 2008 if aser08 == 1 
 	replace sample_year = 2009 if aser09 == 1 
 	replace sample_year = 2010 if aser10 == 1
+	
+	destring school_class oos_*, replace
+	
+	egen missing_tracker = rowtotal(hhtype_pucca hhtype_semi_katcha hhtype_katcha)
+	foreach var in hhtype_pucca hhtype_semi_katcha hhtype_katcha {
+	    replace `var' = 0 if mi(`var') & missing_tracker != 0 
+	}
 	
 	gen hh_electricity_conn = .
 	replace hh_electricity_conn = 1 if hh_electricity_conn_yes == 1
@@ -486,6 +525,11 @@ program recode
 	replace enrolled_ind = 0 if mi(school_class)
 	replace enrolled_ind = 1 if !mi(school_class)
 	
+	//sas = Shah and Steinberg measure of enrollment
+	gen enrolled_ind_sas = .
+	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
+	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
+	
     rename (school_govt school_private school_madarsa school_other) ///
 	     (govt_ind pvt_ind madarsa_ind other_ind)
 	destring madarsa_ind other_ind, replace
@@ -544,6 +588,8 @@ program recode
 	replace sample_year = 2010 if aser10 == 1 
 	replace sample_year = 2011 if aser11 == 1
 	
+	destring school_class oos_*, replace
+	
 	rename hh_mobile hh_phone
 	rename tuition_school_teacher tuition_govt_school
 	
@@ -589,6 +635,11 @@ program recode
 	gen enrolled_ind = .
 	replace enrolled_ind = 0 if mi(school_class)
 	replace enrolled_ind = 1 if !mi(school_class)
+	
+	//sas = Shah and Steinberg measure of enrollment
+	gen enrolled_ind_sas = .
+	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
+	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
 	
 	rename (school_govt school_private school_madarsa school_other) ///
 	     (govt_ind pvt_ind madarsa_ind other_ind) 
@@ -641,6 +692,8 @@ program recode
 	replace sample_year = 2011 if aser11 == 1 
 	replace sample_year = 2012 if aser12 == 1
 	
+	destring school_class oos_*, replace
+	
 	rename hh_mobile hh_phone
 	
 	gen mother_gone_to_school = .
@@ -675,6 +728,11 @@ program recode
 	gen enrolled_ind = .
 	replace enrolled_ind = 0 if mi(school_class)
 	replace enrolled_ind = 1 if !mi(school_class)
+	
+	//sas = Shah and Steinberg measure of enrollment
+	gen enrolled_ind_sas = .
+	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
+	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
 	
 	rename (school_govt school_private school_madarsa school_other) ///
 	     (govt_ind pvt_ind madarsa_ind other_ind)
@@ -753,6 +811,8 @@ program recode
 	replace sample_year = 2012 if aser12 == 1 
 	replace sample_year = 2013 if aser13 == 1
 	
+	destring school_class oos_*, replace
+	
 	rename hh_mobile hh_phone
 	
 	gen mother_gone_to_school = .
@@ -787,6 +847,11 @@ program recode
 	gen enrolled_ind = .
 	replace enrolled_ind = 0 if mi(school_class)
 	replace enrolled_ind = 1 if !mi(school_class)
+	
+	//sas = Shah and Steinberg measure of enrollment
+	gen enrolled_ind_sas = .
+	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
+	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
 	
 	rename (school_govt school_private school_madarsa school_other) ///
 	     (govt_ind pvt_ind madarsa_ind other_ind)
@@ -850,6 +915,8 @@ program recode
 	replace sample_year = 2013 if aser13 == 1 
 	replace sample_year = 2014 if aser14 == 1
 	
+	destring school_class oos_*, replace
+	
 	rename hh_mobile hh_phone
 	
 	foreach var in father_class mother_class {
@@ -876,6 +943,11 @@ program recode
 	gen enrolled_ind = .
 	replace enrolled_ind = 0 if mi(school_class)
 	replace enrolled_ind = 1 if !mi(school_class)
+	
+	//sas = Shah and Steinberg measure of enrollment
+	gen enrolled_ind_sas = .
+	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
+	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
 	
 	rename (school_govt school_private school_madarsa school_other) ///
 	     (govt_ind pvt_ind madarsa_ind other_ind)
@@ -938,6 +1010,8 @@ program recode
 	//2016
 	use ../output/messy_dta/household_2016, clear
 	
+	destring school_class oos_*, replace
+	
 	rename hh_mobile hh_phone
 
 	rename preschool_yes preschool_ind
@@ -964,6 +1038,11 @@ program recode
 	gen enrolled_ind = .
 	replace enrolled_ind = 0 if mi(school_class)
 	replace enrolled_ind = 1 if !mi(school_class)
+	
+	//sas = Shah and Steinberg measure of enrollment
+	gen enrolled_ind_sas = .
+	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
+	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
 	
 	rename (school_govt school_private school_madarsa school_other) ///
 	     (govt_ind pvt_ind madarsa_ind other_ind) 
@@ -1002,6 +1081,8 @@ program recode
 	replace sample_year = 2018 if aser18 == 2018
 	replace sample_year = 2016 if aser18 == 2016
 	rename hh_mobile hh_phone
+	
+	destring school_class oos_*, replace
 	
 	foreach var in father_class mother_class {
 		tostring `var', replace
@@ -1062,6 +1143,11 @@ program recode
 	gen enrolled_ind = .
 	replace enrolled_ind = 0 if mi(school_class)
 	replace enrolled_ind = 1 if !mi(school_class)
+	
+	//sas = Shah and Steinberg measure of enrollment
+	gen enrolled_ind_sas = .
+	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
+	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
 		
 	drop aser18 
 	
@@ -1072,7 +1158,7 @@ program append_files
     clear
 	foreach year in 2007 2008 2009 2010 2011 2012 2013 2014 2016 2018 {
 		dis "`year'"
-		qui append using ../output/clean_dta/household_`year'
+		qui append using ../output/clean_dta/household_`year', force
 	}
 	
 	save ../output/messy_dta/cross_section, replace
@@ -1090,14 +1176,10 @@ program clean_appended
 		replace district_name = "`name' District" if district_name == "`name'"
 	}
 	replace district_name = "North District" if district_name == "North  District"
-
-	bysort district_name: egen timeframe = nvals(year)
-	drop if timeframe != 10 //drop districts which aren't around for the full sample, which leaves 458 districts
 	
-    drop if state_name == "PUDUCHERRY" | state_name == "UTTARAKHAND" //timeline not available
+    drop if state_name == "PUDUCHERRY" | state_name == "UTTARAKHAND" //treatment time unknown
 	
-	//drop unnecessary vars 
-	drop state_code district_code village_code hh_id child_no hh_no id preschool_no id 
+	drop state_code district_code village_code hh_id child_no hh_no id preschool_no id hh_type
 	
     replace schtype_gender = . if schtype_gender == 0 
 	foreach var in schtype_coed schtype_boys schtype_girls {
@@ -1141,36 +1223,192 @@ program clean_appended
 	    replace `var' = 0 if `var' == 2 
 	}
 	
-	replace hh_multiplier = trunc(hh_multiplier)
+	replace hh_multiplier = trunc(hh_multiplier) //round multiplier in order to weight in collapse()
 	
-	/*
-    gen hh_SES = hhtype_pucca + hh_electricity_conn + hh_electricity_today + hh_tv + hh_phone ///
-	    + hh_toilet + hh_cycle + hh_cable_tv + 
+	save ../output/clean_dta/cross_section, replace
 
+	bysort district_name (year): egen impute_hhtype = mean(hhtype_pucca)
+	bysort district_name (year): egen impute_elec_conn = mean(hh_electricity_conn)
+	bysort district_name (year): egen impute_elec_today = mean(hh_electricity_today)
+	bysort district_name (year): egen impute_tv = mean(hh_tv)
+	bysort district_name (year): egen impute_phone = mean(hh_phone)
+	ds impute_*
+	foreach var in `r(varlist)' {
+		replace `var' = . if year != 2008
+	}
+	keep impute* district_name year
+	duplicates drop
+	drop if year != 2008
+	replace year = 2007
+	merge 1:m district_name year using ../output/clean_dta/cross_section, assert(1 2 3) keep(2 3) nogen
+		
+	replace hhtype_pucca = impute_hhtype if year == 2007
+	replace hh_electricity_conn = impute_elec_conn if year == 2007
+	replace hh_electricity_today = impute_elec_today if year == 2007
+	replace hh_tv = impute_tv if year == 2007
+	replace hh_phone = impute_phone if year == 2007
 	
-	bysort district_name (year): egen hhtype_impute = mean(hhtype_pucca)
-	replace hhtype_impute = . if year != 2008
+	save ../output/clean_dta/cross_section, replace
+	
+	bysort district_name (year): egen impute_toilet = mean(hh_toilet)
+	replace impute_toilet = . if year != 2009
+	keep impute_toilet district_name year
+	duplicates drop
+	drop if year != 2009
+	expand 2, gen(tag)
+	replace year = 2008 if tag == 0
+	replace year = 2007 if tag == 1
+	drop tag
+	save ../temp/impute, replace
+	merge 1:m district_name year using ../output/clean_dta/cross_section, assert(1 2 3) keep(2 3) nogen
+	
+	replace hh_toilet = impute_toilet if year == 2007 | year == 2008
+	
+	save ../output/clean_dta/cross_section, replace
+	
+	bysort district_name (year): egen impute_comp = mean(hh_computer_use)
+	bysort district_name (year): egen impute_news = mean(hh_newspaper)
+	bysort district_name (year): egen impute_read = mean(hh_reading_material)
+	foreach var in impute_comp impute_news impute_read {
+		replace `var' = . if year != 2010
+	}
+    keep impute_comp impute_news impute_read district_name year
+	duplicates drop
+	drop if year != 2010
+	expand 2, gen(tag)
+	replace year = 2007 if tag == 0 
+	replace year = 2008 if tag == 1 
+	drop tag 
+	expand 2 if year==2008, gen(tag)
+	replace year = 2009 if tag == 1 
+	drop tag
+	save ../temp/impute, replace
+	merge 1:m district_name year using ../output/clean_dta/cross_section, assert(1 2 3) keep(2 3) nogen
+	
+	replace hh_computer_use = impute_comp if year == 2007 | year == 2008 | year == 2009
+	replace hh_newspaper = impute_news if year == 2007 | year == 2008 | year == 2009
+	replace hh_reading_material = impute_read if year == 2007 | year == 2008 | year == 2009
+	
+	save ../output/clean_dta/cross_section, replace
+	
+	egen temp = rowtotal(hh_motor_veh_*)
+	replace hh_motor_vehicle = 1 if temp == 1 | temp == 2
+	replace hh_motor_vehicle = 0 if temp == 3 | temp == 4
+	bysort district_name (year): egen impute_mv = mean(hh_motor_vehicle)
+	replace impute_mv = . if year != 2012 & year != 2009 & year != 2014
+	keep impute_mv district_name year
+	duplicates drop
+	drop if year != 2014 & year != 2012 & year != 2009
+	expand 2, gen(tag)
+	replace year = 2007 if tag == 0 & year == 2009
+	replace year = 2008 if tag == 1 & year == 2009
+	replace year = 2010 if tag == 0 & year == 2012
+	replace year = 2011 if tag == 1 & year == 2012
+	replace year = 2016 if tag == 0 & year == 2014
+	replace year = 2018 if tag == 1 & year == 2014
+	drop tag 
+	save ../temp/impute, replace
+	merge 1:m district_name year using ../output/clean_dta/cross_section, assert(1 2 3) keep(2 3) nogen
+	
+	replace hh_motor_vehicle = impute_mv if ///
+	    year == 2007 | year == 2008 | year == 2010 | year == 2011 | year == 2016 | year == 2018
+	
+	 gen hh_SES = hhtype_pucca + hh_electricity_conn + hh_tv + hh_phone + hh_toilet ///
+	      + hh_computer + hh_newspaper + hh_reading_material + hh_motor_vehicle
+	
+	bysort state_name district_name: egen timeframe = nvals(year) //how many years is each district in the data?
+	
+	qui ds hhtype_pucca hh_electricity_conn hh_tv hh_phone hh_toilet hh_computer hh_newspaper ///
+	    hh_reading_material hh_motor_vehicle 
+	eststo hh_SES_full: qui estpost sum `r(varlist)'
+	eststo hh_SES_trim: qui estpost sum `r(varlist)' if timeframe == 10
+	esttab hh_SES_full hh_SES_trim using ../output/hhSES_stats.tex, replace cells("mean sd") nonumbers 
+
+	drop if timeframe != 10 //create balanced district-level panel
 	preserve 
-	    keep hhtype_impute district_name year
-		duplicates drop
-		drop if year != 2008
-		tempfile impute
-		replace year = 2007
-		save `impute'
+	    centile hh_SES, centile(25) 
+        local bound = r(c_1)
+        drop if hh_SES <= `bound'
+		qui ds hhtype_pucca hh_electricity_conn hh_tv hh_phone hh_toilet hh_computer hh_newspaper ///
+	    hh_reading_material hh_motor_vehicle 
+		eststo hh_SES_75: qui estpost sum `r(varlist)'
 	restore 
-	merge m:1 district_name year using `impute', assert(1 2 3) 
-	*/
-	
-	collapse (firstnm) state_name (mean) enrolled_ind total_member child_age girl_ind mother_age father_age ///
+	preserve 
+	    centile hh_SES, centile(25) 
+        local bound = r(c_1)
+        keep if hh_SES <= `bound'
+		qui ds hhtype_pucca hh_electricity_conn hh_tv hh_phone hh_toilet hh_computer hh_newspaper ///
+	    hh_reading_material hh_motor_vehicle 
+		eststo hh_SES_25: qui estpost sum `r(varlist)'
+	restore 
+	esttab hh_SES_75 hh_SES_25 using ../output/hhSES_pct_stats.tex, replace cells("mean sd") nonumbers 	
+end 
+
+program collapse_datasets
+	preserve 
+	    drop if girl_ind == 0 
+		collapse (firstnm) state_name (mean) enrolled_ind_sas enrolled_ind total_member child_age mother_age father_age ///
 	    school_class oos_dropout_class english_comp* mother_gone_to_school father_gone_to_school tuition ///
 		no_livestock_ind hh_goat_lamb hh_cows_buffalo hh_other_animals vlg_*  hh_electricity_* ///
 	    hh_tv hh_phone hh_toilet hh_cable_tv hh_computer_use hh_dvd hh_newspaper ///
 		hh_reading_material hh_motor_vehicle hh_three_wheeler hh_four_wheeler hh_tractor ///
-		mother_read_level_1 govt_ind pvt_ind madarsa_ind other_ind hhtype_* ///
+		mother_read_level_1 govt_ind pvt_ind madarsa_ind other_ind hhtype_* hh_SES ///
 		[fweight = hh_multiplier], by(district_name year) 
-
-	save ../output/clean_dta/cross_section, replace
+		save ../output/clean_dta/cross_section_girls_mean, replace
+	restore 
+	
+	preserve 
+	    drop if girl_ind == 1 
+		collapse (firstnm) state_name (mean) enrolled_ind_sas enrolled_ind total_member child_age mother_age father_age ///
+	    school_class oos_dropout_class english_comp* mother_gone_to_school father_gone_to_school tuition ///
+		no_livestock_ind hh_goat_lamb hh_cows_buffalo hh_other_animals vlg_*  hh_electricity_* ///
+	    hh_tv hh_phone hh_toilet hh_cable_tv hh_computer_use hh_dvd hh_newspaper ///
+		hh_reading_material hh_motor_vehicle hh_three_wheeler hh_four_wheeler hh_tractor ///
+		mother_read_level_1 govt_ind pvt_ind madarsa_ind other_ind hhtype_* hh_SES ///
+		[fweight = hh_multiplier], by(district_name year) 
+		save ../output/clean_dta/cross_section_boys_mean, replace
+	restore 
+	
+	preserve 
+	    centile hh_SES, centile(25) 
+        local bound = r(c_1)
+        drop if hh_SES > `bound' //keep bottom 25% 
+		collapse (firstnm) state_name (mean) enrolled_ind_sas enrolled_ind total_member child_age mother_age father_age ///
+	    school_class oos_dropout_class english_comp* mother_gone_to_school father_gone_to_school tuition ///
+		no_livestock_ind hh_goat_lamb hh_cows_buffalo hh_other_animals vlg_*  hh_electricity_* ///
+	    hh_tv hh_phone hh_toilet hh_cable_tv hh_computer_use hh_dvd hh_newspaper ///
+		hh_reading_material hh_motor_vehicle hh_three_wheeler hh_four_wheeler hh_tractor ///
+		mother_read_level_1 govt_ind pvt_ind madarsa_ind other_ind hhtype_* hh_SES ///
+		[fweight = hh_multiplier], by(district_name year) 
+		save ../output/clean_dta/cross_section_lowSES_mean, replace
+	restore 
+	
+	preserve 
+	    centile hh_SES, centile(25) 
+        local bound = r(c_1)
+        drop if hh_SES < `bound' //keep top 75% as complement for lowSES 
+		collapse (firstnm) state_name (mean) enrolled_ind_sas enrolled_ind total_member child_age mother_age father_age ///
+	    school_class oos_dropout_class english_comp* mother_gone_to_school father_gone_to_school tuition ///
+		no_livestock_ind hh_goat_lamb hh_cows_buffalo hh_other_animals vlg_*  hh_electricity_* ///
+	    hh_tv hh_phone hh_toilet hh_cable_tv hh_computer_use hh_dvd hh_newspaper ///
+		hh_reading_material hh_motor_vehicle hh_three_wheeler hh_four_wheeler hh_tractor ///
+		mother_read_level_1 govt_ind pvt_ind madarsa_ind other_ind hhtype_* hh_SES ///
+		[fweight = hh_multiplier], by(district_name year) 
+		save ../output/clean_dta/cross_section_remainderSES_mean, replace
+	restore 
+	
+	preserve
+	collapse (firstnm) state_name (mean) enrolled_ind_sas enrolled_ind total_member child_age mother_age father_age ///
+	    school_class oos_dropout_class english_comp* mother_gone_to_school father_gone_to_school tuition ///
+		no_livestock_ind hh_goat_lamb hh_cows_buffalo hh_other_animals vlg_*  hh_electricity_* ///
+	    hh_tv hh_phone hh_toilet hh_cable_tv hh_computer_use hh_dvd hh_newspaper ///
+		hh_reading_material hh_motor_vehicle hh_three_wheeler hh_four_wheeler hh_tractor ///
+		mother_read_level_1 govt_ind pvt_ind madarsa_ind other_ind hhtype_* hh_SES ///
+		[fweight = hh_multiplier], by(district_name year) 
+	save ../output/clean_dta/cross_section_mean, replace
+	restore 
 end 
+
 
 program trim_strings
     ds, has(type string)
@@ -1205,6 +1443,15 @@ program convert_to_int
         }
     } 
     compress
+end 
+
+program clear_temp
+    local wd ../temp
+    cd `wd'
+    local datafiles: dir "`wd'" files "*.dta"
+    foreach datafile of local datafiles {
+	    rm `datafile'
+    }
 end 
 
 
