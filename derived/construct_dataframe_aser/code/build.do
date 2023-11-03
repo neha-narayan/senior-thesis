@@ -130,28 +130,12 @@ program recode
 	foreach var in govt_ind pvt_ind madarsa_ind other_ind {
 		replace `var' = 0 if mi(`var')
 	}
-		
-	//we drop all kids who are 5 bc 5 year olds can be in 4 situations: 
-	//1. preschool 2. kindergarten 3. first grade 4. not in school
-	//if we drop the pre-k and kindergarten kids, then we have first grade and not in school.
-	//but we don't know if the not in school kids are just staying at home till they enter 
-	//first grade or if they were deterred by aadhaar. so we don't want to consider them 
-	//discouraged students. 
 	
 	drop if school_class > 8 & !mi(school_class)
 	drop if child_age == 3 | child_age == 4 | child_age == 5 
 	drop if child_age > 14 & mi(school_class)
 	drop if preschool_ind == 1
 	drop if mi(child_age)
-	
-	gen enrolled_ind = .
-	replace enrolled_ind = 0 if mi(school_class)
-	replace enrolled_ind = 1 if !mi(school_class)
-	
-	//sas = Shah and Steinberg measure of enrollment
-	gen enrolled_ind_sas = .
-	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
-	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
 	
 	gen tuition = . 
 	replace tuition = 1 if tutionyes == 1 
@@ -165,7 +149,6 @@ program recode
 	replace mother_class = "Above HS" if mother_class == "13"
 	replace mother_class = "0" if mother_class == "14"
 	
-	//recode states for consistency with 2018 dataset 
 	replace state_name = "ANDHRA PRADESH" if state_name == "Andhra Pradesh"
 	replace state_name = "DNH & DD" if ///
 	    state_name == "DADRA & NAGAR HAVELI" | state_name == "DAMAN & DIU"
@@ -265,15 +248,6 @@ program recode
 	drop if child_age > 14 & mi(school_class)
 	drop if preschool_ind == 1
 	drop if mi(child_age)
-
-	gen enrolled_ind = .
-	replace enrolled_ind = 0 if mi(school_class)
-	replace enrolled_ind = 1 if !mi(school_class)
-	
-	//sas = Shah and Steinberg measure of enrollment
-	gen enrolled_ind_sas = .
-	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
-	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
 	
 	rename (school_govt school_private school_madarsa school_other) ///
 	     (govt_ind pvt_ind madarsa_ind other_ind)
@@ -373,15 +347,6 @@ program recode
 	drop if child_age > 14 & mi(school_class)
 	drop if preschool_ind == 1 | kinder_ind == 1 
 	drop if mi(child_age)
-	
-	gen enrolled_ind = .
-	replace enrolled_ind = 0 if mi(school_class)
-	replace enrolled_ind = 1 if !mi(school_class)
-	
-	//sas = Shah and Steinberg measure of enrollment
-	gen enrolled_ind_sas = .
-	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
-	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
 	
 	rename (school_govt school_private school_madarsa school_other) ///
 	     (govt_ind pvt_ind madarsa_ind other_ind)
@@ -520,16 +485,7 @@ program recode
 	drop if child_age > 14 & mi(school_class)
 	drop if preschool_ind == 1 | kinder_ind == 1 
 	drop if mi(child_age)
-	
-	gen enrolled_ind = .
-	replace enrolled_ind = 0 if mi(school_class)
-	replace enrolled_ind = 1 if !mi(school_class)
-	
-	//sas = Shah and Steinberg measure of enrollment
-	gen enrolled_ind_sas = .
-	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
-	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
-	
+
     rename (school_govt school_private school_madarsa school_other) ///
 	     (govt_ind pvt_ind madarsa_ind other_ind)
 	destring madarsa_ind other_ind, replace
@@ -632,15 +588,6 @@ program recode
 	drop if preschool_ind == 1 | kinder_ind == 1 
 	drop if mi(child_age)
 	
-	gen enrolled_ind = .
-	replace enrolled_ind = 0 if mi(school_class)
-	replace enrolled_ind = 1 if !mi(school_class)
-	
-	//sas = Shah and Steinberg measure of enrollment
-	gen enrolled_ind_sas = .
-	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
-	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
-	
 	rename (school_govt school_private school_madarsa school_other) ///
 	     (govt_ind pvt_ind madarsa_ind other_ind) 
 	destring madarsa_ind other_ind, replace
@@ -724,15 +671,6 @@ program recode
 	drop if child_age > 14 & mi(school_class)
 	drop if preschool_ind == 1 | kinder_ind == 1 
 	drop if mi(child_age)
-	
-	gen enrolled_ind = .
-	replace enrolled_ind = 0 if mi(school_class)
-	replace enrolled_ind = 1 if !mi(school_class)
-	
-	//sas = Shah and Steinberg measure of enrollment
-	gen enrolled_ind_sas = .
-	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
-	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
 	
 	rename (school_govt school_private school_madarsa school_other) ///
 	     (govt_ind pvt_ind madarsa_ind other_ind)
@@ -844,15 +782,6 @@ program recode
 	drop if preschool_ind == 1 | kinder_ind == 1 
 	drop if mi(child_age)
 	
-	gen enrolled_ind = .
-	replace enrolled_ind = 0 if mi(school_class)
-	replace enrolled_ind = 1 if !mi(school_class)
-	
-	//sas = Shah and Steinberg measure of enrollment
-	gen enrolled_ind_sas = .
-	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
-	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
-	
 	rename (school_govt school_private school_madarsa school_other) ///
 	     (govt_ind pvt_ind madarsa_ind other_ind)
 	destring madarsa_ind other_ind, replace
@@ -939,15 +868,7 @@ program recode
 	drop if child_age > 14 & mi(school_class)
 	drop if preschool_ind == 1 | kinder_ind == 1 
 	drop if mi(child_age)
-	
-	gen enrolled_ind = .
-	replace enrolled_ind = 0 if mi(school_class)
-	replace enrolled_ind = 1 if !mi(school_class)
-	
-	//sas = Shah and Steinberg measure of enrollment
-	gen enrolled_ind_sas = .
-	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
-	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
+
 	
 	rename (school_govt school_private school_madarsa school_other) ///
 	     (govt_ind pvt_ind madarsa_ind other_ind)
@@ -1034,15 +955,7 @@ program recode
 	drop if child_age > 14 & mi(school_class)
 	drop if preschool_ind == 1 | kinder_ind == 1 
 	drop if mi(child_age)
-	
-	gen enrolled_ind = .
-	replace enrolled_ind = 0 if mi(school_class)
-	replace enrolled_ind = 1 if !mi(school_class)
-	
-	//sas = Shah and Steinberg measure of enrollment
-	gen enrolled_ind_sas = .
-	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
-	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
+
 	
 	rename (school_govt school_private school_madarsa school_other) ///
 	     (govt_ind pvt_ind madarsa_ind other_ind) 
@@ -1139,15 +1052,6 @@ program recode
 	drop if child_age > 14 & mi(school_class)
 	drop if preschool_ind == 1 | kinder_ind == 1 
 	drop if mi(child_age)
-	
-	gen enrolled_ind = .
-	replace enrolled_ind = 0 if mi(school_class)
-	replace enrolled_ind = 1 if !mi(school_class)
-	
-	//sas = Shah and Steinberg measure of enrollment
-	gen enrolled_ind_sas = .
-	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
-	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
 		
 	drop aser18 
 	
@@ -1325,6 +1229,75 @@ program clean_appended
 	esttab hh_SES_full hh_SES_trim using ../output/hhSES_stats.tex, replace cells("mean sd") nonumbers 
 
 	drop if timeframe != 10 //create balanced district-level panel
+	
+    egen schtype_missing = rowtotal(govt_ind pvt_ind madarsa_ind other_ind)
+	
+	//open enrollment definition - either schtype_missing == 0 or mi(school_class)
+	gen enrolled_ind_open = 1
+	replace enrolled_ind_open = 0 if mi(school_class) | schtype_missing == 0 
+	
+	//restricted enrollment definition - must be missing both, and all other students are considered enrolled
+	gen enrolled_ind_restrict = 1 
+	replace enrolled_ind_restrict = 0 if mi(school_class) & schtype_missing == 0 
+	
+	//most restricted enrollment def - must be missing both, and enrolled students must have both nonmissing
+	gen enrolled_ind_most_restrict = .
+	replace enrolled_ind_most_restrict = 0 if mi(school_class) & schtype_missing == 0 
+	replace enrolled_ind_most_restrict = 1 if !mi(school_class) & schtype_missing == 1 
+	
+	//FINISH by making a government enrollment and private enrollment variable 
+	
+	
+	//ASER enrollment measure 
+// 	rename schtype_missing enrolled_ind
+//
+// 	gen enrolled_ind_neha = . 
+// 	replace enrolled_ind_neha = 0 if mi(school_class) | oos_dropout == 1 | oos_never_enr == 1 
+// 	replace enrolled_ind_neha = 1 if enrolled_ind_neha == . 
+//	
+// 	//sas = Shah and Steinberg measure of enrollment
+// 	gen enrolled_ind_sas = .
+// 	replace enrolled_ind_sas = 0 if oos_never_enr == 1 | oos_dropout == 1
+// 	replace enrolled_ind_sas = 1 if mi(oos_never_enr) & mi(oos_dropout)
+	
+	preserve
+	    use ../../../shared_data/NSS_enrollment, clear
+        eststo NSS: estpost tabstat enrolled_ind, by(State) stat(mean) nototal
+ 		eststo NSSgirls: estpost tabstat enrolled_ind if girl_ind == 1, by(State) stat(mean) nototal
+ 		eststo NSSboys: estpost tabstat enrolled_ind if girl_ind == 0, by(State) stat(mean) nototal
+		eststo NSSallstates: estpost tabstat enrolled_ind, stat(mean) 
+		eststo NSSallstates_girls: estpost tabstat enrolled_ind if girl_ind == 1, stat(mean) 
+		eststo NSSallstates_boys: estpost tabstat enrolled_ind if girl_ind == 0, stat(mean) 
+	restore 
+	
+	eststo ASER: estpost tabstat enrolled_ind enrolled_ind_sas if year == 2011, ///
+	    by(state_name) stat(mean) nototal
+ 	eststo ASERgirls: ///
+	    estpost tabstat enrolled_ind enrolled_ind_sas if girl_ind == 1 & year == 2011, ///
+		by(state_name) stat(mean) nototal
+ 	eststo ASERboys: ///
+	    estpost tabstat enrolled_ind enrolled_ind_sas if girl_ind == 0 & year == 2011, ///
+		by(state_name) stat(mean) nototal
+	eststo ASERallstates: ///
+	    estpost tabstat enrolled_ind enrolled_ind_sas if year == 2011, stat(mean)
+	eststo ASERallstates_girls: ///
+	    estpost tabstat enrolled_ind enrolled_ind_sas if girl_ind == 1 & year == 2011, stat(mean)
+	eststo ASERallstates_boys: ///
+	    estpost tabstat enrolled_ind enrolled_ind_sas if girl_ind == 0 & year == 2011, stat(mean)
+	
+	esttab NSS ASER using ../output/enrollment_measures.tex, ///
+	    replace cells("Mean enrolled_ind enrolled_ind_sas") nonumbers 	
+	esttab NSSgirls ASERgirls using ../output/enrollment_measures_girls.tex, ///
+	    replace cells("Mean enrolled_ind enrolled_ind_sas") nonumbers 
+	esttab NSSboys ASERboys using ../output/enrollment_measures_boys.tex, ///
+	    replace cells("Mean enrolled_ind enrolled_ind_sas") nonumbers 
+	esttab NSSallstates ASERallstates using ../output/total_enroll.tex, ///
+	    replace cells("Mean enrolled_ind enrolled_ind_sas") nonumbers 
+	esttab NSSallstates_girls ASERallstates_girls using ../output/total_enroll_girls.tex, ///
+	    replace cells("Mean enrolled_ind enrolled_ind_sas") nonumbers 
+	esttab NSSallstates_boys ASERallstates_boys using ../output/total_enroll_boys.tex, ///
+	    replace cells("Mean enrolled_ind enrolled_ind_sas") nonumbers 
+	
 	preserve 
 	    centile hh_SES, centile(25) 
         local bound = r(c_1)
@@ -1347,7 +1320,7 @@ end
 program collapse_datasets
 	preserve 
 	    drop if girl_ind == 0 
-		collapse (firstnm) state_name (mean) enrolled_ind_sas enrolled_ind total_member child_age mother_age father_age ///
+		collapse (firstnm) state_name (mean) enrolled_ind* total_member child_age mother_age father_age ///
 	    school_class oos_dropout_class english_comp* mother_gone_to_school father_gone_to_school tuition ///
 		no_livestock_ind hh_goat_lamb hh_cows_buffalo hh_other_animals vlg_*  hh_electricity_* ///
 	    hh_tv hh_phone hh_toilet hh_cable_tv hh_computer_use hh_dvd hh_newspaper ///
@@ -1359,7 +1332,7 @@ program collapse_datasets
 	
 	preserve 
 	    drop if girl_ind == 1 
-		collapse (firstnm) state_name (mean) enrolled_ind_sas enrolled_ind total_member child_age mother_age father_age ///
+		collapse (firstnm) state_name (mean) enrolled_ind* total_member child_age mother_age father_age ///
 	    school_class oos_dropout_class english_comp* mother_gone_to_school father_gone_to_school tuition ///
 		no_livestock_ind hh_goat_lamb hh_cows_buffalo hh_other_animals vlg_*  hh_electricity_* ///
 	    hh_tv hh_phone hh_toilet hh_cable_tv hh_computer_use hh_dvd hh_newspaper ///
@@ -1373,7 +1346,7 @@ program collapse_datasets
 	    centile hh_SES, centile(25) 
         local bound = r(c_1)
         drop if hh_SES > `bound' //keep bottom 25% 
-		collapse (firstnm) state_name (mean) enrolled_ind_sas enrolled_ind total_member child_age mother_age father_age ///
+		collapse (firstnm) state_name (mean) enrolled_ind* total_member child_age mother_age father_age ///
 	    school_class oos_dropout_class english_comp* mother_gone_to_school father_gone_to_school tuition ///
 		no_livestock_ind hh_goat_lamb hh_cows_buffalo hh_other_animals vlg_*  hh_electricity_* ///
 	    hh_tv hh_phone hh_toilet hh_cable_tv hh_computer_use hh_dvd hh_newspaper ///
@@ -1387,7 +1360,7 @@ program collapse_datasets
 	    centile hh_SES, centile(25) 
         local bound = r(c_1)
         drop if hh_SES < `bound' //keep top 75% as complement for lowSES 
-		collapse (firstnm) state_name (mean) enrolled_ind_sas enrolled_ind total_member child_age mother_age father_age ///
+		collapse (firstnm) state_name (mean) enrolled_ind* total_member child_age mother_age father_age ///
 	    school_class oos_dropout_class english_comp* mother_gone_to_school father_gone_to_school tuition ///
 		no_livestock_ind hh_goat_lamb hh_cows_buffalo hh_other_animals vlg_*  hh_electricity_* ///
 	    hh_tv hh_phone hh_toilet hh_cable_tv hh_computer_use hh_dvd hh_newspaper ///
@@ -1398,7 +1371,19 @@ program collapse_datasets
 	restore 
 	
 	preserve
-	collapse (firstnm) state_name (mean) enrolled_ind_sas enrolled_ind total_member child_age mother_age father_age ///
+	drop if state_name == "SIKKIM" | state_name == "MEGHALAYA" | state_name == "NAGALAND"
+	collapse (firstnm) state_name (mean) enrolled_ind* total_member child_age mother_age father_age ///
+	    school_class oos_dropout_class english_comp* mother_gone_to_school father_gone_to_school tuition ///
+		no_livestock_ind hh_goat_lamb hh_cows_buffalo hh_other_animals vlg_*  hh_electricity_* ///
+	    hh_tv hh_phone hh_toilet hh_cable_tv hh_computer_use hh_dvd hh_newspaper ///
+		hh_reading_material hh_motor_vehicle hh_three_wheeler hh_four_wheeler hh_tractor ///
+		mother_read_level_1 govt_ind pvt_ind madarsa_ind other_ind hhtype_* hh_SES ///
+		[fweight = hh_multiplier], by(district_name year) 
+	save ../output/clean_dta/cross_section_noSmall_mean, replace
+	restore 
+	
+	preserve
+	collapse (firstnm) state_name (mean) enrolled_ind* total_member child_age mother_age father_age ///
 	    school_class oos_dropout_class english_comp* mother_gone_to_school father_gone_to_school tuition ///
 		no_livestock_ind hh_goat_lamb hh_cows_buffalo hh_other_animals vlg_*  hh_electricity_* ///
 	    hh_tv hh_phone hh_toilet hh_cable_tv hh_computer_use hh_dvd hh_newspaper ///

@@ -7,9 +7,10 @@ set more off
 global raw "C:\Users\Neha Narayan\Desktop\GitHub\senior-thesis\raw\Census"
 
 program main
-    //import_sheets
-	//combine_sheets
-	calculate_population
+//     import_sheets
+// 	combine_sheets
+// 	calculate_population
+	calculate_population_2011only
 end 
 
 program import_sheets
@@ -89,7 +90,7 @@ program combine_sheets
 			rename `var'5 `var'_15to19_11
 			rename `var'6 `var'_20to24_11
 	}
-	replace AreaName = "Andaman and Nicobar Islands" if ///
+	replace AreaName = "Andaman & Nicobar Islands" if ///
 	    AreaName == "State - ANDAMAN & NICOBAR ISLANDS (35)"
 	replace AreaName = "Andhra Pradesh" if AreaName == "State - ANDHRA PRADESH (28)"
 	replace AreaName = "Arunachal Pradesh" if AreaName == "State - ARUNACHAL PRADESH (12)"
@@ -97,13 +98,13 @@ program combine_sheets
 	replace AreaName = "Bihar" if AreaName == "State - BIHAR (10)"
 	replace AreaName = "Chandigarh" if AreaName == "State - CHANDIGARH (04)"
 	replace AreaName = "Chhattisgarh" if AreaName == "State - CHHATTISGARH (22)"
-	replace AreaName =  "DNH and DD" if ///
+	replace AreaName =  "DNH & DD" if ///
 	    AreaName == "State - DADRA & NAGAR HAVELI (26)" | AreaName == "State - DAMAN & DIU (25)"
 	replace AreaName = "Goa" if AreaName == "State - GOA (30)"
 	replace AreaName = "Gujarat" if AreaName == "State - GUJARAT (24)"
 	replace AreaName = "Haryana" if AreaName == "State - HARYANA (06)"
 	replace AreaName = "Himachal Pradesh" if AreaName == "State - HIMACHAL PRADESH (02)"
-	replace AreaName = "Jammu and Kashmir" if AreaName == "State - JAMMU & KASHMIR (01)"
+	replace AreaName = "Jammu & Kashmir" if AreaName == "State - JAMMU & KASHMIR (01)"
 	replace AreaName = "Jharkhand" if AreaName == "State - JHARKHAND (20)"
 	replace AreaName = "Karnataka" if AreaName == "State - KARNATAKA (29)"
 	replace AreaName = "Kerala" if AreaName == "State - KERALA (32)"
@@ -152,12 +153,10 @@ program combine_sheets
 			rename `var'6 `var'_20to24_01
 	}
 	replace AreaName = strproper(AreaName)
-	replace AreaName = "Andaman and Nicobar Islands" if AreaName == "Andaman & Nicobar Islands" 
-	replace AreaName = "Jammu and Kashmir" if AreaName == "Jammu & Kashmir"
 	replace AreaName = "Odisha" if AreaName == "Orissa"
 	replace AreaName = "Puducherry" if AreaName == "Pondicherry"
 	replace AreaName = "Uttarakhand" if AreaName == "Uttaranchal"
-	replace AreaName = "DNH and DD" if AreaName == "Dadra & Nagar Haveli" | AreaName == "Daman & Diu"
+	replace AreaName = "DNH & DD" if AreaName == "Dadra & Nagar Haveli" | AreaName == "Daman & Diu"
 	qui ds AreaName, not
 	destring `r(varlist)', replace
 	qui ds AreaName, not
@@ -168,11 +167,12 @@ program combine_sheets
 	merge 1:1 AreaName using ../output/allpops2001, assert(1 2 3) keep()
 	drop _merge 
 	save ../output/fullcensus, replace
+	
 end 	
 	
 program calculate_population
     use ../output/fullcensus, clear
-	gen total_01 = 0.201705289*TotalPersons_10to14_01 + 0.199074661*TotalPersons_5to9_01 + ///
+	gen total_1 = 0.201705289*TotalPersons_10to14_01 + 0.199074661*TotalPersons_5to9_01 + ///
 	    0.199059085*TotalPersons_5to9_01 + 0.200144779*TotalPersons_5to9_01 + 0.200887226*TotalPersons_5to9_01
 	gen women_01 = 0.201705289*TotalFemales_10to14_01 + 0.199074661*TotalFemales_5to9_01 + ///
 	    0.199059085*TotalFemales_5to9_01 + 0.200144779*TotalFemales_5to9_01 + 0.200887226*TotalFemales_5to9_01
@@ -185,14 +185,14 @@ program calculate_population
 	gen SC_01 = 0.201705289*TotalSCPersons_10to14_01 + 0.199074661*TotalSCPersons_5to9_01 + ///
 	    0.199059085*TotalSCPersons_5to9_01 + 0.200144779*TotalSCPersons_5to9_01 + 0.200887226*TotalSCPersons_5to9_01
 	
-	gen total_02 = TotalPersons_5to9_01
+	gen total_2 = TotalPersons_5to9_01
 	gen women_02 = TotalFemales_5to9_01
 	gen men_02 = TotalMales_5to9_01
 	gen rural_02 = RuralPersons_5to9_01
 	gen ST_02 = TotalSTPersons_5to9_01
 	gen SC_02 = TotalSCPersons_5to9_01
 	
-	gen total_03 = 0.199059085*TotalPersons_5to9_01 + 0.200144779*TotalPersons_5to9_01 + ///
+	gen total_3 = 0.199059085*TotalPersons_5to9_01 + 0.200144779*TotalPersons_5to9_01 + ///
 	    0.200887226*TotalPersons_5to9_01 + 0.200834249*TotalPersons_5to9_01 + 0.198830636*TotalPersons_0to4_01
 	gen women_03 = 0.199059085*TotalFemales_5to9_01 + 0.200144779*TotalFemales_5to9_01 + ///
 	    0.200887226*TotalFemales_5to9_01 + 0.200834249*TotalFemales_5to9_01 + 0.198830636*TotalFemales_0to4_01
@@ -207,7 +207,7 @@ program calculate_population
 	    0.200887226*TotalSCPersons_5to9_01 + 0.200834249*TotalSCPersons_5to9_01 + ///
 		0.198830636*TotalSCPersons_0to4_01
 	
-	gen total_04 = 0.200144779*TotalPersons_5to9_01 + 0.200887226*TotalPersons_5to9_01 + ///
+	gen total_4 = 0.200144779*TotalPersons_5to9_01 + 0.200887226*TotalPersons_5to9_01 + ///
 	    0.200834249*TotalPersons_5to9_01 + 0.198830636*TotalPersons_0to4_01 + 0.199107848*TotalPersons_0to4_01
 	gen women_04 = 0.200144779*TotalFemales_5to9_01 + 0.200887226*TotalFemales_5to9_01 + ///
 	    0.200834249*TotalFemales_5to9_01 + 0.198830636*TotalFemales_0to4_01 + 0.199107848*TotalFemales_0to4_01
@@ -222,7 +222,7 @@ program calculate_population
 	    0.200834249*TotalSCPersons_5to9_01 + 0.198830636*TotalSCPersons_0to4_01 + ///
 		0.199107848*TotalSCPersons_0to4_01
 	
-	gen total_05 = 0.200887226*TotalPersons_5to9_01 + 0.200834249*TotalPersons_5to9_01 + ///
+	gen total_5 = 0.200887226*TotalPersons_5to9_01 + 0.200834249*TotalPersons_5to9_01 + ///
 	    0.198830636*TotalPersons_0to4_01 + 0.199107848*TotalPersons_0to4_01 + 0.198999054*TotalPersons_0to4_01
 	gen women_05 = 0.200887226*TotalFemales_5to9_01 + 0.200834249*TotalFemales_5to9_01 + ///
 	    0.198830636*TotalFemales_0to4_01 + 0.199107848*TotalFemales_0to4_01 + 0.198999054*TotalFemales_0to4_01
@@ -237,7 +237,7 @@ program calculate_population
 	    0.198830636*TotalSCPersons_0to4_01 + 0.199107848*TotalSCPersons_0to4_01 + ///
 		0.198999054*TotalSCPersons_0to4_01
 	
-    gen total_06 = 0.200834249*TotalPersons_5to9_01 + 0.198830636*TotalPersons_0to4_01 + ///
+    gen total_6 = 0.200834249*TotalPersons_5to9_01 + 0.198830636*TotalPersons_0to4_01 + ///
 	    0.199107848*TotalPersons_0to4_01 + 0.198999054*TotalPersons_0to4_01 + 0.200732943*TotalPersons_0to4_01
 	gen women_06 = 0.200834249*TotalFemales_5to9_01 + 0.198830636*TotalFemales_0to4_01 + ///
 	    0.199107848*TotalFemales_0to4_01 + 0.198999054*TotalFemales_0to4_01 + 0.200732943*TotalFemales_0to4_01
@@ -252,7 +252,7 @@ program calculate_population
 	    0.199107848*TotalSCPersons_0to4_01 + 0.198999054*TotalSCPersons_0to4_01 + ///
 		0.200732943*TotalSCPersons_0to4_01
 
-	gen total_07 = (0.199059085 + 0.200144779 + 0.200887226 + 0.200834249)*TotalPersons_5to9_01 + ///
+	gen total_7 = (0.199059085 + 0.200144779 + 0.200887226 + 0.200834249)*TotalPersons_5to9_01 + ///
 	    TotalPersons_0to4_01
 	gen women_07 = (0.199059085 + 0.200144779 + 0.200887226 + 0.200834249)*TotalFemales_5to9_01 + ///
 	    TotalFemales_0to4_01
@@ -265,7 +265,7 @@ program calculate_population
 	gen SC_07 = (0.199059085 + 0.200144779 + 0.200887226 + 0.200834249)*TotalSCPersons_5to9_01 + ///
 	    TotalSCPersons_0to4_01
 	
-	gen total_08 = (0.200144779 + 0.200887226 + 0.200834249)*TotalPersons_5to9_01 + ///
+	gen total_8 = (0.200144779 + 0.200887226 + 0.200834249)*TotalPersons_5to9_01 + ///
 	    TotalPersons_0to4_01 + 0.204670205*TotalPersons_5to9_11
 	gen women_08 = (0.200144779 + 0.200887226 + 0.200834249)*TotalFemales_5to9_01 + ///
 	    TotalFemales_0to4_01 + 0.204670205*TotalFemales_5to9_11
@@ -278,7 +278,7 @@ program calculate_population
 	gen SC_08 = (0.200144779 + 0.200887226 + 0.200834249)*TotalSCPersons_5to9_01 + ///
 	    TotalSCPersons_0to4_01 + 0.204670205*TotalSCPersons_5to9_11
 	
-	gen total_09 = (0.200887226 + 0.200834249)*TotalPersons_5to9_01 + TotalPersons_0to4_01 + ///
+	gen total_9 = (0.200887226 + 0.200834249)*TotalPersons_5to9_01 + TotalPersons_0to4_01 + ///
 	    (0.204670205 + 0.202585422)*TotalPersons_5to9_11
 	gen women_09 = (0.200887226 + 0.200834249)*TotalFemales_5to9_01 + TotalFemales_0to4_01 + ///
 	    (0.204670205 + 0.202585422)*TotalFemales_5to9_11
@@ -401,8 +401,10 @@ program calculate_population
 	gen ST_multiplier = ST_17/total_17
 	gen SC_multiplier = SC_17/total_17
 	
+	//26026303.42 = total babies born in 2012, and we multiply by the share of total population in 2011
+	//that a given state makes up -- seems to be underestimating population, though. 
 	gen total_18 = (0.200750232 + 0.197495796 + 0.194498345)*TotalPersons_5to9_11 + ///
-	    TotalPersons_0to4_11 + 26026303.42 //26026303.42 = total babies born in 2012  
+	    TotalPersons_0to4_11 + 26026303.42*(TotalPersons_allages_11/112806778) 
 	gen women_18 = women_multiplier*total_18
 	gen men_18 = men_multiplier*total_18
 	gen rural_18 = rural_multiplier*total_18
@@ -410,7 +412,7 @@ program calculate_population
 	gen SC_18 = SC_multiplier*total_18
 	
 	gen total_19 = (0.197495796 + 0.194498345)*TotalPersons_5to9_11 + TotalPersons_0to4_11 + ///
-	    26026303.42 + 25738717.68
+	    (26026303.42 + 25738717.68)*(TotalPersons_allages_11/112806778) 
 	gen women_19 = women_multiplier*total_19
 	gen men_19 = men_multiplier*total_19
 	gen rural_19 = rural_multiplier*total_19
@@ -418,14 +420,15 @@ program calculate_population
 	gen SC_19 = SC_multiplier*total_19
 
 	gen total_20 = (0.194498345)*TotalPersons_5to9_11 + TotalPersons_0to4_11 + ///
-	    26026303.42 + 25738717.68 + 24901738.75
+	    (26026303.42 + 25738717.68 + 24901738.75)*(TotalPersons_allages_11/112806778) 
 	gen women_20 = women_multiplier*total_20
 	gen men_20 = men_multiplier*total_20
 	gen rural_20 = rural_multiplier*total_20
 	gen ST_20 = ST_multiplier*total_20
 	gen SC_20 = SC_multiplier*total_20
 	
-	gen total_21 = TotalPersons_0to4_11 + 26026303.42 + 25738717.68 + 24901738.75 + 24823589.97
+	gen total_21 = TotalPersons_0to4_11 + ///
+	    (26026303.42 + 25738717.68 + 24901738.75 + 24823589.97)*(TotalPersons_allages_11/112806778) 
 	gen women_21 = women_multiplier*total_21
 	gen men_21 = men_multiplier*total_21
 	gen rural_21 = rural_multiplier*total_21
@@ -437,9 +440,31 @@ program calculate_population
 	drop women_multiplier men_multiplier rural_multiplier ST_multiplier SC_multiplier
 	rename AreaName state
 	drop if state == "India"
-	merge 1:m state using ../output/panel_1pct, assert(1 2 3)
+	
+	replace state = strupper(state)
+	rename state statename
+	keep total_* statename
+	reshape long total_, i(statename) j(year)
+	keep statename year total_
+	replace year = 2000 + year
+	save ../output/state_populations, replace
+end 
+
+program calculate_population_2011only
+   use ../output/allpops2011, clear
+   keep AreaName TotalPersons* TotalMales* TotalFemales*
+   rename AreaName statename
+   gen primaryage_all = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalPersons_5to9_11 + ///
+       TotalPersons_10to14_11
+   gen primaryage_males = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalMales_5to9_11 + ///
+       TotalMales_10to14_11
+   gen primaryage_females = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalFemales_5to9_11 + ///
+       TotalFemales_10to14_11
+   keep statename primaryage*
+   replace statename = strupper(statename)
+   
+   save ../output/shares_from_2011, replace   
 end 
 	
-
 *Execute
 main
