@@ -4,12 +4,14 @@ clear all
 set more off
 
 program main 
-    *enrollment_plots
-	dynamic_twfe
-	//cohort_twfe
-	//DiD
-	//timeseries
-    * tests
+//     enrollment_plots
+// 	dynamic_twfe
+	cohort_twfe
+//     stacking
+// 	covar_matching
+// 	DiD
+// 	timeseries
+//     tests
 end
 
 program enrollment_plots
@@ -23,11 +25,12 @@ end
 
 program dynamic_twfe
 	use ../../../shared_data/enrollment_dise, clear
-	drop if statename == "CHHATTISGARH" | statename == "HIMACHAL PRADESH" | statename == "MIZORAM"
-	drop if ac_year < 2011 
+	drop if statename == "CHHATTISGARH" | statename == "HIMACHAL PRADESH" | statename == "MIZORAM" | ///
+	    statename == "TAMIL NADU"
+	drop if ac_year < 2011
 	
 	encode(statename), gen(i)
-	//encode(distname), gen(d)
+	encode(distname), gen(d)
 	gen t = ac_year
 			
 	//subject to change based on what the RTI guys say. 
@@ -41,7 +44,7 @@ program dynamic_twfe
 		state == "UTTAR PRADESH" | state == "MADHYA PRADESH")
 	replace first_treat = 2016 if (state == "MANIPUR" | state == "JHARKHAND" | state == "DELHI")
 	replace first_treat = 2015 if (state == "ANDHRA PRADESH" | state == "HARYANA")
-	
+
 	gen rel_time = t - first_treat // event time
 	gen never_treat = first_treat==. // controls
 	sum first_treat
@@ -87,35 +90,68 @@ program dynamic_twfe
 		local idx `++idx'
 	}
 	
-	reg enrollment_rate L_* F_* i.i i.t [weight=schtot], cluster(i)
-	reg enrollment_rate_b L_* F_* i.i i.t [weight=schtot], cluster(i)
-	reg enrollment_rate_g L_* F_* i.i i.t [weight=schtot], cluster(i)
-	boottest L_0, boottype(wild)
+	gen STshare =  primaryage_ST / primaryage_all
+	gen SCshare = primaryage_SC / primaryage_all 
+	
+	bysort statename: egen stateST = mean(STshare)
+	bysort statename: egen stateSC = mean(SCshare)
+	
+	sum STshare, de
+	sum SCshare, de 
+	sum stateST, de
+	sum stateSC, de 
+	
+	preserve 
+	    keep if SCshare >= stateSC
+		//wildbootstrap reg enrollment_rate L_* F_* i.d i.t [weight=schtot], cluster(i) rseed(1960)
+		reg enrollment_rate L_* F_* i.d i.t [weight=schtot], cluster(i)
+		coefplot, omitted keep(L* F*) vertical ///
+	    order(F_6 F_5 F_4 F_3 F_2 F_1 L_0 L_1 L_2 L_3 L_4 L_5 L_6) ///
+	    title("Event Study Plot, SC Students") ///
+	     xtitle("Years From Treatment")
+	restore 
+	
+	preserve 
+	    keep if STshare >= stateST 
+	    ///wildbootstrap reg enrollment_rate L_* F_* i.d i.t [weight=schtot], cluster(i) rseed(1960)
+		reg enrollment_rate L_* F_* i.d i.t [weight=schtot], cluster(i)
+		coefplot, omitted keep(L* F*) vertical ///
+	    order(F_6 F_5 F_4 F_3 F_2 F_1 L_0 L_1 L_2 L_3 L_4 L_5 L_6) ///
+	    title("Event Study Plot, ST Students") ///
+	     xtitle("Years From Treatment")
+	restore 
+		
+	reg enrollment_rate L_* F_* i.d i.t [weight=schtot], cluster(i)
 	coefplot, omitted keep(L* F*) vertical ///
-	    order(F_10 F_9 F_8 F_7 F_6 F_5 F_4 F_3 F_2 F_1 L_0 L_1 L_2 L_3 L_4 L_5 L_6) ///
+	    order(F_6 F_5 F_4 F_3 F_2 F_1 L_0 L_1 L_2 L_3 L_4 L_5 L_6) ///
 	    title("Event Study Plot, Full TWFE") ///
 	     xtitle("Years From Treatment")
-	graph export ../output/twfe_full_dise_rate.png, height(450) width(600) replace
+	graph export ../output/twfe_full_notyet_trim.png, height(450) width(600) replace
 end 
 
 program cohort_twfe
 	use ../../../shared_data/enrollment_dise, clear
-	drop if statename == "CHHATTISGARH" | statename == "HIMACHAL PRADESH" | statename == "MIZORAM" 
-	drop if ac_year < 2011 
+	drop if statename == "CHHATTISGARH" | statename == "HIMACHAL PRADESH" | statename == "MIZORAM" | ///
+	    statename == "TAMIL NADU"
+	drop if ac_year < 2011
 	
 	//2015 cohort
-	preserve 
-		drop if state != "ASSAM" & state != "WEST BENGAL" & state != "MAHARASHTRA" & ///
-		    state != "MEGHALAYA" & state != "JAMMU & KASHMIR" & ///
-		    state != "HARYANA" & state != "ANDHRA PRADESH" //only compare to true controls
-			
+	preserve 		
 		encode(statename), gen(i)
-		//encode(distname), gen(d)
-		gen t = ac_year
+	    gen t = ac_year
 			
 		gen first_treat = . 
-		replace first_treat = 2015 if state == "HARYANA" | state == "ANDHRA PRADESH"
-		
+		replace first_treat = 2019 if state == "TAMIL NADU"
+		replace first_treat = 2017 if (state == "ANDAMAN & NICOBAR ISLANDS" | ///
+			state == "ARUNACHAL PRADESH" | state == "BIHAR" | state == "CHANDIGARH" | state == "CHHATTISGARH" | ///
+			state == "DNH & DD" | state == "GOA" | state == "GUJARAT" | state == "KARNATAKA" | ///
+			state == "LAKSHADWEEP" | state == "MIZORAM" | state == "NAGALAND" | state == "ODISHA" | ///
+			state == "PUNJAB" | state == "RAJASTHAN" | state == "SIKKIM" | state == "TRIPURA" | ///
+			state == "UTTAR PRADESH" | state == "MADHYA PRADESH")
+		replace first_treat = 2016 if (state == "MANIPUR" | state == "JHARKHAND" | state == "DELHI")
+		replace first_treat = 2015 if (state == "ANDHRA PRADESH" | state == "HARYANA")
+	    keep if first_treat == 2015 | mi(first_treat)
+			
 		gen rel_time = t - first_treat // event time
 		gen never_treat = first_treat==. // controls
 		sum first_treat
@@ -160,29 +196,36 @@ program cohort_twfe
 			la var `post' "`idx'"
 			local idx `++idx'
 		}
+		
+		tempfile 2015cohort 
+		drop i t 
+		gen dataset = 2015
+		save `2015cohort'
 	
-		reg enrollment_rate L_* F_* i.i i.t [weight=schtot], cluster(i)
-		reg enrollment_rate_b L_* F_* i.i i.t [weight=schtot], cluster(i)	
-		reg enrollment_rate_g L_* F_* i.i i.t [weight=schtot], cluster(i)	
-		coefplot, omitted keep(L* F*) vertical ///
-	        order(F_6 F_5 F_4 F_3 F_2 F_1 L_0 L_1 L_2 L_3 L_4 L_5 L_6) ///
-	        title("Event Study Plot, 2015 Cohort") ///
-	        xtitle("Years From Treatment")
-	    graph export ../output/twfe_2015cohort_dise_rate.png, height(450) width(600) replace 
+// 		wildbootstrap reg enrollment_rate L_* F_* i.i i.t [weight=schtot], cluster(i) rseed(1960)
+// 		coefplot, omitted keep(L* F*) vertical ///
+// 	        order(F_7 F_8 F_6 F_5 F_4 F_3 F_2 F_1 L_0) ///
+// 	        title("Event Study Plot, 2015 Cohort") ///
+// 	        xtitle("Years From Treatment")
+// 	    graph export ../output/twfe_2015cohort.png, height(450) width(600) replace 
 	restore 
 	
 	//2016 cohort
 	preserve 
-		drop if state != "WEST BENGAL" & state != "ASSAM" & ///
-		    state != "MAHARASHTRA" & state != "MEGHALAYA" & state != "JAMMU & KASHMIR" & ///
-			state != "MANIPUR" &  state != "JHARKHAND" & state != "DELHI" //only compare to true controls
-			
 		encode(statename), gen(i)
-		//encode(distname), gen(d)
-		gen t = ac_year
+	    gen t = ac_year
 			
 		gen first_treat = . 
-		replace first_treat = 2016 if (state == "MANIPUR" | state == "JHARKHAND" | state == "DELHI") 
+		replace first_treat = 2019 if state == "TAMIL NADU"
+		replace first_treat = 2017 if (state == "ANDAMAN & NICOBAR ISLANDS" | ///
+			state == "ARUNACHAL PRADESH" | state == "BIHAR" | state == "CHANDIGARH" | state == "CHHATTISGARH" | ///
+			state == "DNH & DD" | state == "GOA" | state == "GUJARAT" | state == "KARNATAKA" | ///
+			state == "LAKSHADWEEP" | state == "MIZORAM" | state == "NAGALAND" | state == "ODISHA" | ///
+			state == "PUNJAB" | state == "RAJASTHAN" | state == "SIKKIM" | state == "TRIPURA" | ///
+			state == "UTTAR PRADESH" | state == "MADHYA PRADESH")
+		replace first_treat = 2016 if (state == "MANIPUR" | state == "JHARKHAND" | state == "DELHI")
+		replace first_treat = 2015 if (state == "ANDHRA PRADESH" | state == "HARYANA")
+	    keep if first_treat == 2016 | mi(first_treat)
 		
 		gen rel_time = t - first_treat // event time
 		gen never_treat = first_treat==. // controls
@@ -229,25 +272,36 @@ program cohort_twfe
 			local idx `++idx'
 		}
 	
-		reg enrollment_rate L_* F_* i.i i.t [weight=schtot], cluster(i)	
-		coefplot, omitted keep(L* F*) vertical ///
-	        order(F_7 F_6 F_5 F_4 F_3 F_2 F_1 L_0 L_1 L_2 L_3 L_4 L_5) ///
-	        title("Event Study Plot, 2016 Cohort") ///
-	        xtitle("Years From Treatment")
-	    graph export ../output/twfe_2016cohort_dise_rate.png, height(450) width(600) replace 
+	    tempfile 2016cohort 
+		drop i t 
+		gen dataset = 2016
+		save `2016cohort'
+		
+// 		wildbootstrap reg enrollment_rate L_* F_* i.i i.t [weight=schtot], cluster(i) rseed(1960)
+// 		coefplot, omitted keep(L* F*) vertical ///
+// 	        order(F_8 F_7 F_6 F_5 F_4 F_3 F_2 F_1 L_0) ///
+// 	        title("Event Study Plot, 2016 Cohort") ///
+// 	        xtitle("Years From Treatment")
+// 	    graph export ../output/twfe_2016cohort_notyet_trim.png, height(450) width(600) replace 
 	restore
 
 	//2017 
 	preserve 
-		drop if state == "ANDHRA PRADESH" | state == "HARYANA" | ///
-		    state == "MANIPUR" | state == "JHARKHAND" | state == "DELHI" | state == "TAMIL NADU"
 		encode(statename), gen(i)
-		//encode(distname), gen(d)
-		gen t = ac_year
+	    gen t = ac_year
 			
-		gen first_treat = . 
-		replace first_treat = 2017 if state != "WEST BENGAL" & state != "ASSAM" & ///
-		    state != "MAHARASHTRA" & state != "MEGHALAYA" & state != "JAMMU & KASHMIR" //the true controls
+	    gen first_treat = . 
+		replace first_treat = 2019 if state == "TAMIL NADU"
+		replace first_treat = 2017 if (state == "ANDAMAN & NICOBAR ISLANDS" | ///
+			state == "ARUNACHAL PRADESH" | state == "BIHAR" | state == "CHANDIGARH" | state == "CHHATTISGARH" | ///
+			state == "DNH & DD" | state == "GOA" | state == "GUJARAT" | state == "KARNATAKA" | ///
+			state == "LAKSHADWEEP" | state == "MIZORAM" | state == "NAGALAND" | state == "ODISHA" | ///
+			state == "PUNJAB" | state == "RAJASTHAN" | state == "SIKKIM" | state == "TRIPURA" | ///
+			state == "UTTAR PRADESH" | state == "MADHYA PRADESH")
+		replace first_treat = 2016 if (state == "MANIPUR" | state == "JHARKHAND" | state == "DELHI")
+		replace first_treat = 2015 if (state == "ANDHRA PRADESH" | state == "HARYANA")
+	    keep if first_treat == 2017 | mi(first_treat)
+		
 			 
 		gen rel_time = t - first_treat // event time
 		gen never_treat = first_treat==. // controls
@@ -293,26 +347,206 @@ program cohort_twfe
 			la var `post' "`idx'"
 			local idx `++idx'
 		}
+		
+		tempfile 2017cohort 
+		drop i t 
+		gen dataset = 2017 
+		save `2017cohort'
 	
-		reg enrollment_rate L_* F_* i.i i.t [weight=schtot], cluster(i)	
-		coefplot, omitted keep(L* F*) vertical ///
-	        order(F_8 F_7 F_6 F_5 F_4 F_3 F_2 F_1 L_0 L_1 L_2 L_3 L_4) ///
-	        title("Event Study Plot, 2017 Cohort") ///
-	        xtitle("Years From Treatment")
-	    graph export ../output/twfe_2017cohort_dise_rate.png, height(450) width(600) replace 
+// 		wildbootstrap reg enrollment_rate L_* F_* i.i i.t [weight=schtot], cluster(i) rseed(1960)
+// 		coefplot, omitted keep(L* F*) vertical ///
+// 	        order(F_8 F_7 F_6 F_5 F_4 F_3 F_2 F_1 L_0) ///
+// 	        title("Event Study Plot, 2017 Cohort") ///
+// 	        xtitle("Years From Treatment")
+// 	    graph export ../output/twfe_2017cohort_dise_2011rate.png, height(450) width(600) replace 
 	restore
 	
-	//2019
+	clear 
+	append using `2015cohort'
+	append using `2016cohort'
+	append using `2017cohort'
+
+	save ../output/cohortdata, replace
+end 
+
+program stacking 
+	use ../output/cohortdata, clear
+	
+	drop first_treat rel_time never_treat last_cohort gvar F* L* 
+
+	encode(statename), gen(i)
+	encode(distname), gen(d)
+	gen t = ac_year
+		
+	gen first_treat = . 
+	replace first_treat = 2017 if (state == "ANDAMAN & NICOBAR ISLANDS" | ///
+		state == "ARUNACHAL PRADESH" | state == "BIHAR" | state == "CHANDIGARH" | state == "CHHATTISGARH" | ///
+		state == "DNH & DD" | state == "GOA" | state == "GUJARAT" | state == "KARNATAKA" | ///
+		state == "LAKSHADWEEP" | state == "MIZORAM" | state == "NAGALAND" | state == "ODISHA" | ///
+		state == "PUNJAB" | state == "RAJASTHAN" | state == "SIKKIM" | state == "TRIPURA" | ///
+		state == "UTTAR PRADESH" | state == "MADHYA PRADESH")
+	replace first_treat = 2016 if (state == "MANIPUR" | state == "JHARKHAND" | state == "DELHI")
+	replace first_treat = 2015 if (state == "ANDHRA PRADESH" | state == "HARYANA")
+	
+		 
+	gen rel_time = t - first_treat // event time
+	gen never_treat = first_treat==. // controls
+	sum first_treat
+	gen last_cohort = first_treat==r(max) // last treated
+	
+	gen gvar = first_treat
+	recode gvar (. = 0)
+	
+	// leads
+	cap drop F_*
+	cap drop ref*
+	cap drop stack
+	
+	summ rel_time
+	local relmin = abs(r(min))
+	local relmax = abs(r(max))
+	dis "`relmax' `relmin'"
+	
+	forvalues x = 1/`relmin' {
+		dis "`x'"
+		gen F_`x' = rel_time == -`x'
+		replace F_`x' = 0 if never_treat == 1 
+	}
+	replace F_1 = 0 
+	
+	cap drop L_*
+	forval x = 0/`relmax' {
+		gen L_`x' = rel_time == `x'
+		replace L_`x' = 0 if never_treat==1 
+	} 
+	
+	ds F*
+	local idx = 1
+	foreach pre in `r(varlist)' {
+		la var `pre' "-`idx'"
+		local idx `++idx'
+	}
+
+	ds L*
+	local idx = 0
+	foreach post in `r(varlist)' {
+		la var `post' "`idx'"
+		local idx `++idx'
+	}
+	
+	drop L_5 L_6 F_5 F_6
+    gen district_x_data = d*dataset
+	gen year_x_data = t*dataset
+	
+	gen STshare =  primaryage_ST / primaryage_all
+	gen SCshare = primaryage_SC / primaryage_all 
+
+	
+	bysort statename: egen stateST = mean(STshare)
+	bysort statename: egen stateSC = mean(SCshare)
+	bysort statename: egen state_rural = mean(rural_ind)
+	
+	sum STshare, de
+	sum SCshare, de 
+	sum stateST, de
+	sum stateSC, de  
+
 	preserve 
-		drop if state != "WEST BENGAL" & state != "ASSAM" & ///
-		    state != "MAHARASHTRA" & state != "MEGHALAYA" & state != "TAMIL NADU"
-			
+	    keep if rural_ind < state_rural
+		reg enrollment_rate L_* F_* i.district_x_data i.year_x_data [weight=schtot], cluster(i)
+		coefplot, omitted keep(L* F*) vertical ///
+	    order(F_4 F_3 F_2 F_1 L_0 L_1 L_2 L_3 L_4) ///
+	    title("Event Study Plot, Stacked Regression") ///
+	    xtitle("Years From Treatment")
+	restore
+	
+	preserve 
+	    keep if SCshare >= stateSC
+		reg enrollment_rate L_* F_* i.district_x_data i.year_x_data [weight=schtot], cluster(i)
+		coefplot, omitted keep(L* F*) vertical ///
+	    order(F_4 F_3 F_2 F_1 L_0 L_1 L_2 L_3 L_4) ///
+	    title("Event Study Plot, Stacked Regression") ///
+	    xtitle("Years From Treatment")
+	restore 
+	
+	preserve 
+	    keep if STshare >= stateST 
+		wildbootstrap reg enrollment_rate L_* F_* i.district_x_data i.year_x_data [weight=schtot], ///
+		    cluster(i) rseed(1960)
+		coefplot, omitted keep(L* F*) vertical ///
+	    order(F_4 F_3 F_2 F_1 L_0 L_1 L_2 L_3 L_4) ///
+	    title("Event Study Plot, Stacked Regression") ///
+	    xtitle("Years From Treatment")
+	restore 
+		
+	
+// 	wildbootstrap reg enrollment_rateb L_* F_* i.state_x_data i.year_x_data [weight=schtot], cluster(i) rseed(1960)
+	
+	
+	graph export ../output/twfe_stack.png, height(450) width(600) replace
+end 
+
+program covar_matching 
+    use ../../../shared_data/enrollment_dise, clear
+	drop if statename == "CHHATTISGARH" | statename == "HIMACHAL PRADESH" | statename == "MIZORAM"
+	drop if ac_year < 2011
+	gen first_treat = . 
+	replace first_treat = 2019 if state == "TAMIL NADU"
+	replace first_treat = 2017 if (state == "ANDAMAN & NICOBAR ISLANDS" | ///
+		state == "ARUNACHAL PRADESH" | state == "BIHAR" | state == "CHANDIGARH" | state == "CHHATTISGARH" | ///
+		state == "DNH & DD" | state == "GOA" | state == "GUJARAT" | state == "KARNATAKA" | ///
+		state == "LAKSHADWEEP" | state == "MIZORAM" | state == "NAGALAND" | state == "ODISHA" | ///
+		state == "PUNJAB" | state == "RAJASTHAN" | state == "SIKKIM" | state == "TRIPURA" | ///
+		state == "UTTAR PRADESH" | state == "MADHYA PRADESH")
+	replace first_treat = 2016 if (state == "MANIPUR" | state == "JHARKHAND" | state == "DELHI")
+	replace first_treat = 2015 if (state == "ANDHRA PRADESH" | state == "HARYANA")
+	
+	//let's define some control groups based on population size. our 5 controls are Assam, Maharashtra,
+	//West Bengal, Meghalaya, and Jammu + Kashmir 
+	
+	//assam = 5,381,152 
+	//maharashtra = 1.97e+07 (order of 10.9 mil)
+	//west bengal = 1.61e+07 (10.6 mil)
+	//meghalaya = = 547,757
+	//j+k = 2,157,691
+	
+	//primaryage_all quintiles: min =  10359.14, 20th =  222471.5, 40th: 2157691 
+	//60th =  5409471, 80th = 1.27e+07, max = 3.61e+07
+	
+	//first 20% - meghalaya, 20-40%: j+k, 40-60: assam, 60-80: west bengal, 80-100: maharashtra
+	
+// 	gen group = ""
+// 	replace group = "0to20" if state == "ANDAMAN & NICOBAR ISLANDS" | state == "CHANDIGARH" | ///
+// 	    state == "DNH & DD" | state == "GOA" | state == "LAKSHADWEEP" | state == "SIKKIM" | ///
+// 		state == "MEGHALAYA"
+// 	replace group = "20to40" if state == "ARUNACHAL PRADESH" | state == "GOA" | state == "JAMMU & KASHMIR" | ///
+// 	    state == "MANIPUR" | state == "NAGALAND" | state == "TRIPURA"
+// 	replace group = "40to60" if state == "ASSAM" | state == "DELHI" | state == "HARYANA" | ///
+// 	    state == "JHARKHAND" | state == "KERALA" | state == "PUNJAB"
+// 	replace group = "60to80" if state == "GUJARAT" | state == "KARNATAKA" | state == "ODISHA" | ///
+// 	    state == "RAJASTHAN" | state == "TAMIL NADU" | state == "WEST BENGAL"
+// 	replace group = "80to100" if state == "ANDHRA PRADESH" | state == "BIHAR" | state == "MADHYA PRADESH" | ///
+// 	    state == "MAHARASHTRA" | state == "UTTAR PRADESH" 
+//		
+//    // regions from here: https://en.wikipedia.org/wiki/Administrative_divisions_of_India
+//    gen region = ""
+//    replace region = "NORTH" if state == "CHANDIGARH" | state == "DELHI" | state == "HARYANA" | ///
+//        state == "JAMMU & KASHMIR" | state == "PUNJAB" | state == "RAJASTHAN"
+//    replace region = "NORTHEAST" if state == "ASSAM" | state == "ARUNCHAL PRADESH" | state == "MANIPUR" | ///
+//        state == "MEGHALAYA" | state == "NAGALAND" | state == "TRIPURA" | state == "SIKKIM"
+//    replace region = "CENTRAL-EAST" if state == "CHHATTISGARH" | state == "MADHYA PRADESH" | state == "UTTAR PRADESH" | ///
+//        state == "BIHAR" | state == "JHARKHAND" | state == "ODISHA" | state == "WEST BENGAL"
+//    replace region = "WEST" if state == "DNH & DD" | state == "GOA" | state == "GUJARAT" | state == "MAHARASHTRA"
+//   
+   gen STshare = primaryage_ST/primaryage_all 
+   gen group = ""
+   replace group = "HighIndigenous" if STshare >= .1117244
+   
+	preserve 
+		keep if group == "HighIndigenous"
 		encode(statename), gen(i)
 		gen t = ac_year
-			
-		gen first_treat = . 
-		replace first_treat = 2019 if state == "TAMIL NADU"
-		
+				 
 		gen rel_time = t - first_treat // event time
 		gen never_treat = first_treat==. // controls
 		sum first_treat
@@ -357,15 +591,16 @@ program cohort_twfe
 			la var `post' "`idx'"
 			local idx `++idx'
 		}
-	
-		reg enrollment_rate L_* F_* i.i i.t [weight=schtot], cluster(i)	
+
+		wildbootstrap reg enrollment_rate L_* F_* i.i i.t [weight=schtot], cluster(i) rseed(1960)
 		coefplot, omitted keep(L* F*) vertical ///
-	        order(F_10 F_9 F_8 F_7 F_6 F_5 F_4 F_3 F_2 F_1 L_0 L_1 L_2) ///
-	        title("Event Study Plot, 2019 Cohort") ///
-	        xtitle("Years From Treatment")
-	    graph export ../output/twfe_2019cohort_dise_rate.png, height(450) width(600) replace 
-	restore
+			order(F_8 F_7 F_6 F_5 F_4 F_3 F_2 F_1 L_0 L_1 L_2 L_3 L_4) ///
+			title("Event Study Plot, Upper 50% of Indigenous Share Distribution") ///
+			xtitle("Years From Treatment")
+	restore 
+	
 end 
+
 
 program DiD
     use ../../../shared_data/enrollment_dise, clear
@@ -393,40 +628,111 @@ end
 
 program timeseries 
     use ../../../shared_data/enrollment_dise, clear
-	drop if statename != "TAMIL NADU"
+	drop if statename == "CHHATTISGARH" | statename == "HIMACHAL PRADESH" | statename == "MIZORAM"
+	drop if ac_year < 2013 
 	
 	encode(statename), gen(i)
-	tsset ac_year
-	corrgram enrollment_rate
-	gen d_enroll = enrollment_rate[_n] - enrollment_rate[_n-1]
-	reg d_enroll L.d_enroll, r 
+	gen t = ac_year
+			
+	gen first_treat = . 
+	replace first_treat = 2019 if state == "TAMIL NADU"
+	replace first_treat = 2017 if (state == "ANDAMAN & NICOBAR ISLANDS" | ///
+		state == "ARUNACHAL PRADESH" | state == "BIHAR" | state == "CHANDIGARH" | state == "CHHATTISGARH" | ///
+		state == "DNH & DD" | state == "GOA" | state == "GUJARAT" | state == "KARNATAKA" | ///
+		state == "LAKSHADWEEP" | state == "MIZORAM" | state == "NAGALAND" | state == "ODISHA" | ///
+		state == "PUNJAB" | state == "RAJASTHAN" | state == "SIKKIM" | state == "TRIPURA" | ///
+		state == "UTTAR PRADESH" | state == "MADHYA PRADESH")
+	replace first_treat = 2016 if (state == "MANIPUR" | state == "JHARKHAND" | state == "DELHI")
+	replace first_treat = 2015 if (state == "ANDHRA PRADESH" | state == "HARYANA")
 	
-// 	gen treatment = 0 
-// 	replace treatment = 1 if ac_year >= 2017 & (state == "ANDAMAN & NICOBAR ISLANDS" | ///
-// 		state == "ARUNACHAL PRADESH" | state == "BIHAR" | state == "CHANDIGARH" | state == "CHHATTISGARH" | ///
-// 		state == "DNH & DD" | state == "GOA" | state == "GUJARAT" | state == "KARNATAKA" | ///
-// 		state == "LAKSHADWEEP" | state == "MIZORAM" | state == "NAGALAND" | state == "ODISHA" | ///
-// 		state == "PUNJAB" | state == "RAJASTHAN" | state == "SIKKIM" | state == "TRIPURA" | ///
-// 		state == "UTTAR PRADESH" | state == "MADHYA PRADESH")
-// 	replace treatment = 1 if ac_year >= 2016 & (state == "MANIPUR" | state == "JHARKHAND" | state == "DELHI")
-// 	replace treatment = 1 if ac_year >= 2015 & (state == "ANDHRA PRADESH" | state == "HARYANA")
+	gen rel_time = t - first_treat // event time
+	gen never_treat = first_treat==. // controls
+	sum first_treat
+	gen last_cohort = first_treat==r(max) // last treated
+	
+	gen gvar = first_treat
+	recode gvar (. = 0)
+	drop if gvar == 0 
 
-// 	//storing synthetic estimates
-// 	gen holder = .
-//
-// 	//generate lag variables 
-// 	bysort statename: gen enroll_lag1 = enrollment_rate[_n-1]
-// 	bysort statename: gen enroll_lag2 = enrollment_rate[_n-2]
-// 	bysort statename: gen enroll_lag3 = enrollment_rate[_n-3]
-//
-// 	regress enrollment_rate enroll_lag1, r
-// 	predict synthetic_enrollment17 
-// 	replace holder = synthetic_enrollment17 if year == 2017 &
-//	
-// 	encode(statename), gen(i) 
-// 	reg diff treatment i.ac_year i.i, cluster(i)
+	reg enrollment_rate rel_time if ac_year < gvar
+	predict synthetic_ctrls
+    
+	replace synthetic_ctrls = enrollment_rate if ac_year < gvar 
+	
+	preserve 
+		tempfile temp
+		levelsof statename, local(states)
+		foreach state in `states' {
+			replace statename = "SYNTH `state'" if statename == "`state'"
+		}
+		keep statename ac_year schtot synthetic_ctrls first_treat
+		rename synthetic_ctrls enrollment_rate
+		save `temp'
+	restore 
+	drop synthetic_ctrls
+	append using `temp'
+	
+	keep statename ac_year schtot enrollment_rate first_treat
+    
+	encode(statename), gen(i)
+	gen t = ac_year
+	levelsof statename if strpos(statename, "SYNTH"), local(synth)
+	foreach state in `synth' {
+		replace first_treat = . if statename == "`state'"
+	}
+	
+	gen rel_time = t - first_treat // event time
+	gen never_treat = first_treat==. // controls
+	sum first_treat
+	gen last_cohort = first_treat==r(max) // last treated
+	
+	// leads
+	cap drop F_*
+	cap drop ref*
+	cap drop stack
+	
+	summ rel_time
+	local relmin = abs(r(min))
+	local relmax = abs(r(max))
+	dis "`relmax' `relmin'"
+	
+	forvalues x = 1/`relmin' {
+		dis "`x'"
+		gen F_`x' = rel_time == -`x'
+		replace F_`x' = 0 if never_treat == 1 
+	}
+	replace F_1 = 0 
+	
+	cap drop L_*
+	forval x = 0/`relmax' {
+		gen L_`x' = rel_time == `x'
+		replace L_`x' = 0 if never_treat==1 
+	} 
+	
+	ds F*
+	local idx = 1
+	foreach pre in `r(varlist)' {
+		la var `pre' "-`idx'"
+		local idx `++idx'
+	}
+
+	ds L*
+	local idx = 0
+	foreach post in `r(varlist)' {
+		la var `post' "`idx'"
+		local idx `++idx'
+	}
+	
+	reg enrollment_rate L* F* i.t i.i [weight=schtot], cluster(i)
+	coefplot, omitted keep(L* F*) vertical ///
+	        order(F_4 F_3 F_2 F_1 L_0 L_1 L_2 L_3 L_4) ///
+	        title("2017 Cohort, Synthetic Control Approach") ///
+	        xtitle("Years From Treatment")
+	
+	replace rel_time = t - 2017 if strpos(statename, "SYNTH")
+    scatter enrollment_rate rel_time if strpos(statename, "SYNTH") || lfit enrollment_rate rel_time if strpos(statename, "SYNTH") || ///
+	scatter enrollment_rate rel_time if !strpos(statename, "SYNTH") || lfit enrollment_rate rel_time if !strpos(statename, "SYNTH")
 end 
-
 
 program tests
 	use ../../../shared_data/enrollment_dise_disaggregated, clear

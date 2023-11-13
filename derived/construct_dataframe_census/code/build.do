@@ -7,10 +7,245 @@ set more off
 global raw "C:\Users\Neha Narayan\Desktop\GitHub\senior-thesis\raw\Census"
 
 program main
+    import_distdata
 //     import_sheets
 // 	combine_sheets
 // 	calculate_population
-	calculate_population_2011only
+//     shares_2011
+// 	calculate_population_ipolate
+end
+
+program import_distdata
+	foreach state in andamans andhra arunachal assam bihar chandigarh chhattisgarh dd delhi dnh ///
+	    delhi dnh goa gujarat haryana himachal jammu jharkhand karnataka kerala lakshadweep ///
+		madhya maharashtra manipur meghalaya mizoram nagaland odisha puducherry punjab rajasthan ///
+		sikkim tamilnadu tripura uttar uttarakhand westbengal {
+	        import excel "${raw}\district_level_all\\`state'.xls", sheet("Sheet1") firstrow allstring clear
+	        replace AreaName = subinstr(AreaName, "District - ", "", .)
+	        replace AreaName = subinstr(AreaName, "State - ", "", .)
+	        split AreaName, parse(" (") gen(distname) 
+	        drop Table State Distt AreaName
+	        rename distname1 distname 
+	        keep if ///
+	            Agegroup == "All ages" | Agegroup == "0-4" | Agegroup == "5-9" | ///
+		        Agegroup == "10-14" 
+			drop in 1/4
+			replace distname = strupper(distname)
+			gen statename = "`state'"
+	        save ../output/`state'2011, replace
+	}
+	
+	clear
+	foreach state in andamans andhra arunachal assam bihar chandigarh chhattisgarh dd delhi dnh ///
+	    delhi dnh goa gujarat haryana himachal jammu jharkhand karnataka kerala lakshadweep ///
+		madhya maharashtra manipur meghalaya mizoram nagaland odisha puducherry punjab rajasthan ///
+		sikkim tamilnadu tripura uttar uttarakhand westbengal {
+			qui append using ../output/`state'2011
+	}
+	qui duplicates drop 
+	drop distname2 distname3 
+	save ../output/all2011, replace
+	
+	foreach state in andhra assam bihar chandigarh chhattisgarh dd delhi dnh ///
+	    delhi dnh goa gujarat haryana himachal jammu jharkhand karnataka kerala ///
+		madhya maharashtra manipur meghalaya mizoram odisha puducherry punjab rajasthan ///
+		sikkim tamilnadu tripura uttar uttarakhand westbengal {
+	        import excel "${raw}\district_level_SC\\`state'.xls", sheet("Sheet2") firstrow allstring clear
+	        replace AreaName = subinstr(AreaName, "District - ", "", .)
+	        replace AreaName = subinstr(AreaName, "State - ", "", .)
+	        split AreaName, parse(" (") gen(distname) 
+	        drop Table State Distt AreaName
+	        rename distname1 distname 
+	        keep if ///
+	            Agegroup == "All ages" | Agegroup == "0-4" | Agegroup == "5-9" | ///
+		        Agegroup == "10-14" 
+			drop in 1/4
+			replace distname = strupper(distname)
+			gen statename = "`state'"
+	        save ../output/`state'SC2011, replace
+	}
+	
+	clear
+	foreach state in andhra assam bihar chandigarh chhattisgarh dd delhi dnh ///
+	    delhi dnh goa gujarat haryana himachal jammu jharkhand karnataka kerala ///
+		madhya maharashtra manipur meghalaya mizoram odisha puducherry punjab rajasthan ///
+		sikkim tamilnadu tripura uttar uttarakhand westbengal {
+			qui append using ../output/`state'SC2011
+	}
+	qui duplicates drop 
+	rename (TotalPersons TotalMales TotalFemales RuralPersons RuralMales RuralFemales ///
+	    UrbanPersons UrbanMales UrbanFemales) (TotalSCPersons TotalSCMales TotalSCFemales ///
+		RuralSCPersons RuralSCMales RuralSCFemales UrbanSCPersons UrbanSCMales UrbanSCFemales)
+	save ../output/SC2011, replace
+	
+	foreach state in andamans andhra assam bihar chhattisgarh dd dnh ///
+	    goa gujarat himachal jammu jharkhand karnataka kerala ///
+		madhya maharashtra manipur meghalaya mizoram odisha rajasthan ///
+		sikkim tamilnadu tripura uttar uttarakhand westbengal {
+	        import excel "${raw}\district_level_ST\\`state'.xls", sheet("Sheet2") firstrow allstring clear
+	        replace AreaName = subinstr(AreaName, "District - ", "", .)
+	        replace AreaName = subinstr(AreaName, "State - ", "", .)
+	        split AreaName, parse(" (") gen(distname) 
+	        drop Table State Distt AreaName
+	        rename distname1 distname 
+	        keep if ///
+	            Agegroup == "All ages" | Agegroup == "0-4" | Agegroup == "5-9" | ///
+		        Agegroup == "10-14" 
+			drop in 1/4
+			replace distname = strupper(distname)
+			gen statename = "`state'"
+	        save ../output/`state'ST2011, replace
+	}
+	
+	clear
+	foreach state in andamans andhra assam bihar chhattisgarh dd dnh ///
+	    goa gujarat himachal jammu jharkhand karnataka kerala ///
+		madhya maharashtra manipur meghalaya mizoram odisha rajasthan ///
+		sikkim tamilnadu tripura uttar uttarakhand westbengal {
+			qui append using ../output/`state'ST2011
+	}
+	qui duplicates drop 
+	rename (TotalPersons TotalMales TotalFemales RuralPersons RuralMales RuralFemales ///
+	    UrbanPersons UrbanMales UrbanFemales) (TotalSTPersons TotalSTMales TotalSTFemales ///
+		RuralSTPersons RuralSTMales RuralSTFemales UrbanSTPersons UrbanSTMales UrbanSTFemales)
+	save ../output/ST2011, replace
+	
+	merge 1:1 statename distname Agegroup using ../output/all2011, assert(1 2 3) keep(2 3)
+	merge 1:1 statename distname Agegroup using ../output/SC2011, assert(1 2 3) keep(1 3) gen(merge1)
+	drop _merge merge1 distname2 distname3
+	
+	replace statename = strupper(statename)
+	foreach prefix in ANDHRA ARUNACHAL MADHYA UTTAR HIMACHAL {
+		replace statename = "`prefix' PRADESH" if statename == "`prefix'"
+	}
+	replace statename = "DNH & DD" if statename == "DNH" | statename == "DD"
+	replace statename = "ANDAMAN & NICOBAR ISLANDS" if statename == "ANDAMANS"
+	replace statename = "JAMMU & KASHMIR" if statename == "JAMMU"
+	replace statename = "TAMIL NADU" if statename == "TAMILNADU"
+	replace statename = "WEST BENGAL" if statename == "WESTBENGAL"
+	
+	//clean up district names
+	replace distname = strtrim(distname)
+	replace distname = "MIDDLE AND NORTH ANDAMANS" if distname == "NORTH  & MIDDLE ANDAMAN"
+	replace distname = "SOUTH ANDAMANS" if distname == "SOUTH ANDAMAN" 
+	replace distname = "ANDAMANS" if distname == "SOUTH ANDAMANS" | distname == "MIDDLE AND NORTH ANDAMANS"
+	replace distname = "MAHABUBNAGAR" if distname == "MAHBUBNAGAR"
+	replace distname = "NELLORE" if distname == "SRI POTTI SRIRAMULU NELLORE"
+	replace distname = "KADAPA" if distname == "Y.S.R."
+	replace distname = "DARRANG" if distname == "UDALGURI"
+	replace distname = "KAMRUP" if distname == "KAMRUP METROPOLITAN"
+	replace distname = "WEST KARBI ANGLONG" if distname == "KARBI ANGLONG"
+	replace distname = "BASTER" if distname == "BASTAR" | distname == "NARAYANPUR"
+	replace distname = "DANTEWADA" if distname == "DAKSHIN BASTAR DANTEWADA"
+	levelsof(distname) if statename == "DELHI", local(dists)
+	foreach dist in `dists' {
+		replace distname = "`dist' DELHI" if distname == "`dist'"
+	}
+	replace distname = "NEW DELHI" if distname == "NEW DELHI DELHI"
+	replace distname = "AHMEDABAD" if distname == "AHMADABAD"
+	replace distname = "SABARKANTHA" if distname == "SABAR KANTHA"
+	replace distname = "NUH" if distname == "MEWAT"
+    replace distname = "BANDIPORA" if distname == "BANDIPORE"
+	replace distname = "LEH (LADAKH)" if distname == "LEH(LADAKH)"
+	replace distname = "RAJAURI" if distname == "RAJOURI"
+	replace distname = "SHOPIAN" if distname == "SHUPIYAN"
+	replace distname = "HAZARIBAG" if distname == "HAZARIBAGH"
+	replace distname = "PAKAUR" if distname == "PAKUR"
+	//karnataka
+	replace distname = "BALLARI" if distname == "BELLARY" | distname == "VIJAYANAGARA"
+	replace distname = "BENGALURU RURAL" if distname == "BANGALORE RURAL"
+	replace distname = "BENGALURU URBAN" if distname == "BANGALORE"
+	replace distname = "BELGAVI" if distname == "BELGAUM" | distname == "BELAGAVI"
+	replace distname = "BELGAVI CHIKKODI" if distname == "BELGAUM CHIKKODI" | distname == "CHIKKODI" | ///
+	    distname == "BELAGAVI CHIKKODI"
+	replace distname = "VIJAYAPURA" if distname == "BIJAPUR (KARNATAKA)" | distname == "BIJAPUR"
+	replace distname = "CHAMARAJANAGARA" if distname == "CHAMARAJANAGAR"
+	replace distname = "CHIKKAMANGALORE" if distname == "CHIKKAMAGALURU" | distname == "CHIKKAMANGALURU"
+	replace distname = "KALABURGI" if distname == "GULBARGA" | distname == "KALBURGI"
+	replace distname = "MYSURU" if distname == "MYSORE"
+	replace distname = "SHIVAMOGGA" if distname == "SHIMOGA"
+	replace distname = "TUMAKURU" if distname == "TUMKUR"
+	replace distname = "TUMAKURU MADHUGIRI" if distname == "TUMKUR MADHUGIRI" | distname == "MADHUGIRI"
+	replace distname = "UTTARA KANNADA" if distname == "UTTARAKANNADA" | distname == "UTTARA KANNADA SIRSI" | ///
+	    distname == "UTTARKANNADA"
+	replace distname = "YADAGIRI" if distname == "YADGIR"
+	replace distname = "CHIKKAMANGALORE" if distname == "CHIKMAGALUR"
+	replace distname = "ANGUL" if distname == "ANUGUL"
+	replace distname = "BARAGARH" if distname == "BARGARH"
+	replace distname = "DEOGARH" if distname == "DEBAGARH"
+	replace distname = "JAGATSINGHPUR" if distname == "JAGATSINGHAPUR"
+	replace distname = "KEONJHAR" if distname == "KENDUJHAR"
+	replace distname = "KHURDHA" if distname == "KHORDHA"
+	replace distname = "SONAPUR" if distname == "SUBARNAPUR"
+	replace distname = "MOHALI" if distname == "SAHIBZADA AJIT SINGH NAGAR"
+	replace distname = "NAWANSHAHR" if distname == "SHAHID BHAGAT SINGH NAGAR"
+	replace distname = "TARAN TARAN" if distname == "TARN TARAN"
+	replace distname = "PRAYAGRAJ" if distname == "ALLAHABAD"
+	replace distname = "BARABANKI" if distname == "BARA BANKI"
+	replace distname = "BHADOI" if distname == "SANT RAVIDAS NAGAR"
+	replace distname = "HATHRAS" if distname == "MAHAMAYA NAGAR"
+	replace distname = "KASHIRAM NAGAR" if distname == "KANSHIRAM NAGAR"
+	replace distname = "MAHARAJGANJ" if distname == "MAHRAJGANJ"
+	replace distname = "JALPAIGURI" if distname == "ALIPURDUAR"
+	replace distname = "BARDHAMAN" if distname == "BARDDHAMAN" | distname == "PASCHIM BARDHAMAN" | ///
+	    distname == "PURBA BARDHAMAN"
+	replace distname = "KOCH BIHAR" if distname == "COOCHBEHAR" | distname == "COOCH BIHAR"
+	replace distname = "DARJEELING" if distname == "DARJILING" | distname == "KALIMPONG"
+	replace distname = "HOOGHLY" if distname == "HUGLI"
+	replace distname = "PASCHIM MEDINIPUR" if distname == "JHARGRAM"
+	replace distname = "NORTH 24 PARGANAS" if distname == "NORTH TWENTY FOUR PARGANA" | ///
+	    distname == "NORTH TWENTY FOUR PARGANAS"
+	replace distname = "PURULIYA" if distname == "PURULIA"
+	replace distname = "SOUTH 24 PARGANAS" if distname == "SOUTH TWENTY FOUR PARGANAS" 
+	replace distname = "HOWRAH" if distname == "HAORA"
+	foreach dir in SOUTH EAST WEST {
+		replace distname = "`dir' SIKKIM" if distname == "`dir' DISTRICT"
+	}
+	replace distname = "NORTH SIKKIM" if distname == "NORTH  DISTRICT"
+	replace distname = "KIPHERE" if distname == "KIPHIRE"
+	replace distname = "RI BHOI" if distname == "RIBHOI"
+	replace distname = "JEHANABAD" if distname == "ARWAL"
+	replace distname = "BONGAIGAON" if distname == "CHIRANG"
+    replace distname = "KANKER" if distname == "UTTAR BASTAR KANKER"
+	replace distname = "JHABUA" if distname == "ALIRAJPUR"
+	replace distname = "LOHIT" if distname == "ANJAW"
+	
+	ds distname statename Agegroup, not
+	destring `r(varlist)', replace
+	ds distname statename Agegroup, not
+	collapse (sum) `r(varlist)', by(distname statename Agegroup)
+	
+	encode Agegroup, gen(agegroup)
+	drop Agegroup 
+	ds distname statename agegroup, not
+	reshape wide `r(varlist)', i(distname statename) j(agegroup) 
+	foreach var in TotalPersons TotalMales TotalFemales RuralPersons RuralMales RuralFemales ///
+	    UrbanPersons UrbanMales UrbanFemales TotalSCPersons TotalSCMales TotalSCFemales ///
+		RuralSCPersons RuralSCMales RuralSCFemales UrbanSCPersons UrbanSCMales UrbanSCFemales ///
+		TotalSTPersons TotalSTMales TotalSTFemales RuralSTPersons RuralSTMales RuralSTFemales ///
+		UrbanSTPersons UrbanSTMales UrbanSTFemales {
+			rename `var'1 `var'_0to4
+			rename `var'2 `var'_10to14
+			rename `var'3 `var'_5to9
+			rename `var'4 `var'_allages
+	}
+	
+   keep statename distname Total*
+   gen primaryage_all = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalPersons_5to9 + ///
+       TotalPersons_10to14
+   gen primaryage_males = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalMales_5to9 + ///
+       TotalMales_10to14
+   gen primaryage_females = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalFemales_5to9 + ///
+       TotalFemales_10to14
+
+   gen primaryage_SC = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalSCPersons_5to9 + ///
+       TotalSCPersons_10to14
+   gen primaryage_ST = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalSTPersons_5to9 + ///
+       TotalSTPersons_10to14
+	   
+   keep statename distname primaryage*
+	
+   save ../output/shares_from_2011_district, replace 
 end 
 
 program import_sheets
@@ -164,10 +399,9 @@ program combine_sheets
 	save ../output/allpops2001, replace
 	
 	use ../output/allpops2011, clear
-	merge 1:1 AreaName using ../output/allpops2001, assert(1 2 3) keep()
+	merge 1:1 AreaName using ../output/allpops2001, assert(1 2 3) keep(3)
 	drop _merge 
 	save ../output/fullcensus, replace
-	
 end 	
 	
 program calculate_population
@@ -450,19 +684,96 @@ program calculate_population
 	save ../output/state_populations, replace
 end 
 
-program calculate_population_2011only
-   use ../output/allpops2011, clear
-   keep AreaName TotalPersons* TotalMales* TotalFemales*
-   rename AreaName statename
-   gen primaryage_all = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalPersons_5to9_11 + ///
+program shares_2011
+    use ../output/allpops2011, clear
+	rename AreaName statename
+	
+	gen primaryage_all = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalPersons_5to9_11 + ///
        TotalPersons_10to14_11
-   gen primaryage_males = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalMales_5to9_11 + ///
+	gen primaryage_males = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalMales_5to9_11 + ///
        TotalMales_10to14_11
-   gen primaryage_females = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalFemales_5to9_11 + ///
+	gen primaryage_females = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalFemales_5to9_11 + ///
        TotalFemales_10to14_11
+	
+	gen primaryage_SC = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalSCPersons_5to9_11 + ///
+       TotalSCPersons_10to14_11
+	gen primaryage_SCmales = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalSCMales_5to9_11 + ///
+       TotalSCMales_10to14_11
+	gen primaryage_SCfemales = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalSCFemales_5to9_11 + ///
+       TotalSCFemales_10to14_11
+	
+	gen primaryage_ST = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalSTPersons_5to9_11 + ///
+       TotalSTPersons_10to14_11
+	gen primaryage_STmales = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalSTMales_5to9_11 + ///
+       TotalSTMales_10to14_11
+	gen primaryage_STfemales = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalSTFemales_5to9_11 + ///
+       TotalSTFemales_10to14_11
+	
+	gen primaryage_OBCall = .4*primaryage_all
+	gen primaryage_OBCmales = .4*primaryage_males
+	gen primaryage_OBCfemales = .4*primaryage_females
+   
+	gen primaryage_rural = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*RuralPersons_5to9_11 + ///
+       RuralPersons_10to14_11
+	gen primaryage_ruralmales = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*RuralMales_5to9_11 + ///
+       RuralMales_10to14_11
+	gen primaryage_ruralfemales = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*RuralFemales_5to9_11 + ///
+       RuralFemales_10to14_11
+	   
+	   
+    keep statename primaryage*
+	replace statename = strupper(statename)
+    save ../output/shares_from_2011, replace   
+
+end 
+
+program calculate_population_ipolate
+   use ../output/allpops2011, clear
+   merge 1:1 AreaName using ../output/allpops2001, assert(1 2 3) keep(3)
+   keep AreaName Total*
+   rename AreaName statename
+   gen primaryage_11 = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalPersons_5to9_11 + ///
+       TotalPersons_10to14_11
+   gen primaryage_01 = (0.199074661 + 0.199059085 + 0.200144779 + 0.200887226)*TotalPersons_5to9_01 + ///
+       TotalPersons_10to14_01
+   gen primaryage_SC11 = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalSCPersons_5to9_11 + ///
+       TotalSCPersons_10to14_11
+   gen primaryage_SC01 = (0.199074661 + 0.199059085 + 0.200144779 + 0.200887226)*TotalSCPersons_5to9_01 + ///
+       TotalSCPersons_10to14_01
+   gen primaryage_ST11 = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalSTPersons_5to9_11 + ///
+       TotalSTPersons_10to14_11
+   gen primaryage_ST01 = (0.199074661 + 0.199059085 + 0.200144779 + 0.200887226)*TotalSTPersons_5to9_01 + ///
+       TotalSTPersons_10to14_01
+	   
    keep statename primaryage*
    replace statename = strupper(statename)
+   reshape long primaryage_ primaryage_SC primaryage_ST, i(statename) j(ac_year)
+   replace primaryage_ = primaryage_01 if mi(primaryage_)
+   replace primaryage_SC = primaryage_SC01 if mi(primaryage_SC)
+   replace primaryage_ST = primaryage_ST01 if mi(primaryage_ST)
+   drop primaryage_01 primaryage_SC01 primaryage_ST01
+ 
+   expand 11
+   sort statename (ac_year)
+   drop ac_year
+   by statename: gen ac_year = _n + 1999
+   drop if ac_year == 2000
+   foreach var in primaryage_ primaryage_SC primaryage_ST {
+       replace `var' = . if ac_year != 2001 & ac_year != 2011
+   }
    
+   ipolate primaryage_ ac_year, by(statename) gen(primaryage) epolate
+   drop primaryage_
+   ipolate primaryage_SC ac_year, by(statename) gen(primaryageSC) epolate
+   forvalues year = 2012/2021 {
+       bysort statename (ac_year): replace primaryageSC = 0 if ac_year == `year' & ///
+	   primaryageSC[_n-1] == 0 
+   }
+   drop primaryage_SC
+   ipolate primaryage_ST ac_year, by(statename) gen(primaryageST) epolate
+   drop primaryage_ST
+    
+   keep statename primaryage* ac_year
    save ../output/shares_from_2011, replace   
 end 
 	
