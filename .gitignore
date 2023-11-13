@@ -12,3 +12,6 @@
 *.RHistory
 *.mdb
 *.accdb
+*.png 
+*.jpg
+*.jpeg
