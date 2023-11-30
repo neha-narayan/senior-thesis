@@ -1219,37 +1219,353 @@ program clean_appended
 	
 	 gen hh_SES = hhtype_pucca + hh_electricity_conn + hh_tv + hh_phone + hh_toilet ///
 	      + hh_computer + hh_newspaper + hh_reading_material + hh_motor_vehicle
+   
+    replace district_name = strtrim(district_name)
+	replace district_name = strupper(district_name)
+	
+	//andaman + nicobar
+	replace district_name = "ANDAMANS" if district_name == "SOUTH ANDAMANS" | district_name == "MIDDLE AND NORTH ANDAMANS"
+	//arunachal pradesh
+	replace district_name = "PAPUM PARE" if district_name == "CAPITAL COMPLEX ITANAGAR"
+	replace district_name = "LOWER SUBANSIRI" if district_name == "KAMLE"
+	replace district_name = "KURUNG KUMEY" if district_name == "KRA DADI" | district_name == "KRA DAADI"
+	replace district_name = "UPPER SIANG" if district_name == "LEPA RADA"
+	replace district_name = "TIRAP" if district_name == "LONGDING"
+	replace district_name = "EAST SIANG" if district_name == "LOWER SIANG"
+	replace district_name = "LOHIT" if district_name == "NAMSAI"
+	replace district_name = "EAST KAMENG" if district_name == "PAKKE KESSANG"
+	replace district_name = "WEST SIANG" if district_name == "SHI YOMI"
+	replace district_name = "EAST SIANG" if district_name == "SIANG"
+	replace district_name = "LOHIT" if district_name == "ANJAW"
+
+	//andhra pradesh
+	replace district_name = "ADILABAD" if district_name == "KUMURAM BHEEM ASIFABAD" | district_name == "MANCHERIAL" | district_name == "NIRMAL" | district_name == "KOMARAM BHEEM"
+	replace district_name = "KADAPA" if district_name == "CUDDAPAH"
+	replace district_name = "BHADRADRI" if district_name == "BHADRADRI KOTHAGUDEM"
+	replace district_name = "KHAMMAM" if district_name == "BHADRADRI" | district_name == "JAYASHANKAR" | district_name == "MULUGU"
+	replace district_name = "WARANGAL" if district_name == "HANUMAKONDA" | district_name == "WARANGAL URBAN" | ///
+	    district_name == "WARANGAL RURAL" | district_name == "JANGAON" | district_name == "MAHABUBABAD"
+	replace district_name = "HYDERABAD" if district_name == "HYDERBAD"
+	replace district_name = "KARIMNAGAR" if district_name == "JAGTIAL" | district_name == "PEDDAPALLI" | ///
+	    district_name == "RAJANNA SIRICILLA" | district_name == "RAJANNA"
+    replace district_name = "JOGULAMBA" if district_name == "JOGULAMBA GADWAL"
+	replace district_name = "MAHABUBNAGAR" if district_name == "JOGULAMBA" | district_name == "MAHBUBNAGAR" | ///
+	    district_name == "NAGARKURNOOL" | district_name == "NARAYANAPET" | district_name == "WANAPARTHY"
+	replace district_name = "MEDCHAL" if district_name == "MEDCHAL-MALKAJGIRI"
+	replace district_name = "RANGAREDDY" if district_name == "RANGAREDDI" | district_name == "RANGA REDDY" | ///
+	    district_name == "VIKARABAD" | district_name == "MEDCHAL"
+	replace district_name = "NIZAMABAD" if district_name == "KAMAREDDY"
+	replace district_name = "MEDAK" if district_name == "SANGAREDDY" | district_name == "SIDDIPET"
+	replace district_name = "NALGONDA" if district_name == "SURYAPET" | district_name == "YADADRI" | ///
+	    district_name == "YADADRI BHUVANAGIRI"
+	//assam
+	replace district_name = "BAKSA" if district_name == "TAMULPUR"
+	replace district_name = "BARPETA" if district_name == "BAJALI" 
+	replace district_name = "SONITPUR" if district_name == "BISWANATH"
+	replace district_name = "SIBSAGAR" if district_name == "CHARAIDEO"
+	replace district_name = "SIVASAGAR" if district_name == "SIBSAGAR"
+	replace district_name = "BONGAIGAON" if district_name == "CHIRANG"
+	replace district_name = "NAGAON" if district_name == "HOJAI"
+	replace district_name = "KAMRUP" if district_name == "KAMRUP-METRO" | district_name == "KAMRUP-RURAL" 
+	replace district_name = "JORHAT" if district_name == "MAJULI"
+	replace district_name = "MORIGAON" if district_name == "MARIGAON"
+	replace district_name = "DIMA HASAO" if district_name == "NORTH CACHAR HILLS"
+	replace district_name = "DHUBRI" if district_name == "SOUTH SALMARA-MANKACHAR"
+	replace district_name = "DARRANG" if district_name == "UDALGURI"
+	replace district_name = "WEST KARBI ANGLONG" if district_name == "KARBI ANGLONG"
+	//bihar
+	replace district_name = "JEHANABAD" if district_name == "ARWAL"
+	replace district_name = "AURANGABAD" if district_name == "AURANGABAD (BIHAR)"
+	replace district_name = "KAIMUR" if district_name == "KAIMUR (BHABUA)"
+	//chandigarh
+	replace district_name = "CHANDIGARH" if district_name == "CHANDIGARH (U.T.)"
+	//chhattisgarh
+	replace state_name = "CHHATTISGARH" if district_name == "DANTEWADA"
+	replace district_name = "SURGUJA" if district_name == "BALRAMPUR" | district_name == "SURAJPUR"
+	replace district_name = "DURG" if district_name == "BEMETARA" | district_name == "BALOD"
+	replace district_name = "DANTEWADA" if district_name == "BIJAPUR" | district_name == "SUKMA" | ///
+	    district_name == "DAKSHIN BASTAR DANTEWADA"
+	replace district_name = "BILASPUR" if district_name == "BILASPUR (CHHATTISGARH)" | ///
+	    district_name == "GOURELA PENDRA MARVAHI" | district_name == "MUNGELI"
+	replace district_name = "RAIPUR" if district_name == "GARIABAND" | district_name == "BALODABAZAR"
+	replace district_name = "BASTER" if district_name == "KONDAGAON" | district_name == "NARAYANPUR" 
+	replace district_name = "RAIGARH" if district_name == "RAIGARH (CHHATTISGARH)"
+	replace district_name = "KANKER" if district_name == "UTTAR BASTAR KANKER"
+	replace district_name = "KABEERDHAM" if district_name == "KAWARDHA"
+ 	//delhi
+	replace district_name = "CENTRAL DELHI" if district_name == "CENTRAL"
+	replace district_name = "EAST DELHI" if district_name == "EAST"
+	replace district_name = "NORTH DELHI" if district_name == "NORTH"
+	replace district_name = "NORTH EAST DELHI" if district_name == "NORTH EAST"
+	replace district_name = "NORTH WEST DELHI" if district_name == "NORTH WEST" | district_name == "NORTH WEST A" | ///
+	    district_name == "NORTH WEST B"
+	replace district_name = "SOUTH DELHI" if district_name == "SOUTH"
+	replace district_name = "SOUTH EAST DELHI" if district_name == "SOUTH EAST"
+	replace district_name = "SOUTH DELHI" if district_name == "SOUTH EAST DELHI"
+	replace district_name = "SOUTH WEST DELHI" if district_name == "SOUTH WEST" | district_name == "SOUTH WEST A" | ///
+	    district_name == "SOUTH WEST B"
+	replace district_name = "WEST DELHI" if district_name == "WEST" | district_name == "WEST A" | district_name == "WEST B"
+	//dnh & dd
+	replace district_name = "DADRA & NAGAR HAVELI" if district_name == "DADRA AND NAGAR HAVELI(DIST)" | ///
+	    district_name == "DADRA AND NAGAR HAVELI(UT)"
+	replace district_name = "DAMAN" if district_name == "DAMAN (DIST)"
+	replace district_name = "DIU" if district_name == "DIU (DIST)"
+	//gujarat
+	replace district_name = "AHMEDABAD" if district_name == "AHMADABAD" | district_name == "BOTAD"
+	replace district_name = "SABARKANTHA" if district_name == "ARAVALLI" | district_name == "SABAR KANTHA"
+	replace district_name = "VADODARA" if district_name == "CHHOTAUDEPUR"
+	replace district_name = "JAMNAGAR" if district_name == "DEVBHOOMI DWARKA"
+	replace district_name = "JUNAGADH" if district_name == "GIR SOMNATH"
+	replace district_name = "PANCH MAHALS" if district_name == "MAHISAGAR"
+	replace district_name = "RAJKOT" if district_name == "MORBI"
+	//haryana
+	replace district_name = "BHIWANI" if district_name == "CHARKHI DADRI"
+	replace district_name = "GURGAON" if district_name == "GURUGRAM"
+	replace district_name = "NUH" if district_name == "MEWAT"
+	replace district_name = "BILASPUR" if district_name == "BILASPUR (H.P.)"
+	replace district_name = "HAMIRPUR" if district_name == "HAMIRPUR (H.P.)"
+	//jammu + kashmir / ladakh
+	replace state_name = "JAMMU & KASHMIR" if district_name == "KARGIL" | district_name == "LEH (LADAKH)"
+	//karnataka
+	replace district_name = "BALLARI" if district_name == "BELLARY" | district_name == "VIJAYANAGARA"
+	replace district_name = "BENGALURU RURAL" if district_name == "BANGALORE RURAL"
+	replace district_name = "BENGALURU URBAN" if district_name == "BANGALORE NORTH" | district_name == "BANGALORE SOUTH" | ///
+	    district_name == "BANGALORE U NORTH" | district_name == "BANGALORE U SOUTH" | district_name == "BENGALURU U NORTH" | ///
+		district_name == "BENGALURU U SOUTH"
+	replace district_name = "BELGAVI CHIKKODI" if district_name == "BELGAUM CHIKKODI" | district_name == "CHIKKODI" | ///
+	    district_name == "BELAGAVI CHIKKODI"
+	replace district_name = "BELGAVI" if district_name == "BELGAUM" | district_name == "BELAGAVI" | district_name == "BELGAVI CHIKKODI"
+	replace district_name = "VIJAYAPURA" if district_name == "BIJAPUR (KARNATAKA)" | district_name == "BIJAPUR"
+	replace district_name = "CHAMARAJANAGARA" if district_name == "CHAMARAJANAGAR"
+	replace district_name = "CHIKKAMANGALORE" if district_name == "CHIKKAMAGALURU" | district_name == "CHIKKAMANGALURU"
+	replace district_name = "KALABURGI" if district_name == "GULBARGA" | district_name == "KALBURGI"
+	replace district_name = "MYSURU" if district_name == "MYSORE"
+	replace district_name = "SHIVAMOGGA" if district_name == "SHIMOGA"
+	replace district_name = "TUMAKURU MADHUGIRI" if district_name == "TUMKUR MADHUGIRI" | district_name == "MADHUGIRI"
+	replace district_name = "TUMAKURU" if district_name == "TUMKUR" | district_name == "TUMAKURU MADHUGIRI" 
+	replace district_name = "UTTARA KANNADA" if district_name == "UTTARAKANNADA" | district_name == "UTTARA KANNADA SIRSI" | ///
+	    district_name == "UTTARKANNADA"
+	replace district_name = "YADAGIRI" if district_name == "YADGIRI"
+	//madhya pradesh
+	replace district_name = "SHAJAPUR" if district_name == "AGAR MALWA"
+	replace district_name = "TIKAMGARH" if district_name == "NIWARI"
+	replace district_name = "JHABUA" if district_name == "ALIRAJPUR"
+	//maharashtra
+	replace district_name = "MUMBAI" if district_name == "MUMBAI II"
+	replace district_name = "THANE" if district_name == "PALGHAR"
+	replace district_name = "AURANGABAD" if district_name == "AURANGABAD (MAHARASHTRA)"
+	replace district_name = "MUMBAI SUBURBAN" if district_name == "MUMBAI (SUBURBAN)"
+	replace district_name = "RAIGARH" if district_name == "RAIGARH (MAHARASHTRA)"
+	//manipur
+	replace district_name = "IMPHAL EAST" if district_name == "JIRIBAM"
+	replace district_name = "THOUBAL" if district_name == "KAKCHING"
+	replace district_name = "UKHRUL" if district_name == "KAMJONG" | district_name == "KOMJONG"
+	replace district_name = "SENAPATI" if district_name == "KANGPOKPI" | district_name == "KONGPOKPI"
+	replace district_name = "TAMENGLONG" if district_name == "NONEY"
+	replace district_name = "CHURACHANDPUR" if district_name == "PHERZAWL"
+	replace district_name = "CHANDEL" if district_name == "TENGNOUPAL"
+	//meghalaya
+	replace district_name = "JAINTIA HILLS" if district_name == "EAST JAINTIA HILLS" | ///
+	    district_name == "WEST JAINTIA HILLS"
+	replace district_name = "EAST GARO HILLS" if district_name == "NORTH GARO HILLS"
+	replace district_name = "WEST GARO HILLS" if district_name == "SOUTH WEST GARO HILLS"
+	replace district_name = "WEST KHASI HILLS" if district_name == "SOUTH WEST KHASI HILLS"
+	//mizoram
+	replace district_name = "LUNGLEI" if district_name == "HNAHTHIAL"
+	replace district_name = "CHAMPHAI" if district_name == "KHAWZAWL"
+	replace district_name = "AIZAWL" if district_name == "SAITUAL"
+	//nagaland
+	replace district_name = "KIPHERE" if district_name == "KIPHIRE"
+	//odisha
+	replace district_name = "ANGUL" if district_name == "ANUGUL"
+	replace district_name = "BALESHWAR" if district_name == "BALASORE"
+	replace district_name = "BARAGARH" if district_name == "BARGARH"
+	replace district_name = "BAUDH" if district_name == "BOUDH"
+	replace district_name = "BALANGIR" if district_name == "BOLANGIR"
+	replace district_name = "DEOGARH" if district_name == "DEBAGARH"
+	replace district_name = "JAGATSINGHPUR" if district_name == "JAGATSINGHAPUR"
+	replace district_name = "JAJAPUR" if district_name == "JAJPUR"
+	replace district_name = "KEONJHAR" if district_name == "KENDUJHAR"
+	replace district_name = "KHURDHA" if district_name == "KHORDHA"
+	replace district_name = "NABARANGAPUR" if district_name == "NABARANGPUR"
+	replace district_name = "SONAPUR" if district_name == "SONEPUR"
+	replace district_name = "SUNDARGARH" if district_name == "SUNDERGARH"
+	//punjab
+	replace district_name = "SANGRUR" if district_name == "MALERKOTA" | district_name == "MALERKOTLA"
+	replace district_name = "FIROZPUR" if district_name == "FAZILKA"
+	replace district_name = "GURDASPUR" if district_name == "PATHANKOT"
+	//rajasthan
+	replace district_name = "JHUNJHUNUN" if district_name == "JHUNJHUNU"
+	replace district_name = "PRATAPGARH" if district_name == "PRATAPGARH (RAJ.)" | district_name == "PRATAPGARH(RAJASTHAN)"
+	//sikkim
+	replace district_name = "WEST SIKKIM" if district_name == "SORENG"
+	replace district_name = "EAST SIKKIM" if district_name == "PAKYONG"
+	replace district_name = "SOUTH SIKKIM" if district_name == "NAMCHI"
+	replace district_name = "NORTH SIKKIM" if district_name == "MANGAN"
+	replace district_name = "WEST SIKKIM" if district_name == "GYALSHING"
+	replace district_name = "EAST SIKKIM" if district_name == "GANGTOK"
+	//tamil nadu
+	replace district_name = "KANCHEEPURAM" if district_name == "CHENGALPATTU"
+	replace district_name = "VILUPPURAM" if district_name == "KALLAKURICHI"
+	replace district_name = "KRISHNAGIRI" if district_name == "KRISHANAGIRI"
+	replace district_name = "VELLORE" if district_name == "RANIPET" | district_name == "TIRUPATHUR" | ///
+	    district_name == "TIRUPATTUR"
+	replace district_name = "SIVAGANGA" if district_name == "SIVAGANGAI"
+	replace district_name = "TIRUNELVELI" if district_name == "TENKASI"
+	replace district_name = "THIRUVALLUR" if district_name == "TIRUVALLUR"
+	replace district_name = "THIRUVARUR" if district_name == "TIRUVARUR"
+	replace district_name = "VILUPPURAM" if district_name == "VILLUPURAM"
+	//tripura
+	replace district_name = "SOUTH TRIPURA" if district_name == "GOMATI"
+	replace district_name = "WEST TRIPURA" if district_name == "KHOWAI" | district_name == "SEPAHIJALA"
+	replace district_name = "NORTH TRIPURA" if district_name == "UNAKOTI"
+	//uttar pradesh
+	replace district_name = "PRAYAGRAJ" if district_name == "ALLAHABAD"
+	replace district_name = "BALRAMPUR" if district_name == "BALRAMPUR (U.P)"
+	replace district_name = "HAMIRPUR" if district_name == "HAMIRPUR (U.P.)"
+	replace district_name = "JYOTIBA PHULE NAGAR" if district_name == "JYOTIBA PHULE NAGAR (AMROHA)"
+	replace district_name = "KASHIRAM NAGAR" if district_name == "KANSHIRAM NAGAR"
+	replace district_name = "MUZAFFARNAGAR" if district_name == "SHAMLI (PRABUDH NAGAR)"
+	replace district_name = "AMETHI" if district_name == "AMETHI - CSM NAGAR" | district_name == "CSMAHARAJ NAGAR"
+	replace district_name = "SULTANPUR" if district_name == "AMETHI"
+    replace district_name = "GHAZIABAD" if district_name == "HAPUR (PANCHSHEEL NAGAR)"
+	replace district_name = "MORADABAD" if district_name == "SAMBHAL (BHIM NAGAR)"
+	//west bengal
+	replace district_name = "JALPAIGURI" if district_name == "ALIPURDUAR"
+	replace district_name = "BARDHAMAN" if district_name == "BARDDHAMAN" | district_name == "PASCHIM BARDHAMAN" | ///
+	    district_name == "PURBA BARDHAMAN"
+	replace district_name = "KOCH BIHAR" if district_name == "COOCHBEHAR" | district_name == "COOCH BIHAR"
+	replace district_name = "DARJEELING" if district_name == "DARJILING" | district_name == "KALIMPONG" | district_name == "SILIGURI"
+	replace district_name = "HOOGHLY" if district_name == "HUGLI"
+	replace district_name = "PASCHIM MEDINIPUR" if district_name == "JHARGRAM"
+	replace district_name = "NORTH 24 PARGANAS" if district_name == "NORTH TWENTY FOUR PARGANA" | ///
+	    district_name == "NORTH TWENTY FOUR PARGANAS"
+	replace district_name = "PURULIYA" if district_name == "PURULIA"
+	replace district_name = "SOUTH 24 PARGANAS" if district_name == "SOUTH  TWENTY FOUR PARGAN" | ///
+	    district_name == "SOUTH  TWENTY FOUR PARGANA" | district_name == "SOUTH  TWENTY FOUR PARGANAS" | ///
+		district_name == "SOUTH TWENTY FOUR PARGAN"
+	replace district_name = "HOWRAH" if district_name == "HAORA"
+	
+	replace district_name = "MIDDLE AND NORTH ANDAMANS" if district_name == "NORTH  & MIDDLE ANDAMAN"
+	replace district_name = "SOUTH ANDAMANS" if district_name == "SOUTH ANDAMAN" 
+	replace district_name = "ANDAMANS" if district_name == "SOUTH ANDAMANS" | district_name == "MIDDLE AND NORTH ANDAMANS"
+	replace district_name = "MAHABUBNAGAR" if district_name == "MAHBUBNAGAR"
+	replace district_name = "NELLORE" if district_name == "SRI POTTI SRIRAMULU NELLORE"
+	replace district_name = "KADAPA" if district_name == "Y.S.R."
+	replace district_name = "DARRANG" if district_name == "UDALGURI"
+	replace district_name = "KAMRUP" if district_name == "KAMRUP METROPOLITAN"
+	replace district_name = "WEST KARBI ANGLONG" if district_name == "KARBI ANGLONG"
+	replace district_name = "BASTER" if district_name == "BASTAR" | district_name == "NARAYANPUR"
+	replace district_name = "DANTEWADA" if district_name == "DAKSHIN BASTAR DANTEWADA"
+	levelsof(district_name) if state_name == "DELHI", local(dists)
+	foreach dist in `dists' {
+		replace district_name = "`dist' DELHI" if district_name == "`dist'"
+	}
+	replace district_name = "NEW DELHI" if district_name == "NEW DELHI DELHI"
+	replace district_name = "AHMEDABAD" if district_name == "AHMADABAD"
+	replace district_name = "SABARKANTHA" if district_name == "SABAR KANTHA"
+	replace district_name = "NUH" if district_name == "MEWAT"
+    replace district_name = "BANDIPORA" if district_name == "BANDIPORE"
+	replace district_name = "LEH (LADAKH)" if district_name == "LEH(LADAKH)"
+	replace district_name = "RAJAURI" if district_name == "RAJOURI"
+	replace district_name = "SHOPIAN" if district_name == "SHUPIYAN"
+	replace district_name = "HAZARIBAG" if district_name == "HAZARIBAGH"
+	replace district_name = "PAKAUR" if district_name == "PAKUR"
+	//karnataka
+	replace district_name = "BALLARI" if district_name == "BELLARY" | district_name == "VIJAYANAGARA"
+	replace district_name = "BENGALURU RURAL" if district_name == "BANGALORE RURAL"
+	replace district_name = "BENGALURU URBAN" if district_name == "BANGALORE"
+	replace district_name = "BELGAVI" if district_name == "BELGAUM" | district_name == "BELAGAVI"
+	replace district_name = "BELGAVI CHIKKODI" if district_name == "BELGAUM CHIKKODI" | district_name == "CHIKKODI" | ///
+	    district_name == "BELAGAVI CHIKKODI"
+	replace district_name = "VIJAYAPURA" if district_name == "BIJAPUR (KARNATAKA)" | district_name == "BIJAPUR"
+	replace district_name = "CHAMARAJANAGARA" if district_name == "CHAMARAJANAGAR"
+	replace district_name = "CHIKKAMANGALORE" if district_name == "CHIKKAMAGALURU" | district_name == "CHIKKAMANGALURU"
+	replace district_name = "KALABURGI" if district_name == "GULBARGA" | district_name == "KALBURGI"
+	replace district_name = "MYSURU" if district_name == "MYSORE"
+	replace district_name = "SHIVAMOGGA" if district_name == "SHIMOGA"
+	replace district_name = "TUMAKURU" if district_name == "TUMKUR"
+	replace district_name = "TUMAKURU MADHUGIRI" if district_name == "TUMKUR MADHUGIRI" | district_name == "MADHUGIRI"
+	replace district_name = "UTTARA KANNADA" if district_name == "UTTARAKANNADA" | district_name == "UTTARA KANNADA SIRSI" | ///
+	    district_name == "UTTARKANNADA"
+	replace district_name = "YADAGIRI" if district_name == "YADGIR"
+	replace district_name = "CHIKKAMANGALORE" if district_name == "CHIKMAGALUR"
+	replace district_name = "ANGUL" if district_name == "ANUGUL"
+	replace district_name = "BARAGARH" if district_name == "BARGARH"
+	replace district_name = "DEOGARH" if district_name == "DEBAGARH"
+	replace district_name = "JAGATSINGHPUR" if district_name == "JAGATSINGHAPUR"
+	replace district_name = "KEONJHAR" if district_name == "KENDUJHAR"
+	replace district_name = "KHURDHA" if district_name == "KHORDHA"
+	replace district_name = "SONAPUR" if district_name == "SUBARNAPUR"
+	replace district_name = "MOHALI" if district_name == "SAHIBZADA AJIT SINGH NAGAR"
+	replace district_name = "NAWANSHAHR" if district_name == "SHAHID BHAGAT SINGH NAGAR"
+	replace district_name = "TARAN TARAN" if district_name == "TARN TARAN"
+	replace district_name = "PRAYAGRAJ" if district_name == "ALLAHABAD"
+	replace district_name = "BARABANKI" if district_name == "BARA BANKI"
+	replace district_name = "BHADOI" if district_name == "SANT RAVIDAS NAGAR"
+	replace district_name = "HATHRAS" if district_name == "MAHAMAYA NAGAR"
+	replace district_name = "KASHIRAM NAGAR" if district_name == "KANSHIRAM NAGAR"
+	replace district_name = "MAHARAJGANJ" if district_name == "MAHRAJGANJ"
+	replace district_name = "JALPAIGURI" if district_name == "ALIPURDUAR"
+	replace district_name = "BARDHAMAN" if district_name == "BARDDHAMAN" | district_name == "PASCHIM BARDHAMAN" | ///
+	    district_name == "PURBA BARDHAMAN"
+	replace district_name = "KOCH BIHAR" if district_name == "COOCHBEHAR" | district_name == "COOCH BIHAR"
+	replace district_name = "DARJEELING" if district_name == "DARJILING" | district_name == "KALIMPONG"
+	replace district_name = "HOOGHLY" if district_name == "HUGLI"
+	replace district_name = "PASCHIM MEDINIPUR" if district_name == "JHARGRAM"
+	replace district_name = "NORTH 24 PARGANAS" if district_name == "NORTH TWENTY FOUR PARGANA" | ///
+	    district_name == "NORTH TWENTY FOUR PARGANAS"
+	replace district_name = "PURULIYA" if district_name == "PURULIA"
+	replace district_name = "SOUTH 24 PARGANAS" if district_name == "SOUTH TWENTY FOUR PARGANAS" 
+	replace district_name = "HOWRAH" if district_name == "HAORA"
+	foreach dir in SOUTH EAST WEST {
+		replace district_name = "`dir' SIKKIM" if district_name == "`dir' DISTRICT"
+	}
+	replace district_name = "NORTH SIKKIM" if district_name == "NORTH  DISTRICT"
+	replace district_name = "KIPHERE" if district_name == "KIPHIRE"
+	replace district_name = "RI BHOI" if district_name == "RIBHOI"
+	replace district_name = "JEHANABAD" if district_name == "ARWAL"
+	replace district_name = "BONGAIGAON" if district_name == "CHIRANG"
+    replace district_name = "KANKER" if district_name == "UTTAR BASTAR KANKER"
+	replace district_name = "JHABUA" if district_name == "ALIRAJPUR"
+	replace district_name = "LOHIT" if district_name == "ANJAW"
 	
 	bysort state_name district_name: egen timeframe = nvals(year) //how many years is each district in the data?
+	drop if state_name == "ARUNACHAL PRADESH" | state_name == "JAMMU & KASHMIR"
 	
-	qui ds hhtype_pucca hh_electricity_conn hh_tv hh_phone hh_toilet hh_computer hh_newspaper ///
-	    hh_reading_material hh_motor_vehicle 
-	eststo hh_SES_full: qui estpost sum `r(varlist)'
-	eststo hh_SES_trim: qui estpost sum `r(varlist)' if timeframe == 10
-	esttab hh_SES_full hh_SES_trim using ../output/hhSES_stats.tex, replace cells("mean sd") nonumbers 
+// 	qui ds hhtype_pucca hh_electricity_conn hh_tv hh_phone hh_toilet hh_computer hh_newspaper ///
+// 	    hh_reading_material hh_motor_vehicle 
+// 	eststo hh_SES_full: qui estpost sum `r(varlist)'
+// 	eststo hh_SES_trim: qui estpost sum `r(varlist)' if timeframe == 10
+// 	esttab hh_SES_full hh_SES_trim using ../output/hhSES_stats.tex, replace cells("mean sd") nonumbers 
 
 	drop if timeframe != 10 //create balanced district-level panel
+	//The above is dropping a massive amount 
 	
-    egen schtype_missing = rowtotal(govt_ind pvt_ind madarsa_ind other_ind)
+    egen schtype_check = rowtotal(govt_ind pvt_ind madarsa_ind other_ind)
 	
-	//open enrollment definition - either schtype_missing == 0 or mi(school_class)
+	//bryce's enrollment measure: missing school type as true missing,  missing class year as enrolled. 
+	gen enrolled_ind = 1 
+	replace enrolled_ind = 0 if schtype_check == 0 | !mi(oos_never_enr) | !mi(oos_dropout) 
+	
+	//open enrollment definition - either schtype_check == 0 or mi(school_class)
 	gen enrolled_ind_open = 1
-	replace enrolled_ind_open = 0 if mi(school_class) | schtype_missing == 0 
+	replace enrolled_ind_open = 0 if mi(school_class) | schtype_check == 0 
 	
 	//restricted enrollment definition - must be missing both, and all other students are considered enrolled
 	gen enrolled_ind_restrict = 1 
-	replace enrolled_ind_restrict = 0 if mi(school_class) & schtype_missing == 0 
+	replace enrolled_ind_restrict = 0 if mi(school_class) & schtype_check == 0 
 	
 	//most restricted enrollment def - must be missing both, and enrolled students must have both nonmissing
 	gen enrolled_ind_most_restrict = .
-	replace enrolled_ind_most_restrict = 0 if mi(school_class) & schtype_missing == 0 
-	replace enrolled_ind_most_restrict = 1 if !mi(school_class) & schtype_missing == 1 
+	replace enrolled_ind_most_restrict = 0 if mi(school_class) & schtype_check == 0 
+	replace enrolled_ind_most_restrict = 1 if !mi(school_class) & schtype_check == 1 
 	
 	//FINISH by making a government enrollment and private enrollment variable 
 	
 	
 	//ASER enrollment measure 
-// 	rename schtype_missing enrolled_ind
+// 	rename schtype_check enrolled_ind
 //
 // 	gen enrolled_ind_neha = . 
 // 	replace enrolled_ind_neha = 0 if mi(school_class) | oos_dropout == 1 | oos_never_enr == 1 
@@ -1383,13 +1699,12 @@ program collapse_datasets
 	restore 
 	
 	preserve
-	collapse (firstnm) state_name (mean) enrolled_ind* total_member child_age mother_age father_age ///
+	collapse (firstnm) state_name (mean) enrolled_ind total_member child_age mother_age father_age ///
 	    school_class oos_dropout_class english_comp* mother_gone_to_school father_gone_to_school tuition ///
 		no_livestock_ind hh_goat_lamb hh_cows_buffalo hh_other_animals vlg_*  hh_electricity_* ///
 	    hh_tv hh_phone hh_toilet hh_cable_tv hh_computer_use hh_dvd hh_newspaper ///
 		hh_reading_material hh_motor_vehicle hh_three_wheeler hh_four_wheeler hh_tractor ///
-		mother_read_level_1 govt_ind pvt_ind madarsa_ind other_ind hhtype_* hh_SES ///
-		[fweight = hh_multiplier], by(district_name year) 
+		mother_read_level_1 govt_ind pvt_ind madarsa_ind other_ind hhtype_* hh_SES, by(district_name year) 
 	save ../output/clean_dta/cross_section_mean, replace
 	restore 
 end 

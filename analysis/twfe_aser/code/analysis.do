@@ -27,7 +27,7 @@ program static_twfe
 	egen num_state = group(state_name)	
 	
 	//no controls
-	reg enrolled_ind interact i.year i.num_dist, cluster(state_name)
+	reg enrolled_ind_open interact i.year i.num_dist, cluster(state_name)
 end 
 
 program dynamic_twfe_sums
@@ -651,6 +651,10 @@ end
 
 program twfe_decomposed
      use ../../../shared_data/cross_section_mean, clear	
+	 drop if year < 2009
+     drop if state == "CHHATTISGARH" | state == "HIMACHAL PRADESH" | state == "MIZORAM"
+	
+	
 	//2013 cohort 
 	preserve 
 	    //dynamic twfe
@@ -777,7 +781,7 @@ program twfe_decomposed
 			local idx `++idx'
 		}
 	
-		reg enrolled_ind_most_restrict L_* i.d i.t, cluster(i)	
+		reg enrolled_ind_most_restrict L_* F* i.d i.t, cluster(i)	
 		coefplot, omitted keep(L* F*) vertical ///
 	        order(F_8 F_7 F_6 F_5 F_4 F_3 F_2 F_1 L_0 L_1 L_2 L_3 L_4 L_5) ///
 	        title("Event Study Plot, 2015 Cohort") ///
@@ -845,7 +849,7 @@ program twfe_decomposed
 			local idx `++idx'
 		}
 		
-		reg enrolled_ind_most_restrict F_2 L_0 i.d i.t, cluster(i)	
+		reg enrolled_ind_most_restrict F* L* i.d i.t, cluster(i)	
 		coefplot, omitted keep(L* F*) vertical ///
 	        order(F_8 F_7 F_6 F_5 F_4 F_3 F_2 F_1 L_0 L_1 L_2 L_3 L_4 L_5) ///
 	        title("Event Study Plot, 2016 Cohort") ///

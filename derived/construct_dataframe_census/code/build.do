@@ -230,7 +230,8 @@ program import_distdata
 			rename `var'4 `var'_allages
 	}
 	
-   keep statename distname Total*
+   keep statename distname Total* Rural* Urban* 
+   
    gen primaryage_all = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalPersons_5to9 + ///
        TotalPersons_10to14
    gen primaryage_males = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalMales_5to9 + ///
@@ -243,7 +244,12 @@ program import_distdata
    gen primaryage_ST = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*TotalSTPersons_5to9 + ///
        TotalSTPersons_10to14
 	   
-   keep statename distname primaryage*
+   gen primaryage_rural = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*RuralPersons_5to9 + ///
+       RuralPersons_10to14
+   gen primaryage_urban = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*UrbanPersons_5to9 + ///
+       UrbanPersons_10to14
+
+   keep statename distname primaryage* 
 	
    save ../output/shares_from_2011_district, replace 
 end 

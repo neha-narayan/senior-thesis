@@ -5,110 +5,124 @@ set more off
 
 global raw "C:/Users/Neha Narayan/Desktop/GitHub/senior-thesis/raw/DISE"
 
+
+
 program main
-   import_sheets
+//    import_sheets
 //    collapse_17_18
 //    merge_pre2017
 //    prep_post2017
 //    append_files_post2017
 //    merge_files_post2017
-//    merge_district_panels
+   merge_district_panels
 //    merge_panels
 //    population_scaling 
 end 
 
 program import_sheets
-    clear
-    import delimited "../../../raw/DISE District/districtrawdata_16_17", varnames(1)
-	ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* distname statname ac_year schtot
-	keep `r(varlist)'
-	rename statname statename
-	forvalues class = 1/8 {
-		rename (c`class'_b c`class'_g) (c`class'_totb c`class'_totg)
-	}
-	replace statename = strproper(statename)
-	replace distname = strproper(distname)
-	save ../output/clean_dta/full_2016, replace 
+//     clear
+//     import delimited "../../../raw/DISE District/districtrawdata_16_17", varnames(1)
+// 	ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* distname statname ac_year schtot
+// 	keep `r(varlist)'
+// 	rename statname statename
+// 	forvalues class = 1/8 {
+// 		rename (c`class'_b c`class'_g) (c`class'_totb c`class'_totg)
+// 	}
+// 	replace statename = strproper(statename)
+// 	replace distname = strproper(distname)
+// 	save ../output/clean_dta/full_2016, replace 
+//
+// 	clear
+//     import delimited "../../../raw/DISE District/districtrawdata_15_16", varnames(1)
+//     ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* distname statname ac_year schtot
+// 	keep `r(varlist)'
+// 	rename statname statename
+// 	forvalues class = 1/8 {
+// 		rename (c`class'_b c`class'_g) (c`class'_totb c`class'_totg)
+// 	}
+// 	save ../output/clean_dta/full_2015, replace 
+//	
+// 	clear
+//     import delimited "../../../raw/DISE District/districtrawdata_14_15", varnames(1)
+//     ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* distname statname ac_year schtot
+// 	keep `r(varlist)'
+// 	rename statname statename
+// 	forvalues class = 1/8 {
+// 		rename (c`class'_b c`class'_g) (c`class'_totb c`class'_totg)
+// 	}
+// 	save ../output/clean_dta/full_2014, replace 
+	
+// 	clear
+//     import delimited "../../../raw/DISE District/districtrawdata_13_14", varnames(1)
+//     ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* c1 c2 c3 c4 c5 c6 c7 c8 distname statename acyear ///
+// 	    totschools
+// 	keep `r(varlist)'
+// 	forvalues class = 1/8 {
+// 		rename (c`class'_g) (c`class'_totg)
+// 		gen c`class'_totb = c`class' - c`class'_totg
+// 	}
+// 	rename (acyear totschools) (ac_year schtot)
+// 	save ../output/clean_dta/full_2013, replace 
 
 	clear
-    import delimited "../../../raw/DISE District/districtrawdata_15_16", varnames(1)
-    ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* distname statname ac_year schtot
-	keep `r(varlist)'
-	rename statname statename
-	forvalues class = 1/8 {
-		rename (c`class'_b c`class'_g) (c`class'_totb c`class'_totg)
-	}
-	save ../output/clean_dta/full_2015, replace 
-	
-	clear
-    import delimited "../../../raw/DISE District/districtrawdata_14_15", varnames(1)
-    ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* distname statname ac_year schtot
-	keep `r(varlist)'
-	rename statname statename
-	forvalues class = 1/8 {
-		rename (c`class'_b c`class'_g) (c`class'_totb c`class'_totg)
-	}
-	save ../output/clean_dta/full_2014, replace 
-	
-	clear
     import delimited "../../../raw/DISE District/districtrawdata_13_14", varnames(1)
-    ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* c1 c2 c3 c4 c5 c6 c7 c8 distname statename acyear ///
+    ds grossness* distname statename acyear ///
 	    totschools
 	keep `r(varlist)'
-	forvalues class = 1/8 {
-		rename (c`class'_g) (c`class'_totg)
-		gen c`class'_totb = c`class' - c`class'_totg
-	}
 	rename (acyear totschools) (ac_year schtot)
+	replace ac_year = "2013" if !mi(ac_year)
+	destring ac_year, replace
+	recode_dists
+	collapse (sum) grossness*, by(statename distname ac_year)
 	save ../output/clean_dta/full_2013, replace 
 	
-	clear
-    import delimited "../../../raw/DISE District/districtrawdata_12_13", varnames(1)
-    ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* c1 c2 c3 c4 c5 c6 c7 c8 distname statename ac_year ///
-	    totschools
-	keep `r(varlist)'
-	forvalues class = 1/8 {
-		rename (c`class'_g) (c`class'_totg)
-		gen c`class'_totb = c`class' - c`class'_totg
-	}
-	rename (totschools) (schtot)
-	save ../output/clean_dta/full_2012, replace 
-	
-	clear
-    import delimited "../../../raw/DISE District/districtrawdata_11_12", varnames(1)
-    ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* c1 c2 c3 c4 c5 c6 c7 c8 distname statename ac_year ///
-	    totschools
-	keep `r(varlist)'
-	forvalues class = 1/8 {
-		rename (c`class'_g) (c`class'_totg)
-		gen c`class'_totb = c`class' - c`class'_totg
-	}
-	rename (totschools) (schtot)
-	save ../output/clean_dta/full_2011, replace 
-	
-	clear
-    import delimited "../../../raw/DISE District/districtrawdata_10_11", varnames(1)
-    ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* c1 c2 c3 c4 c5 c6 c7 c8 distname statename ac_year ///
-	    totschools
-	keep `r(varlist)'
-	forvalues class = 1/8 {
-		rename (c`class'_g) (c`class'_totg)
-		gen c`class'_totb = c`class' - c`class'_totg
-	}
-	rename (totschools) (schtot)
-	save ../output/clean_dta/full_2010, replace 
-	
-	clear
-    import delimited "../../../raw/DISE District/districtrawdata_09_10", varnames(1)
-    ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* c1 c2 c3 c4 c5 c6 c7 c8 distname statename ac_year ///
-	    totschools
-	keep `r(varlist)'
-	forvalues class = 1/8 {
-		rename (c`class'_g) (c`class'_totg)
-		gen c`class'_totb = c`class' - c`class'_totg
-	}
-	rename (totschools) (schtot)
-	save ../output/clean_dta/full_2009, replace 
+// 	clear
+//     import delimited "../../../raw/DISE District/districtrawdata_12_13", varnames(1)
+//     ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* c1 c2 c3 c4 c5 c6 c7 c8 distname statename ac_year ///
+// 	    totschools
+// 	keep `r(varlist)'
+// 	forvalues class = 1/8 {
+// 		rename (c`class'_g) (c`class'_totg)
+// 		gen c`class'_totb = c`class' - c`class'_totg
+// 	}
+// 	rename (totschools) (schtot)
+// 	save ../output/clean_dta/full_2012, replace 
+//	
+// 	clear
+//     import delimited "../../../raw/DISE District/districtrawdata_11_12", varnames(1)
+//     ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* c1 c2 c3 c4 c5 c6 c7 c8 distname statename ac_year ///
+// 	    totschools
+// 	keep `r(varlist)'
+// 	forvalues class = 1/8 {
+// 		rename (c`class'_g) (c`class'_totg)
+// 		gen c`class'_totb = c`class' - c`class'_totg
+// 	}
+// 	rename (totschools) (schtot)
+// 	save ../output/clean_dta/full_2011, replace 
+//	
+// 	clear
+//     import delimited "../../../raw/DISE District/districtrawdata_10_11", varnames(1)
+//     ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* c1 c2 c3 c4 c5 c6 c7 c8 distname statename ac_year ///
+// 	    totschools
+// 	keep `r(varlist)'
+// 	forvalues class = 1/8 {
+// 		rename (c`class'_g) (c`class'_totg)
+// 		gen c`class'_totb = c`class' - c`class'_totg
+// 	}
+// 	rename (totschools) (schtot)
+// 	save ../output/clean_dta/full_2010, replace 
+//	
+// 	clear
+//     import delimited "../../../raw/DISE District/districtrawdata_09_10", varnames(1)
+//     ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* c1 c2 c3 c4 c5 c6 c7 c8 distname statename ac_year ///
+// 	    totschools
+// 	keep `r(varlist)'
+// 	forvalues class = 1/8 {
+// 		rename (c`class'_g) (c`class'_totg)
+// 		gen c`class'_totb = c`class' - c`class'_totg
+// 	}
+// 	rename (totschools) (schtot)
+// 	save ../output/clean_dta/full_2009, replace 
 end 
 
 program collapse_17_18
@@ -154,8 +168,7 @@ program merge_pre2017
 // 	keep c1_tot* c2_tot* c3_tot* c4_tot* c5_tot* c6_tot* c7_tot* c8_tot* statename distname ac_year schtot
 	
 	//alternative 
-	use ../output/clean_dta/panel_pre2017, clear
-	drop distname 
+	use c1_totg c1_totb c2_tot* c3_tot* c4_tot* c5_tot* c6_tot* c7_tot* c8_tot* apprb7 apprg7 state district_name ac_year rural_urban sch_management using ../output/clean_dta/panel_pre2017, clear
 
 	rename (state district_name) (statename distname)
 	
@@ -168,14 +181,32 @@ program merge_pre2017
 	replace rural_ind = 0 if rural_ind == 2 
 	drop if rural_ind == 9 
 	
+	recode_dists
+	
 	bysort statename distname rural_ind ac_year: gen schtot = _N
+	
+// 	keep c1_totg c1_totb c2_tot* c3_tot* c4_tot* c5_tot* c6_tot* c7_tot* c8_tot* apprb7 apprg7 statename distname ac_year schtot govt_ind rural_ind
 	
 	keep c1_totg c1_totb c2_tot* c3_tot* c4_tot* c5_tot* c6_tot* c7_tot* c8_tot* ///
 	    c1_c* c2_c* c3_c* c4_c* c5_c* c6_c* c7_c* c8_c* c1_t* c2_t* c3_t* c4_t* c5_t* ///
-		c6_t* c7_t* c8_t* c1_o* c2_o* c3_o* c4_o* c5_o* c6_o* c7_o* c8_o* ///
+		c6_t* c7_t* c8_t* c1_o* c2_o* c3_o* c4_o* c5_o* c6_o* c7_o* c8_o* apprb7 apprg7 ///
 		statename distname ac_year schtot govt_ind rural_ind
-	ds schtot govt_ind rural_ind statename distname ac_year, not
-	collapse (sum) `r(varlist)' (firstnm) schtot (mean) govt_ind, by(state distname rural_ind ac_year) fast
+	
+	gen exam_appearers = apprb7 + apprg7 
+	replace exam_appearers = . if ac_year != "2009-10"
+	count if exam_appearers == 0 & ac_year == "2009-10"
+	count if ac_year == "2009-10"
+	
+	gen unreliable = c7_totb + c7_totg
+	gen reliable_index = exam_appearers / unreliable
+	replace reliable_index = . if reliable_index == 0 
+	bysort statename distname ac_year: egen temp = mean(reliable_index)
+    replace reliable_index = temp
+	drop temp
+
+	tostring rural_ind, replace
+	ds schtot govt_ind rural_ind statename distname ac_year reliable_index, not
+	fcollapse (sum) `r(varlist)' (firstnm) schtot reliable_index (mean) govt_ind, by(state distname rural_ind ac_year) 
 	
 	save ../output/clean_dta/enrollment_pre2017, replace
 end
@@ -459,6 +490,10 @@ program merge_files_post2017
 	    drop cpp_`gender'Others
 	}
 	
+	forvalues class = 1/12 {
+		gen c`class'_aadhaar = c`class'_bAadhar + c`class'_gAadhar
+	}
+	
 	save ../output/clean_dta/panel_post2017, replace
 	
 	gen govt_ind = . 
@@ -473,32 +508,76 @@ program merge_files_post2017
 	rename (state district) (statename distname)
     bysort state distname rural_ind ac_year: gen schtot = _N
 	
-    
+	keep c1_totg c1_totb c2_tot* c3_tot* c4_tot* c5_tot* c6_tot* c7_tot* c8_tot* c1_c* c2_c* c3_c* c4_c* c5_c* c6_c* c7_c* c8_c* c1_t* c2_t* c3_t* c4_t* c5_t* c6_t* c7_t* c8_t* c1_o* c2_o* c3_o* c4_o* c5_o* c6_o* c7_o* c8_o* c1_a c2_a c3_a c4_a c5_a c6_a c7_a c8_a statename distname ac_year schtot govt_ind rural_ind
+	
 	keep c1_totg c1_totb c2_tot* c3_tot* c4_tot* c5_tot* c6_tot* c7_tot* c8_tot* ///
 	    c1_c* c2_c* c3_c* c4_c* c5_c* c6_c* c7_c* c8_c* c1_t* c2_t* c3_t* c4_t* c5_t* ///
-		c6_t* c7_t* c8_t* c1_o* c2_o* c3_o* c4_o* c5_o* c6_o* c7_o* c8_o* ///
-		statename distname ac_year schtot govt_ind rural_ind
+		c6_t* c7_t* c8_t* c1_o* c2_o* c3_o* c4_o* c5_o* c6_o* c7_o* c8_o* c1_a c2_a c3_a ///
+		c4_a c5_a c6_a c7_a c8_a statename distname ac_year schtot govt_ind rural_ind
 	ds schtot govt_ind rural_ind statename distname ac_year, not
-	collapse (sum) `r(varlist)' (firstnm) schtot (mean) govt_ind, by(state distname rural_ind ac_year) fast
+	collapse (sum) `r(varlist)' (firstnm) schtot, by(state distname rural_ind govt_ind ac_year) fast
 	
 	save ../output/clean_dta/enrollment_post2017, replace 
 end
 
 program merge_district_panels
     use ../output/clean_dta/enrollment_pre2017, clear
+	destring rural_ind, replace
 	append using ../output/clean_dta/enrollment_post2017
 	
-	replace statename = strtrim(statename)
+	recode_dists
+	
+	ds statename distname ac_year govt_ind rural_ind reliable_index, not
+	collapse (sum) `r(varlist)' (mean) govt_ind reliable_index, by(statename distname rural_ind ac_year)
+		
+	replace ac_year = substr(ac_year, 1, 4)
+	destring ac_year, replace
+	drop if mi(ac_year) | ac_year < 2009
+	
+	bysort statename distname rural_ind: egen N = nvals(ac_year)
+	drop if N != 13
+
+	save ../output/clean_dta/enrollment_dise, replace
+end 
+
+program population_scaling 
+	use ../output/clean_dta/enrollment_dise, clear
+	ds statename distname ac_year govt_ind rural_ind reliable_index, not
+	collapse (sum) `r(varlist)' (mean) govt_ind reliable_index, by(statename distname ac_year rural_ind)
+	drop N
+	merge m:1 statename distname using ../../../shared_data/shares_from_2011_district, assert(1 2 3) keep(3)
+	drop _merge
+		
+	egen enrollment = rowtotal(c1_totg c2_totg c3_totg c4_totg c5_totg c6_totg c7_totg c8_totg ///
+	    c1_totb c2_totb c3_totb c4_totb c5_totb c6_totb c7_totb c8_totb)
+	egen enrollment_g = rowtotal(c1_totg c2_totg c3_totg c4_totg c5_totg c6_totg c7_totg c8_totg)
+	egen enrollment_b = rowtotal(c1_totb c2_totb c3_totb c4_totb c5_totb c6_totb c7_totb c8_totb)
+	egen scenrollment = rowtotal(c1_cg c2_cg c3_cg c4_cg c5_cg c6_cg c7_cg c8_cg ///
+	    c1_cb c2_cb c3_cb c4_cb c5_cb c6_cb c7_cb c8_cb)
+	egen stenrollment = rowtotal(c1_tg c2_tg c3_tg c4_tg c5_tg c6_tg c7_tg c8_tg ///
+	    c1_tb c2_tb c3_tb c4_tb c5_tb c6_tb c7_tb c8_tb)
+		
+	egen aadhaar = rowtotal(c1_a c2_a c3_a c4_a c5_a c6_a c7_a c8_a)
+
+	gen enrollment_rate = enrollment/primaryage_all
+	gen enrollment_rateg =  enrollment_g/primaryage_females
+	gen enrollment_rateb = enrollment_b/primaryage_males
+	gen enrollment_rateSC = scenrollment/primaryage_SC
+	gen enrollment_rateST = stenrollment/primaryage_ST
+	gen rural_enrollment_rate = enrollment / primaryage_rural
+	gen urban_enrollment_rate = enrollment / primaryage_urban
+	
+	save ../../../shared_data/enrollment_dise, replace
+end 
+
+program recode_dists
+    replace statename = strtrim(statename)
 	
 	replace statename = strupper(statename)
-	replace statename = "ANDAMAN & NICOBAR ISLANDS" if statename == "A & N ISLANDS" | ///
-	    statename == "A & N Islands" | statename == "ANDAMAN AND NICOBAR ISLANDS"
+	replace statename = "ANDAMAN & NICOBAR ISLANDS" if statename == "A & N ISLANDS" | statename == "A & N Islands" | statename == "ANDAMAN AND NICOBAR ISLANDS"
 	replace statename = "ANDHRA PRADESH" if statename == "TELANGANA"
 	replace statename = "CHHATTISGARH" if statename == "CHHATISGARH"
-	replace statename = "DNH & DD" if statename == "D & N HAVELI" | statename == "DADRA & NAGAR HAVELI" | ///
-	    statename == "DAMAN & DIU" | statename == "DADRA & NAGAR HAVELI AND DAMAN & DIU" | ///
-		statename ==  "DADRA AND NAGAR HAVELI" | statename == "DAMAN & DIU AND DADRA & NAGAR HAVELI" | ///
-		statename == "DAMAN AND DIU"
+	replace statename = "DNH & DD" if statename == "D & N HAVELI" | statename == "DADRA & NAGAR HAVELI" |  statename == "DAMAN & DIU" | statename == "DADRA & NAGAR HAVELI AND DAMAN & DIU" | statename ==  "DADRA AND NAGAR HAVELI" | statename == "DAMAN & DIU AND DADRA & NAGAR HAVELI" | statename == "DAMAN AND DIU"
 	replace statename = "JAMMU & KASHMIR" if statename == "JAMMU AND KASHMIR"
 	replace statename = "KERALA" if statename == "KERLA"
 	replace statename = "ODISHA" if statename == "ORISSA"
@@ -530,21 +609,16 @@ program merge_district_panels
 	replace distname = "KADAPA" if distname == "CUDDAPAH"
 	replace distname = "BHADRADRI" if distname == "BHADRADRI KOTHAGUDEM"
 	replace distname = "KHAMMAM" if distname == "BHADRADRI" | distname == "JAYASHANKAR" | distname == "MULUGU"
-	replace distname = "WARANGAL" if distname == "HANUMAKONDA" | distname == "WARANGAL URBAN" | ///
-	    distname == "WARANGAL RURAL" | distname == "JANGAON" | distname == "MAHABUBABAD"
+	replace distname = "WARANGAL" if distname == "HANUMAKONDA" | distname == "WARANGAL URBAN" | distname == "WARANGAL RURAL" | distname == "JANGAON" | distname == "MAHABUBABAD"
 	replace distname = "HYDERABAD" if distname == "HYDERBAD"
-	replace distname = "KARIMNAGAR" if distname == "JAGTIAL" | distname == "PEDDAPALLI" | ///
-	    distname == "RAJANNA SIRICILLA" | distname == "RAJANNA"
+	replace distname = "KARIMNAGAR" if distname == "JAGTIAL" | distname == "PEDDAPALLI" | distname == "RAJANNA SIRICILLA" | distname == "RAJANNA"
     replace distname = "JOGULAMBA" if distname == "JOGULAMBA GADWAL"
-	replace distname = "MAHABUBNAGAR" if distname == "JOGULAMBA" | distname == "MAHBUBNAGAR" | ///
-	    distname == "NAGARKURNOOL" | distname == "NARAYANAPET" | distname == "WANAPARTHY"
+	replace distname = "MAHABUBNAGAR" if distname == "JOGULAMBA" | distname == "MAHBUBNAGAR" |distname == "NAGARKURNOOL" | distname == "NARAYANAPET" | distname == "WANAPARTHY"
 	replace distname = "MEDCHAL" if distname == "MEDCHAL-MALKAJGIRI"
-	replace distname = "RANGAREDDY" if distname == "RANGAREDDI" | distname == "RANGA REDDY" | ///
-	    distname == "VIKARABAD" | distname == "MEDCHAL"
+	replace distname = "RANGAREDDY" if distname == "RANGAREDDI" | distname == "RANGA REDDY" | distname == "VIKARABAD" | distname == "MEDCHAL"
 	replace distname = "NIZAMABAD" if distname == "KAMAREDDY"
 	replace distname = "MEDAK" if distname == "SANGAREDDY" | distname == "SIDDIPET"
-	replace distname = "NALGONDA" if distname == "SURYAPET" | distname == "YADADRI" | ///
-	    distname == "YADADRI BHUVANAGIRI"
+	replace distname = "NALGONDA" if distname == "SURYAPET" | distname == "YADADRI" | distname == "YADADRI BHUVANAGIRI"
 	//assam
 	replace distname = "BAKSA" if distname == "TAMULPUR"
 	replace distname = "BARPETA" if distname == "BAJALI" 
@@ -570,10 +644,8 @@ program merge_district_panels
 	replace statename = "CHHATTISGARH" if distname == "DANTEWADA"
 	replace distname = "SURGUJA" if distname == "BALRAMPUR" | distname == "SURAJPUR"
 	replace distname = "DURG" if distname == "BEMETARA" | distname == "BALOD"
-	replace distname = "DANTEWADA" if distname == "BIJAPUR" | distname == "SUKMA" | ///
-	    distname == "DAKSHIN BASTAR DANTEWADA"
-	replace distname = "BILASPUR" if distname == "BILASPUR (CHHATTISGARH)" | ///
-	    distname == "GOURELA PENDRA MARVAHI" | distname == "MUNGELI"
+	replace distname = "DANTEWADA" if distname == "BIJAPUR" | distname == "SUKMA" | distname == "DAKSHIN BASTAR DANTEWADA"
+	replace distname = "BILASPUR" if distname == "BILASPUR (CHHATTISGARH)" | distname == "GOURELA PENDRA MARVAHI" | distname == "MUNGELI"
 	replace distname = "RAIPUR" if distname == "GARIABAND" | distname == "BALODABAZAR"
 	replace distname = "BASTER" if distname == "KONDAGAON" | distname == "NARAYANPUR" 
 	replace distname = "RAIGARH" if distname == "RAIGARH (CHHATTISGARH)"
@@ -584,17 +656,14 @@ program merge_district_panels
 	replace distname = "EAST DELHI" if distname == "EAST"
 	replace distname = "NORTH DELHI" if distname == "NORTH"
 	replace distname = "NORTH EAST DELHI" if distname == "NORTH EAST"
-	replace distname = "NORTH WEST DELHI" if distname == "NORTH WEST" | distname == "NORTH WEST A" | ///
-	    distname == "NORTH WEST B"
+	replace distname = "NORTH WEST DELHI" if distname == "NORTH WEST" | distname == "NORTH WEST A" | distname == "NORTH WEST B"
 	replace distname = "SOUTH DELHI" if distname == "SOUTH"
 	replace distname = "SOUTH EAST DELHI" if distname == "SOUTH EAST"
 	replace distname = "SOUTH DELHI" if distname == "SOUTH EAST DELHI"
-	replace distname = "SOUTH WEST DELHI" if distname == "SOUTH WEST" | distname == "SOUTH WEST A" | ///
-	    distname == "SOUTH WEST B"
+	replace distname = "SOUTH WEST DELHI" if distname == "SOUTH WEST" | distname == "SOUTH WEST A" | distname == "SOUTH WEST B"
 	replace distname = "WEST DELHI" if distname == "WEST" | distname == "WEST A" | distname == "WEST B"
 	//dnh & dd
-	replace distname = "DADRA & NAGAR HAVELI" if distname == "DADRA AND NAGAR HAVELI(DIST)" | ///
-	    distname == "DADRA AND NAGAR HAVELI(UT)"
+	replace distname = "DADRA & NAGAR HAVELI" if distname == "DADRA AND NAGAR HAVELI(DIST)" | distname == "DADRA AND NAGAR HAVELI(UT)"
 	replace distname = "DAMAN" if distname == "DAMAN (DIST)"
 	replace distname = "DIU" if distname == "DIU (DIST)"
 	//gujarat
@@ -616,11 +685,8 @@ program merge_district_panels
 	//karnataka
 	replace distname = "BALLARI" if distname == "BELLARY" | distname == "VIJAYANAGARA"
 	replace distname = "BENGALURU RURAL" if distname == "BANGALORE RURAL"
-	replace distname = "BENGALURU URBAN" if distname == "BANGALORE NORTH" | distname == "BANGALORE SOUTH" | ///
-	    distname == "BANGALORE U NORTH" | distname == "BANGALORE U SOUTH" | distname == "BENGALURU U NORTH" | ///
-		distname == "BENGALURU U SOUTH"
-	replace distname = "BELGAVI CHIKKODI" if distname == "BELGAUM CHIKKODI" | distname == "CHIKKODI" | ///
-	    distname == "BELAGAVI CHIKKODI"
+	replace distname = "BENGALURU URBAN" if distname == "BANGALORE NORTH" | distname == "BANGALORE SOUTH" | distname == "BANGALORE U NORTH" | distname == "BANGALORE U SOUTH" | distname == "BENGALURU U NORTH" | distname == "BENGALURU U SOUTH"
+	replace distname = "BELGAVI CHIKKODI" if distname == "BELGAUM CHIKKODI" | distname == "CHIKKODI" | distname == "BELAGAVI CHIKKODI"
 	replace distname = "BELGAVI" if distname == "BELGAUM" | distname == "BELAGAVI" | distname == "BELGAVI CHIKKODI"
 	replace distname = "VIJAYAPURA" if distname == "BIJAPUR (KARNATAKA)" | distname == "BIJAPUR"
 	replace distname = "CHAMARAJANAGARA" if distname == "CHAMARAJANAGAR"
@@ -630,8 +696,7 @@ program merge_district_panels
 	replace distname = "SHIVAMOGGA" if distname == "SHIMOGA"
 	replace distname = "TUMAKURU MADHUGIRI" if distname == "TUMKUR MADHUGIRI" | distname == "MADHUGIRI"
 	replace distname = "TUMAKURU" if distname == "TUMKUR" | distname == "TUMAKURU MADHUGIRI" 
-	replace distname = "UTTARA KANNADA" if distname == "UTTARAKANNADA" | distname == "UTTARA KANNADA SIRSI" | ///
-	    distname == "UTTARKANNADA"
+	replace distname = "UTTARA KANNADA" if distname == "UTTARAKANNADA" | distname == "UTTARA KANNADA SIRSI" | distname == "UTTARKANNADA"
 	replace distname = "YADAGIRI" if distname == "YADGIRI"
 	//madhya pradesh
 	replace distname = "SHAJAPUR" if distname == "AGAR MALWA"
@@ -652,8 +717,7 @@ program merge_district_panels
 	replace distname = "CHURACHANDPUR" if distname == "PHERZAWL"
 	replace distname = "CHANDEL" if distname == "TENGNOUPAL"
 	//meghalaya
-	replace distname = "JAINTIA HILLS" if distname == "EAST JAINTIA HILLS" | ///
-	    distname == "WEST JAINTIA HILLS"
+	replace distname = "JAINTIA HILLS" if distname == "EAST JAINTIA HILLS" | distname == "WEST JAINTIA HILLS"
 	replace distname = "EAST GARO HILLS" if distname == "NORTH GARO HILLS"
 	replace distname = "WEST GARO HILLS" if distname == "SOUTH WEST GARO HILLS"
 	replace distname = "WEST KHASI HILLS" if distname == "SOUTH WEST KHASI HILLS"
@@ -695,8 +759,7 @@ program merge_district_panels
 	replace distname = "KANCHEEPURAM" if distname == "CHENGALPATTU"
 	replace distname = "VILUPPURAM" if distname == "KALLAKURICHI"
 	replace distname = "KRISHNAGIRI" if distname == "KRISHANAGIRI"
-	replace distname = "VELLORE" if distname == "RANIPET" | distname == "TIRUPATHUR" | ///
-	    distname == "TIRUPATTUR"
+	replace distname = "VELLORE" if distname == "RANIPET" | distname == "TIRUPATHUR" | distname == "TIRUPATTUR"
 	replace distname = "SIVAGANGA" if distname == "SIVAGANGAI"
 	replace distname = "TIRUNELVELI" if distname == "TENKASI"
 	replace distname = "THIRUVALLUR" if distname == "TIRUVALLUR"
@@ -719,62 +782,16 @@ program merge_district_panels
 	replace distname = "MORADABAD" if distname == "SAMBHAL (BHIM NAGAR)"
 	//west bengal
 	replace distname = "JALPAIGURI" if distname == "ALIPURDUAR"
-	replace distname = "BARDHAMAN" if distname == "BARDDHAMAN" | distname == "PASCHIM BARDHAMAN" | ///
-	    distname == "PURBA BARDHAMAN"
+	replace distname = "BARDHAMAN" if distname == "BARDDHAMAN" | distname == "PASCHIM BARDHAMAN" | distname == "PURBA BARDHAMAN"
 	replace distname = "KOCH BIHAR" if distname == "COOCHBEHAR" | distname == "COOCH BIHAR"
 	replace distname = "DARJEELING" if distname == "DARJILING" | distname == "KALIMPONG" | distname == "SILIGURI"
 	replace distname = "HOOGHLY" if distname == "HUGLI"
 	replace distname = "PASCHIM MEDINIPUR" if distname == "JHARGRAM"
-	replace distname = "NORTH 24 PARGANAS" if distname == "NORTH TWENTY FOUR PARGANA" | ///
-	    distname == "NORTH TWENTY FOUR PARGANAS"
+	replace distname = "NORTH 24 PARGANAS" if distname == "NORTH TWENTY FOUR PARGANA" | distname == "NORTH TWENTY FOUR PARGANAS"
 	replace distname = "PURULIYA" if distname == "PURULIA"
-	replace distname = "SOUTH 24 PARGANAS" if distname == "SOUTH  TWENTY FOUR PARGAN" | ///
-	    distname == "SOUTH  TWENTY FOUR PARGANA" | distname == "SOUTH  TWENTY FOUR PARGANAS" | ///
-		distname == "SOUTH TWENTY FOUR PARGAN"
+	replace distname = "SOUTH 24 PARGANAS" if distname == "SOUTH  TWENTY FOUR PARGAN" | distname == "SOUTH  TWENTY FOUR PARGANA" | distname == "SOUTH  TWENTY FOUR PARGANAS" | distname == "SOUTH TWENTY FOUR PARGAN"
 	replace distname = "HOWRAH" if distname == "HAORA"
-	
-	qui ds statename distname ac_year govt_ind rural_ind, not
-	collapse (sum) `r(varlist)' (mean) govt_ind rural_ind, by(statename distname ac_year)
-	
-	replace ac_year = substr(ac_year, 1, 4)
-	destring ac_year, replace
-	drop if mi(ac_year) | ac_year < 2009
-	
-	bysort statename distname: egen N = nvals(ac_year)
-	drop if N != 13
-
-	save ../output/clean_dta/enrollment_dise, replace
 end 
-
-program population_scaling 
-	use ../output/clean_dta/enrollment_dise, clear
-	ds statename distname ac_year govt_ind rural_ind, not
-	collapse (sum) `r(varlist)' (mean) govt_ind rural_ind, by(statename distname ac_year)
-	drop N
-	merge m:1 statename distname using ../../../shared_data/shares_from_2011_district, assert(1 2 3) keep(3)
-	drop _merge
-	
-	egen enrollment = rowtotal(c1_totg c2_totg c3_totg c4_totg c5_totg c6_totg c7_totg c8_totg ///
-	    c1_totb c2_totb c3_totb c4_totb c5_totb c6_totb c7_totb c8_totb)
-	egen enrollment_g = rowtotal(c1_totg c2_totg c3_totg c4_totg c5_totg c6_totg c7_totg c8_totg)
-	egen enrollment_b = rowtotal(c1_totb c2_totb c3_totb c4_totb c5_totb c6_totb c7_totb c8_totb)
-	egen scenrollment = rowtotal(c1_cg c2_cg c3_cg c4_cg c5_cg c6_cg c7_cg c8_cg ///
-	    c1_cb c2_cb c3_cb c4_cb c5_cb c6_cb c7_cb c8_cb)
-	egen stenrollment = rowtotal(c1_tg c2_tg c3_tg c4_tg c5_tg c6_tg c7_tg c8_tg ///
-	    c1_tb c2_tb c3_tb c4_tb c5_tb c6_tb c7_tb c8_tb)
-//
-// 	collapse (sum) enrollment enrollment_g enrollment_b scenrollment stenrollment schtot ///
-// 	    (firstnm) primaryage_all primaryage_SC primaryage_ST, ///
-// 	    by(statename ac_year)
-	gen enrollment_rate = enrollment/primaryage_all
-	gen enrollment_rateg =  enrollment_g/primaryage_females
-	gen enrollment_rateb = enrollment_b/primaryage_males
-	gen enrollment_rateSC = scenrollment/primaryage_SC
-	gen enrollment_rateST = stenrollment/primaryage_ST
-	
-	save ../../../shared_data/enrollment_dise, replace
-end 
-
 
 
 program merge_panels
