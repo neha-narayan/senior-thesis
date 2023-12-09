@@ -97,16 +97,16 @@ program merge_district_panels
 	bysort statename distname pincode: egen N = nvals(ac_year)
 	drop if N != 13
 
-	save ../output/clean_dta/enrollment_dise, replace
+	save ../output/clean_dta/pincode_enrollment_dise, replace
 end 
 
 program population_scaling 
 	use ../output/clean_dta/enrollment_dise, clear
-	ds statename distname ac_year govt_ind rural_ind reliable_index, not
-	collapse (sum) `r(varlist)' (mean) govt_ind reliable_index, by(statename distname ac_year rural_ind)
-	drop N
-	merge m:1 statename distname using ../../../shared_data/shares_from_2011_district, assert(1 2 3) keep(3)
-	drop _merge
+// 	ds statename distname ac_year govt_ind rural_ind reliable_index, not
+// 	collapse (sum) `r(varlist)' (mean) govt_ind reliable_index, by(statename distname ac_year rural_ind)
+// 	drop N
+// 	merge m:1 statename distname using ../../../shared_data/shares_from_2011_district, assert(1 2 3) keep(3)
+// 	drop _merge
 		
 	egen enrollment = rowtotal(c1_totg c2_totg c3_totg c4_totg c5_totg c6_totg c7_totg c8_totg ///
 	    c1_totb c2_totb c3_totb c4_totb c5_totb c6_totb c7_totb c8_totb)
