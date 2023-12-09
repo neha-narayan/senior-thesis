@@ -6,8 +6,7 @@ set more off
 program main
    merge_pre2017
    merge_files_post2017
-//    merge_district_panels
-//    merge_panels
+//    merge_pincode_panels
 //    population_scaling 
 end 
 
@@ -82,7 +81,7 @@ program merge_pre2017
 	save ../output/clean_dta/pincode_enrollment_post2017, replace 
 end
 
-program merge_district_panels
+program merge_pincode_panels
     use ../output/clean_dta/pincode_enrollment_pre2017, clear
 	append using ../output/clean_dta/pincode_enrollment_post2017
 		
@@ -96,18 +95,7 @@ program merge_district_panels
 	
 	bysort statename distname pincode: egen N = nvals(ac_year)
 	drop if N != 13
-
-	save ../output/clean_dta/pincode_enrollment_dise, replace
-end 
-
-program population_scaling 
-	use ../output/clean_dta/enrollment_dise, clear
-// 	ds statename distname ac_year govt_ind rural_ind reliable_index, not
-// 	collapse (sum) `r(varlist)' (mean) govt_ind reliable_index, by(statename distname ac_year rural_ind)
-// 	drop N
-// 	merge m:1 statename distname using ../../../shared_data/shares_from_2011_district, assert(1 2 3) keep(3)
-// 	drop _merge
-		
+	
 	egen enrollment = rowtotal(c1_totg c2_totg c3_totg c4_totg c5_totg c6_totg c7_totg c8_totg ///
 	    c1_totb c2_totb c3_totb c4_totb c5_totb c6_totb c7_totb c8_totb)
 	egen enrollment_g = rowtotal(c1_totg c2_totg c3_totg c4_totg c5_totg c6_totg c7_totg c8_totg)
@@ -116,16 +104,27 @@ program population_scaling
 	    c1_cb c2_cb c3_cb c4_cb c5_cb c6_cb c7_cb c8_cb)
 	egen stenrollment = rowtotal(c1_tg c2_tg c3_tg c4_tg c5_tg c6_tg c7_tg c8_tg ///
 	    c1_tb c2_tb c3_tb c4_tb c5_tb c6_tb c7_tb c8_tb)
-		
-	gen enrollment_rate = enrollment/primaryage_all
-	gen enrollment_rateg =  enrollment_g/primaryage_females
-	gen enrollment_rateb = enrollment_b/primaryage_males
-	gen enrollment_rateSC = scenrollment/primaryage_SC
-	gen enrollment_rateST = stenrollment/primaryage_ST
-	gen rural_enrollment_rate = enrollment / primaryage_rural
-	gen urban_enrollment_rate = enrollment / primaryage_urban
-	
-	save ../../../shared_data/enrollment_dise, replace
+
+	save ../../../shared_data/pincode_enrollment_dise, replace
+end 
+
+program population_scaling 
+// 	use ../output/clean_dta/enrollment_dise, clear
+// 	ds statename distname ac_year govt_ind rural_ind reliable_index, not
+// 	collapse (sum) `r(varlist)' (mean) govt_ind reliable_index, by(statename distname ac_year rural_ind)
+// 	drop N
+// 	merge m:1 statename distname using ../../../shared_data/shares_from_2011_district, assert(1 2 3) keep(3)
+// 	drop _merge
+				
+// 	gen enrollment_rate = enrollment/primaryage_all
+// 	gen enrollment_rateg =  enrollment_g/primaryage_females
+// 	gen enrollment_rateb = enrollment_b/primaryage_males
+// 	gen enrollment_rateSC = scenrollment/primaryage_SC
+// 	gen enrollment_rateST = stenrollment/primaryage_ST
+// 	gen rural_enrollment_rate = enrollment / primaryage_rural
+// 	gen urban_enrollment_rate = enrollment / primaryage_urban
+//	
+// 	save ../../../shared_data/enrollment_dise, replace
 end 
 
 program recode_dists
@@ -348,49 +347,6 @@ program recode_dists
 	replace distname = "PURULIYA" if distname == "PURULIA"
 	replace distname = "SOUTH 24 PARGANAS" if distname == "SOUTH  TWENTY FOUR PARGAN" | distname == "SOUTH  TWENTY FOUR PARGANA" | distname == "SOUTH  TWENTY FOUR PARGANAS" | distname == "SOUTH TWENTY FOUR PARGAN"
 	replace distname = "HOWRAH" if distname == "HAORA"
-end 
-
-program merge_panels
-    dis "Create the full panel."
-    use ../output/clean_dta/panel_pre2017, clear
-    qui append using ../output/clean_dta/panel_post2017
-	//qui append using ../output/clean_dta/RECODED_panel_2001-12
-	save ../output/clean_dta/panel, replace
-end
-
-program trim_strings
-    ds, has(type string)
-    local string_vars = r(varlist)
-    foreach var in `string_vars' {
-        replace `var' = strtrim(`var')
-    }
-    compress
-end
-
-program convert_to_int_post
-    ds psuedocode, not
-    local string_vars = r(varlist)
-    foreach var in `string_vars' {
-    	if "`:type `var''" != "string" {
-            continue
-        }
-        local length = strlen(`var')
-        di "`var'"
-        if `length' < 16 {
-            gen `var'_r = real(`var')
-            sum `var'_r, d
-            count if !mi(`var'_r)
-            local nonmiss = `r(N)'
-            count
-            local N = `r(N)'
-            local nonmissing_pct = `nonmiss'/`N'
-            if `nonmissing_pct' >= 0.05 {
-                destring `var', replace
-            }
-            drop `var'_r
-        }
-    } 
-    compress
 end 
 
 *Execute
