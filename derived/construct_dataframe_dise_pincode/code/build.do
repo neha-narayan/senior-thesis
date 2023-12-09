@@ -3,170 +3,15 @@ log using build.log, replace
 clear all
 set more off
 
-global raw "C:/Users/Neha Narayan/Desktop/GitHub/senior-thesis/raw/DISE"
-
-
-
 program main
-//    import_sheets
-//    collapse_17_18
    merge_pre2017
-//    prep_post2017
-//    append_files_post2017
    merge_files_post2017
 //    merge_district_panels
 //    merge_panels
 //    population_scaling 
 end 
 
-program import_sheets
-//     clear
-//     import delimited "../../../raw/DISE District/districtrawdata_16_17", varnames(1)
-// 	ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* distname statname ac_year schtot
-// 	keep `r(varlist)'
-// 	rename statname statename
-// 	forvalues class = 1/8 {
-// 		rename (c`class'_b c`class'_g) (c`class'_totb c`class'_totg)
-// 	}
-// 	replace statename = strproper(statename)
-// 	replace distname = strproper(distname)
-// 	save ../output/clean_dta/full_2016, replace 
-//
-// 	clear
-//     import delimited "../../../raw/DISE District/districtrawdata_15_16", varnames(1)
-//     ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* distname statname ac_year schtot
-// 	keep `r(varlist)'
-// 	rename statname statename
-// 	forvalues class = 1/8 {
-// 		rename (c`class'_b c`class'_g) (c`class'_totb c`class'_totg)
-// 	}
-// 	save ../output/clean_dta/full_2015, replace 
-//	
-// 	clear
-//     import delimited "../../../raw/DISE District/districtrawdata_14_15", varnames(1)
-//     ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* distname statname ac_year schtot
-// 	keep `r(varlist)'
-// 	rename statname statename
-// 	forvalues class = 1/8 {
-// 		rename (c`class'_b c`class'_g) (c`class'_totb c`class'_totg)
-// 	}
-// 	save ../output/clean_dta/full_2014, replace 
-	
-// 	clear
-//     import delimited "../../../raw/DISE District/districtrawdata_13_14", varnames(1)
-//     ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* c1 c2 c3 c4 c5 c6 c7 c8 distname statename acyear ///
-// 	    totschools
-// 	keep `r(varlist)'
-// 	forvalues class = 1/8 {
-// 		rename (c`class'_g) (c`class'_totg)
-// 		gen c`class'_totb = c`class' - c`class'_totg
-// 	}
-// 	rename (acyear totschools) (ac_year schtot)
-// 	save ../output/clean_dta/full_2013, replace 
-
-	clear
-    import delimited "../../../raw/DISE District/districtrawdata_13_14", varnames(1)
-    ds grossness* distname statename acyear ///
-	    totschools
-	keep `r(varlist)'
-	rename (acyear totschools) (ac_year schtot)
-	replace ac_year = "2013" if !mi(ac_year)
-	destring ac_year, replace
-	recode_dists
-	collapse (sum) grossness*, by(statename distname ac_year)
-	save ../output/clean_dta/full_2013, replace 
-	
-// 	clear
-//     import delimited "../../../raw/DISE District/districtrawdata_12_13", varnames(1)
-//     ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* c1 c2 c3 c4 c5 c6 c7 c8 distname statename ac_year ///
-// 	    totschools
-// 	keep `r(varlist)'
-// 	forvalues class = 1/8 {
-// 		rename (c`class'_g) (c`class'_totg)
-// 		gen c`class'_totb = c`class' - c`class'_totg
-// 	}
-// 	rename (totschools) (schtot)
-// 	save ../output/clean_dta/full_2012, replace 
-//	
-// 	clear
-//     import delimited "../../../raw/DISE District/districtrawdata_11_12", varnames(1)
-//     ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* c1 c2 c3 c4 c5 c6 c7 c8 distname statename ac_year ///
-// 	    totschools
-// 	keep `r(varlist)'
-// 	forvalues class = 1/8 {
-// 		rename (c`class'_g) (c`class'_totg)
-// 		gen c`class'_totb = c`class' - c`class'_totg
-// 	}
-// 	rename (totschools) (schtot)
-// 	save ../output/clean_dta/full_2011, replace 
-//	
-// 	clear
-//     import delimited "../../../raw/DISE District/districtrawdata_10_11", varnames(1)
-//     ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* c1 c2 c3 c4 c5 c6 c7 c8 distname statename ac_year ///
-// 	    totschools
-// 	keep `r(varlist)'
-// 	forvalues class = 1/8 {
-// 		rename (c`class'_g) (c`class'_totg)
-// 		gen c`class'_totb = c`class' - c`class'_totg
-// 	}
-// 	rename (totschools) (schtot)
-// 	save ../output/clean_dta/full_2010, replace 
-//	
-// 	clear
-//     import delimited "../../../raw/DISE District/districtrawdata_09_10", varnames(1)
-//     ds c1_* c2_* c3_* c4_* c5_* c6_* c7_* c8_* c1 c2 c3 c4 c5 c6 c7 c8 distname statename ac_year ///
-// 	    totschools
-// 	keep `r(varlist)'
-// 	forvalues class = 1/8 {
-// 		rename (c`class'_g) (c`class'_totg)
-// 		gen c`class'_totb = c`class' - c`class'_totg
-// 	}
-// 	rename (totschools) (schtot)
-// 	save ../output/clean_dta/full_2009, replace 
-end 
-
-program collapse_17_18
-    foreach file in basic general facility repeaters enrollment scenrollment stenrollment ///
-	    obcenrollment disabledenrollment rte teachers {
-		clear
-        import delimited ../output/csv/`file'_2017, varnames(1) bindquote(strict)
-		cap rename school_code schcd
-	    save ../output/messy_dta/`file'_2017, replace
-	}
-	
-	use ../output/messy_dta/basic_2017, clear
-	foreach file in general facility repeaters enrollment scenrollment stenrollment obcenrollment ///
-	    disabledenrollment rte teachers {
-			merge 1:1 schcd using ../output/messy_dta/`file'_2017, assert(1 2 3) gen(merge_`file')
-	}
-		
-    drop schcd pincode block_name cluster_name village_name merge_*
-	
-// 	gen govt_ind = . 
-// 	replace govt_ind = 1 if schmgt == 1 | schmgt == 2 | schmgt == 3 | schmgt == 4 | schmgt == 6 
-// 	replace govt_ind = 0 if schmgt == 5
-// 	drop if mi(govt_ind)
-	
-	bysort state distname: gen N = _N 
-	
-	qui ds c* 
-	collapse (sum) `r(varlist)' (firstnm) ac_year N, by(distname state)
-	rename N schtot
-	keep state distname c1_tot* c2_tot* c3_tot* c4_tot* c5_tot* c6_tot* c7_tot* c8_tot* ac_year schtot
-	
-	replace distname = strproper(distname)
-	rename state statename
-	
-	save ../output/clean_dta/full_2017, replace
-end
-
 program merge_pre2017
-//     use ../output/clean_dta/full_2009, clear
-// 	forvalues year = 2010/2017 {
-// 		qui append using ../output/clean_dta/full_`year'
-// 	}
-// 	keep c1_tot* c2_tot* c3_tot* c4_tot* c5_tot* c6_tot* c7_tot* c8_tot* statename distname ac_year schtot
-	
 	//alternative 
 	use ../output/clean_dta/panel_pre2017, clear
 	
@@ -184,12 +29,12 @@ program merge_pre2017
 	
 	recode_dists
 	
-	bysort statename distname rural_ind ac_year: gen schtot = _N
+	bysort statename distname pincode rural_ind ac_year: gen schtot = _N
 	
 	keep c1_totg c1_totb c2_tot* c3_tot* c4_tot* c5_tot* c6_tot* c7_tot* c8_tot* ///
 	    c1_c* c2_c* c3_c* c4_c* c5_c* c6_c* c7_c* c8_c* c1_t* c2_t* c3_t* c4_t* c5_t* ///
 		c6_t* c7_t* c8_t* c1_o* c2_o* c3_o* c4_o* c5_o* c6_o* c7_o* c8_o* apprb7 apprg7 ///
-		statename distname ac_year schtot govt_ind rural_ind 
+		statename distname ac_year schtot govt_ind rural_ind pincode
 	
 	gen exam_appearers = apprb7 + apprg7 
 	replace exam_appearers = . if ac_year != "2009-10" 
@@ -197,301 +42,17 @@ program merge_pre2017
 
 	gen unreliable = c7_totb + c7_totg
 	gen reliable_index = exam_appearers / unreliable
-    bysort statename distname ac_year: egen temp = mean(reliable_index)
+	bysort statename distname pincode ac_year: egen temp = mean(reliable_index)
     replace reliable_index = temp
 	drop temp
 
 	tostring rural_ind, replace
-	ds schtot rural_ind statename distname ac_year reliable_index, not
-	fcollapse (sum) `r(varlist)' (firstnm) schtot reliable_index, by(state distname rural_ind ac_year) 
+	tostring pincode, replace
+	ds schtot rural_ind statename distname ac_year reliable_index pincode, not
+	fcollapse (sum) `r(varlist)' (firstnm) schtot reliable_index, by(state distname pincode rural_ind ac_year) 
 
-	save ../output/clean_dta/enrollment_pre2017, replace
-end
- 
-program prep_post2017
-    dis "Convert the raw files from 2018-19 to 2021-22 to datasets at the table-year level."
-    foreach year in 2018-19 2019-20 2020-21 2021-22 {
-	    clear
-	    local idx = 0
-        local filenames : dir "${raw} `year'" files "nationalEnrol*.csv"
-	    cap dis "`filenames'"
-	    foreach file in `filenames' {
-		    local idx "`++idx'"
-		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
-			trim_strings
-		    convert_to_int_post
-		    tempfile enroll_`idx'
-		    save "`enroll_`idx''"
-		    clear
-	    }
-	    clear
-	    forvalues i = 1/`idx' {
-		    append using "`enroll_`i''"
-	    }
-		gen ac_year = "`year'"
-	    save "../output/messy_dta/enrollment_`year'", replace
-    }
+	save ../output/clean_dta/pincode_enrollment_pre2017, replace
 
-    foreach year in 2018-19 2019-20  {
-	    clear
-	    local idx = 0
-        local filenames : dir "${raw} `year'" files "100_prof*.csv"
-	    cap dis "`filenames'"
-	    foreach file in `filenames' {
-		    local idx "`++idx'"
-		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
-			trim_strings
-		    convert_to_int_post
-		    tempfile prof_`idx'
-		    save "`prof_`idx''"
-		    clear
-	    }    
-	    clear
-	    forvalues i = 1/`idx' {
-		    append using "`prof_`i''"
-	    }
-		gen ac_year = "`year'"
-	    save "../output/messy_dta/profile_`year'", replace
-    }
-
-    foreach year in 2020-21 2021-22  {
-	    clear
-	    local idx = 0
-        local filenames : dir "${raw} `year'" files "nationalProfile*.csv"
-	    cap dis "`filenames'"
-	    foreach file in `filenames' {
-		    local idx "`++idx'"
-		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
-			trim_strings
-		    convert_to_int_post
-		    tempfile prof_`idx'
-		    save "`prof_`idx''"
-		    clear
-	    }
-	    clear
-	    forvalues i = 1/`idx' {
-		    append using "`prof_`i''"
-	    }
-		gen ac_year = "`year'"
-	    save "../output/messy_dta/profile_`year'", replace
-    }
-
-    foreach year in 2018-19 2019-20  {
-	    clear
-	    local idx = 0
-        local filenames : dir "${raw} `year'" files "100_fac*.csv"
-	    cap dis "`filenames'"
-	    foreach file in `filenames' {
-		    local idx "`++idx'"
-		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
-			trim_strings
-		    convert_to_int_post
-		    tempfile facility_`idx'
-		    save "`facility_`idx''"
-		    clear
-	    }
-	    clear
-	    forvalues i = 1/`idx' {
-		    append using "`facility_`i''"
-	    }
-		gen ac_year = "`year'"
-	    save "../output/messy_dta/facility_`year'", replace
-    }
-
-    foreach year in 2020-21 2021-22  {
-	    clear
-	    local idx = 0
-        local filenames : dir "${raw} `year'" files "nationalfacility*.csv"
-	    cap dis "`filenames'"
-	    foreach file in `filenames' {
-		    local idx "`++idx'"
-		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
-			trim_strings
-		    convert_to_int_post
-		    tempfile facility_`idx'
-		    save "`facility_`idx''"
-		    clear
-	    }
-	    clear
-	    forvalues i = 1/`idx' {
-		    append using "`facility_`i''"
-	    }
-		gen ac_year = "`year'"
-	    save "../output/messy_dta/facility_`year'", replace
-    }
-
-    foreach year in 2018-19 2019-20  {
-	    clear
-	    local idx = 0
-        local filenames : dir "${raw} `year'" files "100_tch*.csv"
-	    cap dis "`filenames'"
-	    foreach file in `filenames' {
-		    local idx "`++idx'"
-		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
-			trim_strings
-		    convert_to_int_post
-		    tempfile teachers_`idx'
-		    save "`teachers_`idx''"
-		    clear
-	    }
-	    clear
-	    forvalues i = 1/`idx' {
-		    append using "`teachers_`i''"
-	    }
-		gen ac_year = "`year'"
-	    save "../output/messy_dta/teachers_`year'", replace
-    }
-
-    foreach year in 2020-21 2021-22  {
-	    clear
-	    local idx = 0
-        local filenames : dir "${raw} `year'" files "nationalTeacher*.csv"
-	    cap dis "`filenames'"
-	    foreach file in `filenames' {
-		    local idx "`++idx'"
-		    import delimited "${raw} `year'\\`file'", varnames(1) stringcols(_all)
-			trim_strings
-		    convert_to_int_post
-		    tempfile teachers_`idx'
-		    save "`teachers_`idx''"adil
-		    clear
-	    }
-	    clear
-	    forvalues i = 1/`idx' {
-		    append using "`teachers_`i''"
-	    }
-		gen ac_year = "`year'"
-	    save "../output/messy_dta/teachers_`year'", replace
-    } 
-end 
-
-//takes REALLY long time, run on server or use compiled version of this data already on server 
-program append_files_post2017
-    dis "Consolidate the yearly files by table from 2018-19 to 2021-22."
-	foreach year in 2018-19 2019-20 2020-21 2021-22 {
-	    use ../output/messy_dta/profile_`year', clear
-		qui ds psuedocode ac_year, not
-	    collapse (firstnm) `r(varlist)', by(psuedocode ac_year)
-		trim_strings
-		convert_to_int_post
-		save ../output/messy_dta/profile_`year', replace
-	}
-	foreach year in 2018-19 2019-20 2020-21 2021-22 {
-		use ../output/messy_dta/enrollment_`year', clear
-		qui ds psuedocode ac_year item_desc, not
-	    collapse (firstnm) `r(varlist)', by(psuedocode ac_year item_desc)
-		trim_strings
-		convert_to_int_post
-		save ../output/messy_dta/enrollment_`year', replace
-	}
-
-    //recode some vars that convert_to_int_post fails to convert 
-	use "../output/messy_dta/profile_2018-19", clear
-	qui ds year_of_recognition*
-	foreach var in `r(varlist)' {
-		replace `var' = "" if `var' == "NULL"
-		destring `var', replace
-	}
-	save "../output/messy_dta/profile_2018-19", replace
-    clear
-    foreach year in 2018-19 2019-20 2020-21 2021-22 {
-		append using ../output/messy_dta/profile_`year'
-	}
-	qui duplicates drop 
-	save ../output/messy_dta/profile_append_post2017, replace
-	
-	clear 
-	foreach year in 2018-19 2019-20 2020-21 2021-22 {
-		append using ../output/messy_dta/enrollment_`year'
-	}
-	qui duplicates drop 
-	save ../output/messy_dta/enrollment_append_post2017, replace
-		
-	clear 
-	foreach year in 2018-19 2019-20 2020-21 2021-22 {
-		append using ../output/messy_dta/facility_`year'
-	}
-	qui duplicates drop
-	save ../output/messy_dta/facility_append_post2017, replace
-
-    clear 
-	foreach year in 2018-19 2019-20 2020-21 2021-22 {
-		append using ../output/messy_dta/teachers_`year'
-	}
-	qui duplicates drop 
-	save ../output/messy_dta/teachers_append_post2017, replace
-end 
-
-program merge_files_post2017
-//     dis "Create the panel for 2018-19 to 2021-22 and reshape data to conform with earlier panel."
-//     use ../output/messy_dta/enrollment_append_post2017, clear
-// 	drop if mi(item_desc)
-// 	replace item_desc = subinstr(item_desc, " ", "", .)
-// 	replace item_desc = "AgeLessThan5" if item_desc == "Age<5"
-// 	qui ds psuedocode item_desc ac_year, not
-// 	reshape wide `r(varlist)', i(psuedocode ac_year) j(item_desc) string
-// 	forvalues i = 1/12 {
-// 		rename c`i'_bSC c`i'_cb
-// 		rename c`i'_gSC c`i'_cg
-// 		rename c`i'_bST c`i'_tb
-// 		rename c`i'_gST c`i'_tg
-// 		rename c`i'_bOBC c`i'_ob
-// 		rename c`i'_gOBC c`i'_og
-// 		rename c`i'_bTotalrepeaters fail`i'b
-// 		rename c`i'_gTotalrepeaters fail`i'g
-// 		destring c`i'_bAge*, replace
-// 		egen c`i'_totb = rowtotal(c`i'_bAge*)
-// 		destring c`i'_gAge*, replace
-// 		egen c`i'_totg = rowtotal(c`i'_gAge*)
-// 	}
-// 	egen cpp_totb = rowtotal(cpp_bAge*)
-// 	egen cpp_totg = rowtotal(cpp_gAge*)
-// 	rename cpp_bSC cpp_cb
-// 	rename cpp_gSC cpp_cg
-// 	rename cpp_bST cpp_tb
-// 	rename cpp_gST cpp_tg
-// 	rename cpp_bOBC cpp_ob
-// 	rename cpp_gOBC cpp_og
-// 	rename cpp_bTotalrepeaters failppb
-// 	rename cpp_gTotalrepeaters failppg
-// 	save ../output/messy_dta/enrollment_append_post2017, replace 
-//	
-// 	use ../output/messy_dta/profile_append_post2017, clear
-//	
-// 	merge 1:1 psuedocode ac_year using ../output/messy_dta/teachers_append_post2017, ///
-// 	    assert(1 2 3) keep(3) gen(merge_teachers)
-// 	drop merge_teachers
-//	
-// 	merge 1:1 psuedocode ac_year using ../output/messy_dta/facility_append_post2017, ///
-// 	    assert(1 2 3) keep(3) gen(merge_facility)
-// 	drop merge_facility
-//	
-// 	merge 1:1 psuedocode ac_year using ../output/messy_dta/enrollment_append_post2017, ///
-// 	    assert(1 2 3) keep(3) gen(merge_enroll)
-// 	drop merge_enroll
-//	
-// 	rename psuedocode school_code
-// 	qui ds school_code ac_year, not 
-//     qui ds `r(varlist)', has(type string)
-//     foreach var in `r(varlist)' {
-//     	dis "attempting to destring `var'"
-//     	cap destring `var', replace
-//     }
-//     foreach gender in g b {
-// 	    forvalues class = 1/12 {
-// 		    replace c`class'_o`gender' = c`class'_`gender'Others if mi(c`class'_o`gender')
-// 	        drop c`class'_`gender'Others
-// 	    }
-// 	    replace cpp_o`gender' = cpp_`gender'Others if mi(cpp_o`gender')
-// 	    drop cpp_`gender'Others
-// 	}
-//	
-// 	forvalues class = 1/12 {
-// 		gen c`class'_aadhaar = c`class'_bAadhar + c`class'_gAadhar
-// 	}
-//	
-// 	save ../output/clean_dta/panel_post2017, replace
-	
 	use ../output/clean_dta/panel_post2017, clear
 	
 	gen govt_ind = . 
@@ -507,35 +68,33 @@ program merge_files_post2017
 	
 	recode_dists 
 	
-    bysort state distname rural_ind ac_year: gen schtot = _N
+    bysort state distname pincode rural_ind ac_year: gen schtot = _N
 	
 	keep c1_totg c1_totb c2_tot* c3_tot* c4_tot* c5_tot* c6_tot* c7_tot* c8_tot* ///
 	    c1_c* c2_c* c3_c* c4_c* c5_c* c6_c* c7_c* c8_c* c1_t* c2_t* c3_t* c4_t* c5_t* ///
 		c6_t* c7_t* c8_t* c1_o* c2_o* c3_o* c4_o* c5_o* c6_o* c7_o* c8_o* ///
-		statename distname ac_year schtot govt_ind rural_ind 
+		statename distname ac_year schtot govt_ind rural_ind pincode
 	
-	tostring rural_ind, replace
-	ds schtot rural_ind statename distname ac_year, not
-	collapse (sum) `r(varlist)' (firstnm) schtot, by(statename distname rural_ind ac_year) fast
+	tostring rural_ind pincode, replace
+	ds schtot rural_ind statename distname ac_year pincode, not
+	collapse (sum) `r(varlist)' (firstnm) schtot, by(statename distname pincode rural_ind ac_year) fast
 	
-	save ../output/clean_dta/enrollment_post2017, replace 
+	save ../output/clean_dta/pincode_enrollment_post2017, replace 
 end
 
 program merge_district_panels
-    use ../output/clean_dta/enrollment_pre2017, clear
-	destring rural_ind, replace
-	append using ../output/clean_dta/enrollment_post2017
-	
-	recode_dists
-	
-	ds statename distname ac_year govt_ind rural_ind reliable_index, not
-	collapse (sum) `r(varlist)' (mean) govt_ind reliable_index, by(statename distname rural_ind ac_year)
+    use ../output/clean_dta/pincode_enrollment_pre2017, clear
+	append using ../output/clean_dta/pincode_enrollment_post2017
 		
 	replace ac_year = substr(ac_year, 1, 4)
 	destring ac_year, replace
 	drop if mi(ac_year) | ac_year < 2009
 	
-	bysort statename distname rural_ind: egen N = nvals(ac_year)
+	destring rural_ind, replace
+	ds statename distname pincode ac_year govt_ind rural_ind reliable_index, not
+	collapse (sum) `r(varlist)' (mean) rural_ind govt_ind reliable_index, by(statename distname pincode ac_year)
+	
+	bysort statename distname pincode: egen N = nvals(ac_year)
 	drop if N != 13
 
 	save ../output/clean_dta/enrollment_dise, replace
@@ -790,8 +349,6 @@ program recode_dists
 	replace distname = "SOUTH 24 PARGANAS" if distname == "SOUTH  TWENTY FOUR PARGAN" | distname == "SOUTH  TWENTY FOUR PARGANA" | distname == "SOUTH  TWENTY FOUR PARGANAS" | distname == "SOUTH TWENTY FOUR PARGAN"
 	replace distname = "HOWRAH" if distname == "HAORA"
 end 
-
-
 
 program merge_panels
     dis "Create the full panel."

@@ -3,7 +3,6 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 library(cowplot)
-
 library(RColorBrewer)
 library(ggmap)
 library(maps)
@@ -60,12 +59,25 @@ map <- ggplot() +
 
 ggsave('../output/policy_rollout.png', plot = map, width = 30, height = 20, units = "cm")
 
+#district reliability
+dists_shape = st_read('../../../raw/data/polbnda_ind.shp')
+dists_shape <- dists_shape %>% 
+  rename(distname = laa)
+ratings = distinct(read.csv('../../../shared_data/cohortdata.csv')[,c("distname", "reliable_scale")])
 
-geojson_file_path <- '../../../raw/UIDAI.geojson'
-test = st_read(geojson_file_path)
-ggplot() +
-  geom_sf(data = test) +
-  theme_minimal()
+total <- merge(dists_shape, ratings, by="distname", all.x = TRUE)
+most_reliable <- total[total$reliable_scale == "Most Reliable",]
+least_reliable <- total[total$reliable_scale == "Least Reliable",]
+
+map2 <- ggplot() +
+  geom_sf(data = total, fill = "white", color = "black") +
+  geom_sf(data = most_reliable, aes(fill = "Most Reliable"), color = NA) +
+  geom_sf(data = least_reliable, aes(fill = "Least Reliable"), color = NA) +
+  labs(title = "Most vs. Least Reliable Districts") +
+  scale_fill_manual(values = c("Most Reliable" = "#014421","Least Reliable" = "#6DAA7F"),
+                    name = "Group")
+ggsave('../output/reliable_geo_dist.png', plot = map2, width = 30, height = 20, units = "cm")
+
 
 
 

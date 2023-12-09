@@ -249,7 +249,7 @@ program import_distdata
    gen primaryage_urban = (0.197495796 + 0.200750232 + 0.202585422 + 0.204670205)*UrbanPersons_5to9 + ///
        UrbanPersons_10to14
 
-   keep statename distname primaryage* 
+   keep statename distname primaryage* *_allages
 	
    save ../output/shares_from_2011_district, replace 
 end 
