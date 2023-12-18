@@ -9,7 +9,7 @@ for (year in 16:20) {
 
 coord_to_pin <-  function(lat, lon) {
   pincode <-  NULL
-  key <-  "AIzaSyBaZyL5UqkNkKzVjiStSe45gB0Of53dNbY"
+  key <-  "YOUR_KEY_HERE"
   baseurl <-  "https://maps.googleapis.com/maps/api/geocode/json"
   endpoint <- paste0(baseurl, "?latlng=", lat, ",", lon, 
                      "&result_type=postal_code&key=", key)
