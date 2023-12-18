@@ -4,13 +4,12 @@ clear all
 set more off
 
 program main
-   merge_pre2017
-   merge_files_post2017
+   condense_panels
 //    merge_pincode_panels
-//    population_scaling 
+//     incorporate_enrollment_centers
 end 
 
-program merge_pre2017
+program condense_panels
 	//alternative 
 	use ../output/clean_dta/panel_pre2017, clear
 	
@@ -28,7 +27,7 @@ program merge_pre2017
 	
 	recode_dists
 	
-	bysort statename distname pincode rural_ind ac_year: gen schtot = _N
+	bysort pincode rural_ind ac_year: gen schtot = _N
 	
 	keep c1_totg c1_totb c2_tot* c3_tot* c4_tot* c5_tot* c6_tot* c7_tot* c8_tot* ///
 	    c1_c* c2_c* c3_c* c4_c* c5_c* c6_c* c7_c* c8_c* c1_t* c2_t* c3_t* c4_t* c5_t* ///
@@ -41,14 +40,14 @@ program merge_pre2017
 
 	gen unreliable = c7_totb + c7_totg
 	gen reliable_index = exam_appearers / unreliable
-	bysort statename distname pincode ac_year: egen temp = mean(reliable_index)
+	bysort pincode ac_year: egen temp = mean(reliable_index)
     replace reliable_index = temp
 	drop temp
 
 	tostring rural_ind, replace
 	tostring pincode, replace
 	ds schtot rural_ind statename distname ac_year reliable_index pincode, not
-	fcollapse (sum) `r(varlist)' (firstnm) schtot reliable_index, by(state distname pincode rural_ind ac_year) 
+	fcollapse (sum) `r(varlist)' (firstnm) statename schtot reliable_index, by(pincode rural_ind ac_year) 
 
 	save ../output/clean_dta/pincode_enrollment_pre2017, replace
 
@@ -67,7 +66,7 @@ program merge_pre2017
 	
 	recode_dists 
 	
-    bysort state distname pincode rural_ind ac_year: gen schtot = _N
+    bysort pincode rural_ind ac_year: gen schtot = _N
 	
 	keep c1_totg c1_totb c2_tot* c3_tot* c4_tot* c5_tot* c6_tot* c7_tot* c8_tot* ///
 	    c1_c* c2_c* c3_c* c4_c* c5_c* c6_c* c7_c* c8_c* c1_t* c2_t* c3_t* c4_t* c5_t* ///
@@ -76,25 +75,33 @@ program merge_pre2017
 	
 	tostring rural_ind pincode, replace
 	ds schtot rural_ind statename distname ac_year pincode, not
-	collapse (sum) `r(varlist)' (firstnm) schtot, by(statename distname pincode rural_ind ac_year) fast
+	collapse (sum) `r(varlist)' (firstnm) schtot statename, by(pincode rural_ind ac_year) fast
 	
 	save ../output/clean_dta/pincode_enrollment_post2017, replace 
 end
 
+program verify_pincodes
+        import delimited ../../../raw/all_india_pin_code, varnames(1) clear
+		keep pincode 
+		duplicates drop 
+		tostring pincode, replace
+		save ../../../shared_data/all_pincodes, replace
+end 
 program merge_pincode_panels
     use ../output/clean_dta/pincode_enrollment_pre2017, clear
 	append using ../output/clean_dta/pincode_enrollment_post2017
-		
+	
+	merge m:1 pincode using ../output/all_pincodes, assert(1 2 3) keep(3)
+
 	replace ac_year = substr(ac_year, 1, 4)
 	destring ac_year, replace
-	drop if mi(ac_year) | ac_year < 2009
+	
+	bysort pincode: egen N = nvals(ac_year)
+	drop if N != 13
 	
 	destring rural_ind, replace
-	ds statename distname pincode ac_year govt_ind rural_ind reliable_index, not
-	collapse (sum) `r(varlist)' (mean) rural_ind govt_ind reliable_index, by(statename distname pincode ac_year)
-	
-	bysort statename distname pincode: egen N = nvals(ac_year)
-	drop if N != 13
+	ds pincode statename ac_year govt_ind rural_ind reliable_index, not
+	collapse (sum) `r(varlist)' (firstnm) reliable_index statename, by(pincode ac_year)
 	
 	egen enrollment = rowtotal(c1_totg c2_totg c3_totg c4_totg c5_totg c6_totg c7_totg c8_totg ///
 	    c1_totb c2_totb c3_totb c4_totb c5_totb c6_totb c7_totb c8_totb)
@@ -107,6 +114,25 @@ program merge_pincode_panels
 
 	save ../../../shared_data/pincode_enrollment_dise, replace
 end 
+
+program incorporate_enrollment_centers
+    import delimited ../../../raw/Aadhaar_Centers/UIDAI.csv, varnames(1) clear
+	
+	sort pincode
+	bysort pincode: gen num_centers = _N
+	
+	duplicates drop pincode, force
+	keep pincode num_centers 
+	tostring pincode, replace
+	
+	merge 1:m pincode using ../../../shared_data/pincode_enrollment_dise, assert(1 2 3) keep(2 3)
+	drop _merge 
+	replace num_centers = 0 if mi(num_centers)
+	save ../../../shared_data/pincode_enrollment_dise, replace
+end 
+
+
+
 
 program population_scaling 
 // 	use ../output/clean_dta/enrollment_dise, clear

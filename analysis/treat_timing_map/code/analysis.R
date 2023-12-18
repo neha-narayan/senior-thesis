@@ -82,7 +82,19 @@ ggsave('../output/reliable_geo_dist.png', plot = map2, width = 30, height = 20, 
 
 
 
-
+for(i in 1:length(PinCode)){ 
+  var = PinCode[i] 
+  link=paste("http://dev.virtualearth.net/REST/v1/Locations?postalCode=", var, "&o=xml&maxResults=1&key=[YOurKey]",sep = "") 
+  data<- xmlParse(link) 
+  xml_data <- xmlToList(data) 
+  PinCodeLatLongtemp <- data.frame(PinCode = "Temp", Lat = "Lat", Long = "Long") 
+  PinCodeLatLongtemp$PinCode <- var 
+  PinCodeLatLongtemp$Lat <- 
+    xml_data$ResourceSets$ResourceSet$Resources$Location$Point$Latitude 
+  PinCodeLatLongtemp$Long <- 
+    xml_data$ResourceSets$ResourceSet$Resources$Location$Point$Longitude 
+  PinCodeLatLong <- rbindlist(list(PinCodeLatLongtemp,PinCodeLatLong), fill = T) 
+} 
 
 
 

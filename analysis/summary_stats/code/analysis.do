@@ -23,7 +23,7 @@ program summary_stats
 	replace rural_ind = 0 if rural_ind == 2 
 	drop if rural_ind == 9 
 	
-	keep distname statename ac_year govt_ind rural_ind c1_totg c2_totg c3_totg ///
+	keep distname statename pincode ac_year govt_ind rural_ind c1_totg c2_totg c3_totg ///
 	    c4_totg c5_totg c6_totg c7_totg c8_totg c1_totb c2_totb c3_totb c4_totb c5_totb ///
 		c6_totb c7_totb c8_totb toilet_girls toilet_common electricity drinking_water ///
 		tch_male tch_female tch_nr playground approachbyroad medium1 medium2 medium3 ///
@@ -65,24 +65,23 @@ program summary_stats
 	
 	replace ac_year = substr(ac_year, 1, 4)
 	destring ac_year, replace
-	drop if mi(ac_year) | ac_year < 2009
 	
-	bysort statename distname rural_ind: egen N = nvals(ac_year)
-	drop if N != 9
-	
-	bysort statename distname ac_year: gen schtot = _N
-
 	keep if ac_year == 2014
-	drop ac_year 
+	count
 	
 	gen group = "Treatment"
 	replace group = "Control" if statename == "ASSAM" | statename == "JAMMU & KASHMIR" | ///
 	    statename == "KERALA" | statename == "MAHARASHTRA" | statename == "MEGHALAYA" | ///
 		statename == "WEST BENGAL"
+		
+	bysort statename pincode ac_year: gen schtot = _N
 	
-	fcollapse (firstnm) schtot group (mean) govt_ind rural_ind enrollment toilet_girls ///
-	    toilet_common electricity drinking_water teachers playground approachbyroad vernacular, ///
-		by(statename distname) 
+	tostring pincode, replace
+	fcollapse (sum) enrollment (firstnm) schtot group (mean) teachers govt_ind rural_ind toilet_girls ///
+	    toilet_common electricity drinking_water playground approachbyroad vernacular, ///
+		by(pincode)
+	merge m:1 pincode using ../../../shared_data/all_pincodes, assert(1 2 3) keep(3)
+	unique pincode 
 	
     save ../output/summary_stats, replace
 	
@@ -95,7 +94,7 @@ program summary_stats
 	la var toilet_common "Dummy for Common Toilet"
 	la var electricity "Dummy for Working Electricity"
 	la var drinking_water "Dummy for Drinking Water"
-	la var teachers "Number of Teachers"
+	la var teachers "Number of Teachers (Per School)"
 	la var playground "Dummy for Playground"
 	la var schtot "Number of Schools" 
 	la var vernacular "Dummy for Instruction in Vernacular"
@@ -110,8 +109,16 @@ program summary_stats
 	esttab PreCTrim PreTTrim using ../output/summary_stats1.tex, ///
             replace cells(mean(fmt(%5.2f)) sd(fmt(%5.2f))) nonumbers label
 	
-	drop if statename == "PUDUCHERRY" | statename == "UTTARAKHAND"  |statename == "CHHATTISGARH" | ///
-	statename == "HIMACHAL PRADESH" | statename == "MIZORAM" | statename == "TAMIL NADU"
+	preserve 
+	    use ../../../shared_data/pincode_enrollment_dise, clear 
+		drop if statename == "PUDUCHERRY" | statename == "UTTARAKHAND" | statename == "CHHATTISGARH" | ///
+	        statename == "HIMACHAL PRADESH" | statename == "MIZORAM" | statename == "TAMIL NADU"
+		keep pincode
+		duplicates drop pincode, force
+		save ../temp/pincodes1, replace
+	restore
+	
+	merge m:1 pincode using ../temp/pincodes1, assert(1 2 3) keep(3) gen(merge_inter)
 	
 	eststo PostCTrim: estpost sum govt_ind rural_ind enrollment toilet_girls toilet_common ///
 	    electricity drinking_water teachers playground approachbyroad vernacular schtot if group == "Control"
