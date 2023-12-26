@@ -87,6 +87,7 @@ program verify_pincodes
 		tostring pincode, replace
 		save ../../../shared_data/all_pincodes, replace
 end 
+
 program merge_pincode_panels
     use ../output/clean_dta/pincode_enrollment_pre2017, clear
 	append using ../output/clean_dta/pincode_enrollment_post2017
@@ -96,11 +97,12 @@ program merge_pincode_panels
 	replace ac_year = substr(ac_year, 1, 4)
 	destring ac_year, replace
 	
-	bysort pincode: egen N = nvals(ac_year)
+	bysort pincode: egen N = nvals(ac_year) 
 	drop if N != 13
 	
 	destring rural_ind, replace
-	ds pincode statename ac_year govt_ind rural_ind reliable_index, not
+	gen rural_schools = rural_ind*schtot
+	ds pincode statename ac_year rural_ind reliable_index, not
 	collapse (sum) `r(varlist)' (firstnm) reliable_index statename, by(pincode ac_year)
 	
 	egen enrollment = rowtotal(c1_totg c2_totg c3_totg c4_totg c5_totg c6_totg c7_totg c8_totg ///
@@ -118,21 +120,21 @@ end
 program incorporate_enrollment_centers
     import delimited ../../../raw/Aadhaar_Centers/UIDAI.csv, varnames(1) clear
 	
-	sort pincode
-	bysort pincode: gen num_centers = _N
+	gen enrollment_center = 0
+	replace enrollment_center = 1 if strpos(enrolment_type, "Enrolment")
+	drop if enrollment_center == 0 
+	
+	bysort state: gen num_centers = _N
+	bysort state: egen num_pincodes = nvals(pincode)
 	
 	duplicates drop pincode, force
-	keep pincode num_centers 
+	keep pincode num_centers state
 	tostring pincode, replace
 	
-	merge 1:m pincode using ../../../shared_data/pincode_enrollment_dise, assert(1 2 3) keep(2 3)
-	drop _merge 
+	merge 1:m pincode using ../../../shared_data/pincode_enrollment_dise, assert(1 2 3) keep(2 3) gen(merge_centers)
 	replace num_centers = 0 if mi(num_centers)
 	save ../../../shared_data/pincode_enrollment_dise, replace
 end 
-
-
-
 
 program population_scaling 
 // 	use ../output/clean_dta/enrollment_dise, clear

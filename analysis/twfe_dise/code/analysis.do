@@ -117,6 +117,8 @@ program cohort_twfe
 	use ../../../shared_data/enrollment_dise, clear
 	drop if statename == "CHHATTISGARH" | statename == "HIMACHAL PRADESH" | statename == "MIZORAM" | ///
 	    statename == "TAMIL NADU" | statename == "PUDUCHERRY" | statename == "UTTARAKHAND" 
+	collapse (sum) enrollment enrollment_rate schtot govt_ind ///
+	    (firstnm) primaryage_* reliable, by(statename distname ac_year)
 
 	//2015 cohort
 	preserve 		
@@ -366,9 +368,6 @@ program stacking
 	sum natlSCshare, de
 	
     use ../output/cohortdata, clear
-	collapse (sum) enrollment_rateg enrollment_rateb enrollment_rate enrollment_rateSC ///
-	    enrollment_rateST schtot govt_ind (firstnm) primaryage* reliable_index, ///
-		by(statename distname ac_year dataset)
 	bysort statename distname (reliable_index): replace reliable_index = reliable_index[1]
 	drop if ac_year < 2011
 	
@@ -435,8 +434,14 @@ program stacking
 	}
 	
 	drop L_5 L_6 F_5 F_6
-    gen district_x_data = d*dataset
-	gen year_x_data = t*dataset
+	
+	gen interact = 0 
+	replace interact = 1 if ac_year >= 2017 & first_treat == 2017 
+	replace interact = 1 if ac_year >= 2016 & first_treat == 2016
+	replace interact = 1 if ac_year >= 2015 & first_treat == 2015
+		
+	reghdfe enrollment_rate interact [aw=schtot], ///
+		    absorb(d#dataset t#dataset) vce(cluster i)
 	
 	preserve 
 	    use ../../../shared_data/enrollment_dise, clear
@@ -445,12 +450,6 @@ program stacking
 		    statename == "TAMIL NADU" | statename == "PUDUCHERRY" | statename == "UTTARAKHAND" 
 		centile reliable_index, centile(50)
 	restore 
-		
-	gen reliable_scale = ""
-	replace reliable_scale = "Least Reliable" if reliable_index < `r(c_1)' 
-	replace reliable_scale = "Most Reliable"  if reliable_index >= `r(c_1)'
-	
-	export delimited using ../output/cohortdata.csv, replace 
 	
 	reg enrollment_rate L_* F_* i.district_x_data i.year_x_data [weight=schtot], cluster(i) 
 	coefplot, omitted keep(L* F*) vertical ///
@@ -475,7 +474,6 @@ program stacking
         xtitle("Years From Treatment") ///
 		ytitle("Change in Enrollment Rate")
     graph export "../output/final figures/twfe_stack_boys.png", height(450) width(600) replace 
-	
 
 
 // 	centile reliable_index if ac_year == 2011, centile(50)
